@@ -1,8 +1,4 @@
-const knex = require('knex')({
-  client: 'pg',
-  connection: {
-    database: (process.env.PGDATABASE || 'carpooldb')
-  }
-})
+const knexfile = require('../../knexfile')
+const knex = require('knex')(knexfile.development)
 
 module.exports = knex

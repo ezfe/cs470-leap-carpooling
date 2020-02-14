@@ -4,7 +4,9 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "migrate:make": "knex migrate:make",
+    "migrate:latest": "knex migrate:latest"
   },
   "dependencies": {
     "dotenv": "^8.2.0",

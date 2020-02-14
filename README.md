@@ -16,4 +16,5 @@
    - Mac: `brew install yarn`
    - The rest: [https://classic.yarnpkg.com/en/docs/install](yarnpkg.com)
 3. Run `yarn` to install dependencies (do this and the rest from the project directory)
-4. Run `yarn start` to run the server
+4. Run `yarn migrate:latest` to configure your database tables
+5. Run `yarn start` to run the server
