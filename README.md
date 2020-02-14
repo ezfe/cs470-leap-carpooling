@@ -5,10 +5,13 @@
 ## Setup Instructions
 
 1. Clone the repository
-3. Install PostgreSQL
+2. Install PostgreSQL
    - Mac: `brew install postgresql`
    - The rest: [https://www.postgresql.org/download/](postgresql.org)
-4. After Postgres is installed, run `createdb` and name it `carpooldb`
+3. After Postgres is installed, run `createdb` and name it `carpooldb`
+4. Install `node` 13
+   - Mac: `brew install node`
+   - The rest: [https://nodejs.org/en/download/current/](nodejs.org)
 2. Install `yarn`
    - Mac: `brew install yarn`
    - The rest: [https://classic.yarnpkg.com/en/docs/install](yarnpkg.com)
