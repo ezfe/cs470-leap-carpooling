@@ -9,10 +9,11 @@ routes.use('/sample-endpoint', sampleCollection)
 
 // This would be the home page
 routes.get('/', async (req, res) => {
-  // const response = await db.query('SELECT NOW()')
   try {
     const response = await db.raw('SELECT NOW()')
-    res.send(JSON.stringify(response.rows[0]))
+    const row0 = response.rows[0]
+    const now = row0.now
+    res.render('index', { now: now })
   } catch (err) {
     console.error(err)
     res.send('An error occurred')

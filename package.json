@@ -2,6 +2,7 @@
   "name": "cs470-leap-carpooling",
   "version": "1.0.0",
   "main": "src/index.js",
+  "license": "UNLICENSED",
   "scripts": {
     "start": "node src/index.js",
     "lint": "eslint src",
@@ -12,7 +13,8 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "knex": "^0.20.9",
-    "pg": "^7.18.1"
+    "pg": "^7.18.1",
+    "pug": "^2.0.4"
   },
   "devDependencies": {
     "eslint": "^6.8.0",

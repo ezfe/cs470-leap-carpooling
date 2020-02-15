@@ -8,6 +8,7 @@ dotenv.config()
 /* Express Setup */
 const app = express()
 
+app.set('view engine', 'pug')
 app.use('/', routes)
 
 app.listen(8000, () => {
