@@ -1,7 +1,11 @@
-const routes = require('express').Router()
+const path = require('path')
+const express = require('express')
+const routes = express.Router()
 const db = require('../db')
 
 const sampleCollection = require('./sample_collection')
+
+routes.use('/static', express.static(path.join(__dirname, '../../static')))
 
 // All the routes in sample_collection will be
 // added inside of /sample-endpoint
