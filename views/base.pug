@@ -1,18 +1,18 @@
 doctype html
-html(lang='en')
+html(lang="en")
   head
-    meta(charset='utf-8')
+    meta(charset="utf-8")
     meta(
-      name='viewport',
-      content='width=device-width, initial-scale=1, shrink-to-fit=no'
+      name="viewport",
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
     )
     
     // Bootstrap CSS
     link(
-      rel='stylesheet'
-      href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css'
-      integrity='sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh'
-      crossorigin='anonymous'
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha256-L/W5Wfqfa0sdBNIKN9cG6QA5F2qx4qICmU2VgLruv9Y="
+      crossorigin="anonymous"
     )
 
     title
@@ -22,6 +22,39 @@ html(lang='en')
     block header_extension
   body
 
+    block navbar_settings
+      - var current_page = "base"
+    
+    block navbar_content
+      nav.navbar.navbar-expand-sm.navbar-dark.bg-dark.mb-4
+        .container
+          a.navbar-brand(href="/")
+            i.fas.fa-car.mr-2
+            | Leap Carpool
+          
+          button.navbar-toggler(
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarCollapsableContent"
+            aria-controls="navbarCollapsableContent"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          )
+            span.navbar-toggler-icon
+          
+          .collapse.navbar-collapse#navbarCollapsableContent
+            ul.navbar-nav.mr-auto
+              li.nav-item(
+                class=(current_page == 'index' ? 'active' : '')
+              )
+                a.nav-link(href="/")
+                  | Home
+              li.nav-item(
+                class=(current_page == 'sample-endpoint' ? 'active' : '')
+              )
+                a.nav-link(href="/sample-endpoint")
+                  | Sample Endpoint
+
     block body_content
       .container
         block content
@@ -30,19 +63,25 @@ html(lang='en')
     <!-- Bootstrap v4.4.1 JS -->
     <!-- Also includes jQuery and Popper.js -->
     script(
-      src='https://code.jquery.com/jquery-3.4.1.slim.min.js'
-      integrity='sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n'
-      crossorigin='anonymous'
+      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous"
     )
     script(
-      src='https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js'
-      integrity='sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo'
-      crossorigin='anonymous'
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"
+      integrity="sha256-/ijcOLwFf26xEYAjW75FizKVo5tnTYiQddPZoLUHHZ8="
+      crossorigin="anonymous"
     )
     script(
-      src='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js'
-      integrity='sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6'
-      crossorigin='anonymous'
+      src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js"
+      integrity="sha256-WqU1JavFxSAMcLP2WIOI+GB2zWmShMI82mTpLDcqFUg="
+      crossorigin="anonymous"
     )
 
+    script(
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js"
+      integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0="
+      crossorigin="anonymous"
+    )
+  
     block scripts_extension

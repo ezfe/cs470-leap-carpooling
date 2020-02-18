@@ -17,7 +17,7 @@ routes.get('/', async (req, res) => {
     const response = await db.raw('SELECT NOW()')
     const row0 = response.rows[0]
     const now = row0.now
-    res.render('index', { now: now })
+    res.render('index', { now })
   } catch (err) {
     console.error(err)
     res.send('An error occurred')

@@ -3,14 +3,18 @@ const routes = require('express').Router()
 const db = require('../db')
 
 // Home-page of this route collection
-routes.get('/list', async (req, res) => {
+routes.get('/', async (req, res) => {
   const samples = await db('sample_table')
-  res.send(samples)
+  res.render('sample-endpoint', { samples })
 })
 
 routes.get('/add', async (req, res) => {
-  await db('sample_table').insert({ string_field: 'sample text', created_at: db.fn.now() })
-  res.send('done')
+  await db('sample_table').insert({
+    string_field: 'sample text',
+    created_at: db.fn.now()
+  })
+
+  res.redirect('/sample-endpoint')
 })
 
 // This file then exports the express router, with
