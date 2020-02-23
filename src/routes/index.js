@@ -19,8 +19,7 @@ routes.get('/', async (req, res) => {
     const now = row0.now
     res.render('index', { now })
   } catch (err) {
-    console.error(err)
-    res.send('An error occurred')
+    res.render('database-error')
   }
 })
 
