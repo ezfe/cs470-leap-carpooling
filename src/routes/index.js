@@ -11,7 +11,6 @@ routes.use('/static', express.static(path.join(__dirname, '../../static')))
 // added inside of /sample-endpoint
 routes.use('/sample-endpoint', sampleCollection)
 
-// This would be the home page
 routes.get('/', async (req, res) => {
   try {
     const response = await db.raw('SELECT NOW()')
