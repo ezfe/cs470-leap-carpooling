@@ -17,7 +17,7 @@ routes.get('/', async (req, res) => {
     const response = await db.raw('SELECT NOW()')
     const row0 = response.rows[0]
     const now = row0.now
-    res.render('index', { now })
+    res.render('index', { now: now })
   } catch (err) {
     res.render('database-error')
   }

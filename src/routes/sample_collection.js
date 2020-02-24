@@ -8,6 +8,7 @@ routes.get('/', async (req, res) => {
     const samples = await db('sample_table')
     res.render('sample-endpoint', { samples })
   } catch (err) {
+    console.error(err)
     res.render('database-error')
   }
 })
@@ -23,6 +24,10 @@ routes.get('/add', async (req, res) => {
   } catch (err) {
     res.render('database-error')
   }
+})
+
+routes.get('/other-endpoint', (req, res) => {
+  res.send('Plain text')
 })
 
 // This file then exports the express router, with
