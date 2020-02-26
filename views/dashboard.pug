@@ -3,9 +3,38 @@ extends base.pug
 block navbar_settings
   - var current_page = "dashboard"
 
+block header_extension
+  link(rel="stylesheet", href="/static/dashboard.css")
+
 block content
+  .row.mb-3
+    .col
+      .card
+        h5.card-header.trip-success
+          i.fas.fa-check-circle.mr-2
+          | Confirmed Trip
+        .card-body
+          h5.card-title Trip with Nicole
+          p.card-text This is text
+          button.btn.btn-outline-secondary Trip Details
+  .row.mb-3
+    .col
+      .card
+        h5.card-header.trip-pending
+          i.fas.fa-exclamation-triangle.mr-2
+          | Pending Response Trip
+        .card-body
+          h5.card-title Trip with Nicole
+          p.card-text This is text
+          button.btn.btn-outline-secondary Trip Details
   .row
     .col
-      h2 This is our first box
-
+      .card
+        h5.card-header.trip-processing
+          i.fas.fa-sync-alt.mr-2
+          | Trip Processing
+        .card-body
+          h5.card-title Trip with Nicole
+          p.card-text This is text
+          button.btn.btn-outline-secondary Trip Details
     

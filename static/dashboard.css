@@ -1,0 +1,18 @@
+
+.trip-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.trip-pending {
+  color: #856404;
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+}
+
+.trip-processing {
+  color: #383d41;
+  background-color: #e2e3e5;
+  border-color: #d6d8db;
+}
