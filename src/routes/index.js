@@ -10,6 +10,9 @@ routes.use('/static', express.static(path.join(__dirname, '../../static')))
 // All the routes in sample_collection will be
 // added inside of /sample-endpoint
 routes.use('/sample-endpoint', sampleCollection)
+routes.get('/dashboard', (req,res) => {
+  res.render('dashboard')
+})
 
 // This would be the home page
 routes.get('/', async (req, res) => {
