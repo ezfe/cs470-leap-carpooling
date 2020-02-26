@@ -51,6 +51,11 @@ html(lang="en")
                 a.nav-link(href="/")
                   | Home
               li.nav-item(
+                class=(current_page == 'dashboard' ? 'active' : '')
+              )
+                a.nav-link(href="/dashboard")
+                  | Dashboard
+              li.nav-item(
                 class=(current_page == 'sample-endpoint' ? 'active' : '')
               )
                 a.nav-link(href="/sample-endpoint")
