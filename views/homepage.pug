@@ -1,0 +1,27 @@
+extends base.pug
+
+block navbar_settings
+  - var current_page = "homepage"
+
+block content
+  .row
+    .col
+      .jumbotron.bg-car
+        #left-item
+          h1.display-4 LEAP Lifts
+          p.lead Find a carpool to or from campus!
+  .row
+    .col.col-sm-6
+      .jumbotron.text-center.text-white.driver-signup-jumbo
+        h1
+          img.mr-3(src="/static/steering-wheel.svg",style="height:30px;")
+          | Drivers
+        p.mb-0 Sign up to give other students rides
+    .col.col-sm-6
+      .jumbotron.text-center.text-white.driver-signup-jumbo
+        h1
+          i.fas.fa-user-friends.mr-3
+          | Riders
+        p.mb-0 Sign up to get a ride from other students
+        
+    

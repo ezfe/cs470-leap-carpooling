@@ -15,14 +15,15 @@ routes.use('/dashboard', dashboard)
 
 // This would be the home page
 routes.get('/', async (req, res) => {
-  try {
-    const response = await db.raw('SELECT NOW()')
-    const row0 = response.rows[0]
-    const now = row0.now
-    res.render('index', { now })
-  } catch (err) {
-    res.render('database-error')
-  }
+  res.render('homepage')
+  // try {
+  //   const response = await db.raw('SELECT NOW()')
+  //   const row0 = response.rows[0]
+  //   const now = row0.now
+  //   res.render('index', { now })
+  // } catch (err) {
+  //   res.render('database-error')
+  // }
 })
 
 module.exports = routes

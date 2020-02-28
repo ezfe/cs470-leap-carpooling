@@ -15,6 +15,11 @@ html(lang="en")
       crossorigin="anonymous"
     )
 
+    link(
+      rel="stylesheet"
+      href="/static/sitewide-styles.css"
+    )
+
     title
       block title
       | LEAP Carpooling
@@ -26,7 +31,7 @@ html(lang="en")
       - var current_page = "base"
     
     block navbar_content
-      nav.navbar.navbar-expand-sm.navbar-dark.mb-4(style="background-color:#388717;")
+      nav.navbar.navbar-expand-sm.navbar-dark.mb-4
         .container
           a.navbar-brand(href="/")
             i.fas.fa-frog.mr-2
