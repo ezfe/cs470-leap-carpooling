@@ -5,23 +5,30 @@ block navbar_settings
 
 block content
   .row
-    .col
-      .jumbotron.bg-car
+    .col.mb-4
+      #main-jumbo.text-white.box-shadow
         .container
           .row
             .col.col-md-6
               h1.display-4 LEAP Lifts
               p.lead Find a carpool to or from campus!
   .row
-    .col.col-sm-6
-      a(href="#").jumbotron.text-center.text-white.driver-signup-jumbo
+    .col-12.col-lg-6.signup-column
+      a(href="#").text-center.text-white.signup-box.box-shadow-hover
         h1
           img.mr-3(src="/static/steering-wheel.svg",style="height:30px;")
           | Drivers
-        p.mb-0 Sign up to give other students rides
-    .col.col-sm-6
-      .jumbotron.text-center.text-white.driver-signup-jumbo
+        p Sign up to give other students rides
+        button.btn.btn-outline-light
+          | Give A Ride
+          i.fas.fa-angle-double-right.ml-2
+
+    .col-12.col-lg-6.signup-column
+      a(href="#").text-center.text-white.signup-box.box-shadow-hover
         h1
           i.fas.fa-user-friends.mr-3
           | Riders
-        p.mb-0 Sign up to get a ride from other students
+        p Sign up to get rides with other students
+        button.btn.btn-outline-light
+          | Get A Ride
+          i.fas.fa-angle-double-right.ml-2

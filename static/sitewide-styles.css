@@ -3,34 +3,43 @@
   --color2: rgba(105, 181, 120, 1);
   --color3: rgba(58, 125, 68, 1);
   --color4: rgba(37, 77, 50, 1);
-  --color5: rgba(19, 39, 78, 1);
+  --dark-blue: rgba(19, 39, 78, 1);
 }
 
 .navbar {
-  background-color: var(--color5);
+  background-color: var(--dark-blue);
 }
 
-.bg-car {
+#main-jumbo {
   height: 50vh;
   color: white;
+  
+  padding: 2rem;
+  border-radius: .3rem;
+
   background-image: url('/static/car-darkened-left.jpg');
   background-size: cover;
   background-position-x: left;
   background-position-y: bottom;
 }
 
-.jumbotron {
-  box-shadow: 0px 10px 30px gray;
+.box-shadow, .box-shadow-hover {
+  /* box-shadow: 0px 10px 30px gray; */
+  box-shadow: 0 10px 14px rgba(50, 50, 93,.5);
+  transition: box-shadow .25s ease;
 }
 
-.driver-signup-jumbo {
+.box-shadow-hover:hover {
+  box-shadow: 0 10px 20px rgba(50,50,93,.7);
+}
+
+.signup-box {
   display: block;
-  background-color: var(--color5);
-  box-shadow: 0 3px 14px rgba(50,50,93,.3);
-  transition: all .25s ease;
+  padding: 2rem 1rem;
+  border-radius: .3rem;
+  background-color: var(--dark-blue);
 }
 
-.driver-signup-jumbo:hover {
+.signup-box:hover {
   text-decoration: none;
-  box-shadow: 0 7px 20px rgba(50,50,93,.7);
 }
