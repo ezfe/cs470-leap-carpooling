@@ -7,6 +7,11 @@ block header_extension
   link(rel="stylesheet", href="/static/dashboard.css")
 
 block content
+  .row.mb-3
+    .col.text-center
+      a.btn.btn-info.btn-lg(href="/trips/new", style="width: 200px;")
+        i.fas.fa-plus.mr-2
+        | New Trip
   each trip in trips
     .row.mb-3
       .col

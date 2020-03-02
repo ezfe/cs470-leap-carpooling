@@ -1,0 +1,66 @@
+extends base.pug
+
+block navbar_settings
+  - var current_page = "new_trip"
+
+//- block header_extension
+//-   link(rel="stylesheet", href="/static/dashboard.css")
+
+block content
+  form
+    .form-group.row
+      label.col-sm-2.col-form-label I want to...
+      .col-sm-10
+        .btn-group(role="group")
+          button.btn.btn-light(type="button") Drive
+          button.btn.btn-light(type="button") Ride
+    .form-group.row
+      .col-4
+        span.small From
+        input.form-control.disabled(type="text", value="Lafayette College")
+      .col-2
+        i.fas.fa-arrows-alt-h
+      .col-4
+        span.small To
+        input.form-control(type="text")
+    .row
+      .col
+        span.small
+          | Click the
+          i.fas.fa-arrows-alt-h.mx-2
+          | to reverse the trip direction
+
+    hr
+
+    .form-group.row
+      .col
+        input.form-control(type="text", value="3/10/2020")
+      .col
+        .btn-group(role="group")
+          button.btn.btn-light(type="button") AM
+          button.btn.btn-light(type="button") PM
+    .form-group.row
+      .col
+        button.btn.btn-outline-secondary(role="button") Add Date
+
+    .form-group.row
+      label.col-sm-4.col-form-label
+        | How far can you travel to get picked up?
+      .col-sm-8
+        .input-group
+          input.form-control(type="text")
+          .input-group-append
+            span.input-group-text minutes
+
+    .form-group.row.mt-5
+      .col.text-right
+        a(href="/trips").btn.btn-danger
+          i.fas.fa-times-circle.mr-2
+          | Discard
+      .col
+        button(type="submit").btn.btn-primary
+          i.fas.fa-check-circle.mr-2
+          | Submit
+
+    
+  

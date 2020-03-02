@@ -1,5 +1,9 @@
 const routes = require('express').Router()
 
+const tripCreation = require('./trip_creation')
+
+routes.use('/new', tripCreation)
+
 routes.get('/', (req, res) => {
   const trips = [
     {
