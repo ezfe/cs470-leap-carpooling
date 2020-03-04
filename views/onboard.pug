@@ -1,0 +1,37 @@
+extends base.pug
+
+block navbar_settings
+  - var current_page = "new_trip"
+
+//- block header_extension
+//-   link(rel="stylesheet", href="/static/dashboard.css")
+
+block content
+  form
+    .row.mb-2
+      .col.text-center
+        h4 Upload a Photo
+    .row.mb-5
+      .col.d-flex.justify-content-center
+        div(style="background-color:red;height:150px;width: 150px;")
+    .row.mb-2
+      .col.offset-lg-4
+        h4 Enter your preferred first name
+    .row.mb-5
+      .col.col-lg-4.offset-lg-4
+        input.form-control(value="Ezekiel")
+    .row.mb-2
+      .col.offset-lg-4
+        h4 Enter your preferred email
+    .row.mb-5
+      .col.col-lg-4.offset-lg-4
+        input.form-control(value="eline@lafayette.edu")
+    .row.mb-2
+      .col.offset-lg-4
+        h4 Enter your phone number
+    .row.mb-5
+      .col.col-lg-4.offset-lg-4
+        input.form-control(value="+1 (123) 456-7890")
+    .row
+      .col.text-center
+        button.btn.btn-secondary(type="submit") Submit
