@@ -12,6 +12,15 @@ routes.get('/login', async (req, res) => {
   }
 })
 
+routes.post('/login', async (req, res) => {
+  try {
+    const user = await db('users').where({ id: req.body.chosen_user }).first()
+    res.send(`Hello ${user.first_name} ${user.last_name}`)
+  } catch (err) {
+    res.render('database-error')
+  }
+})
+
 // POST /sessions/create-user
 routes.post('/create-user', async (req, res) => {
   try {
@@ -21,6 +30,7 @@ routes.post('/create-user', async (req, res) => {
       last_name: req.body.last_name,
       created_at: db.fn.now()
     })
+    res.redirect('/')
   } catch (err) {
     res.render('database-error')
   }
