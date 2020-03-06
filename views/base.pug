@@ -65,6 +65,11 @@ html(lang="en")
               )
                 a.nav-link(href="/sample-endpoint")
                   | Sample Endpoint
+              li.nav-item(
+                class=(current_page == 'session_choose_user' ? 'active' : '')
+              )
+                a.nav-link(href="/sessions/login")
+                  | Login
 
     block body_content
       .container

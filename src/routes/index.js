@@ -4,6 +4,7 @@ const routes = express.Router()
 // const db = require('../db')
 
 const dashboard = require('./dashboard')
+const sessions = require('./sessions')
 const sampleCollection = require('./sample_collection')
 
 routes.use('/static', express.static(path.join(__dirname, '../../static')))
@@ -12,9 +13,16 @@ routes.use('/static', express.static(path.join(__dirname, '../../static')))
 // added inside of /sample-endpoint
 routes.use('/sample-endpoint', sampleCollection)
 routes.use('/trips', dashboard)
+
 routes.get('/onboard', (req, res) => {
   res.render('onboard')
 })
+
+routes.post('/onboard', (req, res) => {
+  res.send('Unfinished')
+})
+
+routes.use('/sessions', sessions)
 
 // This would be the home page
 routes.get('/', async (req, res) => {
