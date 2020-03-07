@@ -10,12 +10,17 @@ dotenv.config()
 /* Express Setup */
 const app = express()
 
+if (!process.env.SESSION_SECRET) {
+  console.log('Set SESSION_SECRET=(SOME RANDOM SECRET VALUE) in .env!')
+  process.exit(1)
+}
 app.use(session({
-  secret: 'keyboard cat',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: { maxAge: 60000 }
 }))
+
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.set('view engine', 'pug')
