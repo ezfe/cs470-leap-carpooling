@@ -1,10 +1,18 @@
 const db = require('../db')
 
-function getUserByID(id) {
+async function getLoggedInUser(req) {
+  return getUserByID(req.session.userID)
+}
+
+function setLoggedInAs(req, user) {
+  req.session.userID = user.id
+}
+
+async function getUserByID(id) {
   return getUserByField('id', id)
 }
 
-function getUserByNetID(netid) {
+async function getUserByNetID(netid) {
   return getUserByField('netid', netid)
 }
 
@@ -16,4 +24,9 @@ async function getUserByField(field, value) {
   return user || null
 }
 
-module.exports = { getUserByID, getUserByNetID }
+module.exports = {
+  getLoggedInUser,
+  setLoggedInAs,
+  getUserByID,
+  getUserByNetID
+}

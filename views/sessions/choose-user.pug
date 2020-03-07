@@ -4,6 +4,12 @@ block navbar_settings
   - var current_page = "session_choose_user"
 
 block content
+  if currentUser
+    .row
+      .col
+        = 'Currently: '
+        = currentUser.first_name + ' ' + currentUser.last_name
+    hr
   form(method="POST")
     each user in users
       .row
