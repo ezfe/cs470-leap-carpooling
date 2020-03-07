@@ -1,6 +1,7 @@
 // Get an express router
 const routes = require('express').Router()
 const db = require('../db')
+const { getUserByID } = require('../models/users')
 
 // Home-page of this route collection
 routes.get('/login', async (req, res) => {
@@ -12,12 +13,12 @@ routes.get('/login', async (req, res) => {
   }
 })
 
-routes.post('/login', async (req, res) => {
-  try {
-    const user = await db('users').where({ id: req.body.chosen_user }).first()
+routes.post('/login', (req, res) => {
+  const user = getUserByID(req.body.chosen_user)
+  if (user) {
     res.send(`Hello ${user.first_name} ${user.last_name}`)
-  } catch (err) {
-    res.render('database-error')
+  } else {
+    res.send('User not found')
   }
 })
 
