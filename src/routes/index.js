@@ -5,13 +5,9 @@ const routes = express.Router()
 
 const dashboard = require('./dashboard')
 const sessions = require('./sessions')
-const sampleCollection = require('./sample_collection')
 
 routes.use('/static', express.static(path.join(__dirname, '../../static')))
 
-// All the routes in sample_collection will be
-// added inside of /sample-endpoint
-routes.use('/sample-endpoint', sampleCollection)
 routes.use('/trips', dashboard)
 
 routes.get('/onboard', (req, res) => {

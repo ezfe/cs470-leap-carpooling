@@ -50,26 +50,32 @@ html(lang="en")
           
           .collapse.navbar-collapse#navbarCollapsableContent
             ul.navbar-nav.mr-auto
-              li.nav-item(
-                class=(current_page == 'index' ? 'active' : '')
-              )
-                a.nav-link(href="/")
-                  | Home
-              li.nav-item(
-                class=(current_page == 'dashboard' ? 'active' : '')
-              )
-                a.nav-link(href="/trips")
-                  | Dashboard
-              li.nav-item(
-                class=(current_page == 'sample-endpoint' ? 'active' : '')
-              )
-                a.nav-link(href="/sample-endpoint")
-                  | Sample Endpoint
-              li.nav-item(
-                class=(current_page == 'session_choose_user' ? 'active' : '')
-              )
-                a.nav-link(href="/sessions/login")
-                  | Login
+              -
+                const navElements = [
+                  {
+                    title: 'Home',
+                    name: 'index',
+                    'url': '/'
+                  },
+                  {
+                    title: 'Dashboard',
+                    name: 'dashboard',
+                    'url': '/trips'
+                  },
+                  {
+                    title: 'Onboard',
+                    name: 'onboard',
+                    'url': '/onboard'
+                  },
+                  {
+                    title: 'Login',
+                    name: 'session_choose_user',
+                    'url': '/sessions/login'
+                  },
+                ]
+              each nav in navElements
+                li.nav-item(class=(current_page == nav.name ? 'active' : ''))
+                  a.nav-link(href=nav.url)= nav.title
 
     block body_content
       .container
