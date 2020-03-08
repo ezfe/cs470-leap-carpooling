@@ -1,7 +1,7 @@
 const path = require('path')
 const express = require('express')
 const routes = express.Router()
-// const db = require('../db')
+const db = require('../db')
 
 const dashboard = require('./dashboard')
 const sessions = require('./sessions')
@@ -14,13 +14,37 @@ routes.use('/static', express.static(path.join(__dirname, '../../static')))
 routes.use('/sample-endpoint', sampleCollection)
 routes.use('/trips', dashboard)
 
+routes.post('/onboard', async(req, res) => {
+  try {
+    const users = await db('users')
+    const currentUser = await getLoggedInUser(req)
+   // const records = await db('users')
+    // .returning('*')
+    // .where ('id','=',currentUser)
+    // .update({
+    //  preferred_name : req.body.preferred_name,
+    //  email : req.body.preferred_email,
+    //  phone_number : req.body._phone
+   //})
+  //  setLoggedInAs(req, records[0])
+  //  res.redirect('/')
+  res.render('onboard')
+  }catch (err) {
+    res.render('database-error')
+    }
+  res.send('Unfinished')
+ })
+
 routes.get('/onboard', (req, res) => {
   res.render('onboard')
-})
+//   // const prefName = preferred_name
+//   // const preEmail = preferred_email
+//   // const phone =  _phone
 
-routes.post('/onboard', (req, res) => {
+
   res.send('Unfinished')
 })
+
 
 routes.use('/sessions', sessions)
 
