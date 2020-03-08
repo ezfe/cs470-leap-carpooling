@@ -3,7 +3,7 @@ const dotenv = require('dotenv')
 const routes = require('./routes')
 const bodyParser = require('body-parser')
 const session = require('express-session')
-
+const { authenticateUser } = require('./middleware/auth')
 /* Load environment variables from .env file */
 dotenv.config()
 
@@ -23,6 +23,9 @@ app.use(session({
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+
+app.use(authenticateUser)
+
 app.set('view engine', 'pug')
 app.use('/', routes)
 

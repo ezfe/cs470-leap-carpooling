@@ -1,13 +1,13 @@
 // Get an express router
 const routes = require('express').Router()
 const db = require('../db')
-const { setLoggedInAs, getLoggedInUser, getUserByID } = require('../models/users')
+const { setLoggedInAs, getUserByID } = require('../models/users')
 
 // Home-page of this route collection
 routes.get('/login', async (req, res) => {
   try {
     const users = await db('users')
-    const currentUser = await getLoggedInUser(req)
+    const currentUser = req.user
     res.render('sessions/choose-user', { users, currentUser })
   } catch (err) {
     res.render('database-error')
