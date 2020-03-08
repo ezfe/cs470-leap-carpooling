@@ -1,13 +1,13 @@
 extends base.pug
 
 block navbar_settings
-  - var current_page = "new_trip"
+  - var current_page = "onboard"
 
 //- block header_extension
 //-   link(rel="stylesheet", href="/static/dashboard.css")
 
 block content
-  form(method="POST", action='/onboard')
+  form(method="POST")
     .row.mb-2
       .col.text-center
         h4 Upload a Photo

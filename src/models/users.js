@@ -1,9 +1,5 @@
 const db = require('../db')
 
-async function getLoggedInUser(req) {
-  return getUserByID(req.session.userID)
-}
-
 function setLoggedInAs(req, user) {
   req.session.userID = user.id
 }
@@ -25,7 +21,6 @@ async function getUserByField(field, value) {
 }
 
 module.exports = {
-  getLoggedInUser,
   setLoggedInAs,
   getUserByID,
   getUserByNetID
