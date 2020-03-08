@@ -2,6 +2,7 @@ const path = require('path')
 const express = require('express')
 const routes = express.Router()
 const db = require('../db')
+const { getLoggedInUser } = require('../models/users')
 
 const dashboard = require('./dashboard')
 const sessions = require('./sessions')
@@ -16,24 +17,29 @@ routes.use('/trips', dashboard)
 
 routes.post('/onboard', async(req, res) => {
   try {
-    const users = await db('users')
     const currentUser = await getLoggedInUser(req)
-   // const records = await db('users')
-    // .returning('*')
-    // .where ('id','=',currentUser)
-    // .update({
-    //  preferred_name : req.body.preferred_name,
-    //  email : req.body.preferred_email,
-    //  phone_number : req.body._phone
-   //})
-  //  setLoggedInAs(req, records[0])
-  //  res.redirect('/')
-  res.render('onboard')
-  }catch (err) {
-    res.render('database-error')
+    if (currentUser) {
+      // Do something
+    } else {
+      // Not logged in
     }
-  res.send('Unfinished')
- })
+
+    // const records = await db('users')
+    //   .returning('*')
+    //   .where('id', '=', currentUser)
+    //   .update({
+    //     preferred_name: req.body.preferred_name,
+    //     email: req.body.preferred_email,
+    //     phone_number: req.body._phone
+    //   })
+    // res.redirect('/')
+
+    res.send('Unfinished')
+    // res.render('onboard')
+  } catch (err) {
+    res.render('database-error')
+  }
+})
 
 routes.get('/onboard', (req, res) => {
   res.render('onboard')
