@@ -30,7 +30,6 @@ routes.post('/onboard', requireAuthenticated, async(req, res) => {
 
 routes.get('/onboard', (req, res) => {
   res.render('onboard')
-  res.send('Unfinished')
 })
 
 routes.use('/sessions', sessions)
