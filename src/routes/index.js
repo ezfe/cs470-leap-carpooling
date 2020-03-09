@@ -17,13 +17,12 @@ routes.post('/onboard', requireAuthenticated, async(req, res) => {
     // currentUser should be guarunteed when requireAuthenticated is run
     const currentUser = req.user.id
     console.error(currentUser)
-    const records = await db('users')
-      .where('id', '=', currentUser)
+    await db('users').where('id', '=', currentUser)
       .update({
         preferred_name: req.body.preferred_name,
         email: req.body.preferred_email,
         phone_number: req.body._phone
-       })
+      })
 
       res.redirect('/')
   } catch (err) {
