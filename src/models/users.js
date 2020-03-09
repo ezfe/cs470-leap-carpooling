@@ -4,6 +4,10 @@ function setLoggedInAs(req, user) {
   req.session.userID = user.id
 }
 
+function setLoggedOut(req) {
+  req.session.userID = null
+}
+
 async function getUserByID(id) {
   return getUserByField('id', id)
 }
@@ -22,6 +26,7 @@ async function getUserByField(field, value) {
 
 module.exports = {
   setLoggedInAs,
+  setLoggedOut,
   getUserByID,
   getUserByNetID
 }

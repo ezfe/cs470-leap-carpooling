@@ -1,7 +1,7 @@
 // Get an express router
 const routes = require('express').Router()
 const db = require('../db')
-const { setLoggedInAs, getUserByID } = require('../models/users')
+const { setLoggedOut, setLoggedInAs, getUserByID } = require('../models/users')
 
 // Home-page of this route collection
 routes.get('/login', async (req, res) => {
@@ -12,6 +12,11 @@ routes.get('/login', async (req, res) => {
   } catch (err) {
     res.render('database-error')
   }
+})
+
+routes.get('/logout', (req, res) => {
+  setLoggedOut(req, null)
+  res.redirect('/')
 })
 
 routes.post('/login', async (req, res) => {
