@@ -10,8 +10,10 @@
     "migrate:latest": "knex migrate:latest"
   },
   "dependencies": {
+    "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "express-session": "^1.17.0",
     "knex": "^0.20.9",
     "pg": "^7.18.1",
     "pug": "^2.0.4"

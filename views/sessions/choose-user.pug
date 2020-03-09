@@ -1,0 +1,43 @@
+extends ../base.pug
+
+block navbar_settings
+  - var current_page = "session_choose_user"
+
+block content
+  if currentUser
+    .row
+      .col
+        = 'Currently: '
+        = currentUser.first_name + ' ' + currentUser.last_name
+    hr
+  form(method="POST")
+    each user in users
+      .row
+        .col
+          .form-group
+            .form-check
+              input.form-check-input(type="radio", id=`user_${user.id}` name="chosen_user", value=user.id)
+              label.form-check-label(for=`user_${user.id}`)
+                = user.first_name
+                = ' '
+                = user.last_name
+    .row
+      .col
+        button.btn.btn-primary(type="submit") Login
+  hr
+  form(method="POST", action="/sessions/create-user")
+    .form-group.row
+      label.col-sm-2.col-form-label(for="netid") Lafayette Username
+      .col-sm-10
+        input.form-control#netid(type="text", name="netid")
+    .form-group.row
+      label.col-sm-2.col-form-label(for="first_name") First Name
+      .col-sm-10
+        input.form-control#first_name(type="text", name="first_name")
+    .form-group.row
+      label.col-sm-2.col-form-label(for="last_name") Last Name
+      .col-sm-10
+        input.form-control#last_name(type="text", name="last_name")
+    .row
+      .col
+        button.btn.btn-primary(type="submit") Create & Login
