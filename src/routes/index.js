@@ -14,17 +14,14 @@ routes.use('/trips', dashboard)
 
 routes.post('/onboard', requireAuthenticated, async(req, res) => {
   try {
-    // currentUser should be guarunteed when requireAuthenticated is run
-    const currentUser = req.user.id
-    console.error(currentUser)
-    await db('users').where('id', '=', currentUser)
+    await db('users').where({ id: req.user.id })
       .update({
         preferred_name: req.body.preferred_name,
         email: req.body.preferred_email,
         phone_number: req.body._phone
       })
 
-      res.redirect('/')
+    res.redirect('/')
   } catch (err) {
     console.error(err)
     res.render('database-error')
