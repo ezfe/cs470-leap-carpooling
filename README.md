@@ -18,3 +18,7 @@
 3. Run `yarn` to install dependencies (do this and the rest from the project directory)
 4. Run `yarn migrate:latest` to configure your database tables
 5. Run `yarn start` to run the server
+
+# Google Maps
+
+A project must be created at [console.cloud.google.com](https://console.cloud.google.com).
