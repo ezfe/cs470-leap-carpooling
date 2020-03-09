@@ -76,6 +76,21 @@ html(lang="en")
               each nav in navElements
                 li.nav-item(class=(current_page == nav.name ? 'active' : ''))
                   a.nav-link(href=nav.url)= nav.title
+            ul.navbar-nav
+              if user_logged_in
+                li.nav-item.dropdown
+                  a.nav-link.dropdown-toggle(
+                    href="#",
+                    role="button",
+                    data-toggle="dropdown",
+                    aria-haspopup="true",
+                    aria-expanded="false"
+                  )= user_preferred_name
+                  div.dropdown-menu(aria-labelledby="navbarDropdown")
+                    a.dropdown-item(href="#") Settings
+              else
+                li.nav-item
+                  a.nav-link(href="/sessions/login") Sign in or Register
 
     block body_content
       .container
