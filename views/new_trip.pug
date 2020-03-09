@@ -3,11 +3,11 @@ extends base.pug
 block navbar_settings
   - var current_page = "new_trip"
 
-//- block header_extension
-//-   link(rel="stylesheet", href="/static/dashboard.css")
+block header_extension
+  link(rel="stylesheet", href="/static/dashboard.css")
 
 block content
-  form
+  form#request_form(method="POST")
     .form-group.row
       label.col-sm-2.col-form-label I want to...
       .col-sm-10
@@ -17,12 +17,13 @@ block content
     .form-group.row
       .col-4
         span.small From
-        input.form-control.disabled(type="text", value="Lafayette College", id="source_location")
+        input.form-control(type="text", value="Lafayette College", disabled, id="source_location")
       .col-2
         i.fas.fa-arrows-alt-h
       .col-4
         span.small To
-        input.form-control(type="text", id="destination_location")
+        input.form-control#location_field(type="text")
+        input#place_id_field(type="hidden", name="place_id")
     .row
       .col
         span.small
@@ -63,4 +64,11 @@ block content
           | Submit
 
     
-  
+  script(
+    type="text/javascript",
+    src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`
+  )
+  script(
+    type="text/javascript",
+    src="/static/new_trip.js"
+  )

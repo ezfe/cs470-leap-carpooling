@@ -3,7 +3,16 @@ const db = require('../db')
 
 // /trips/new
 routes.get('/', (req, res) => {
-  res.render('new_trip')
+  const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
+  if (!googleMapsAPIKey) {
+    res.send('GOOGLE_MAPS_PLACES_KEY is unset')
+    return
+  }
+  res.render('new_trip', { googleMapsAPIKey })
+})
+
+routes.post('/', (req, res) => {
+  res.send(req.body)
 })
 
 // POST /sessions/create-user
