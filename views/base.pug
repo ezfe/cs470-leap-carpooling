@@ -66,12 +66,7 @@ html(lang="en")
                     title: 'Onboard',
                     name: 'onboard',
                     url: '/onboard'
-                  },
-                  {
-                    title: 'Login',
-                    name: 'session_choose_user',
-                    url: '/sessions/login'
-                  },
+                  }
                 ]
               each nav in navElements
                 li.nav-item(class=(current_page == nav.name ? 'active' : ''))
