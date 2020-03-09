@@ -21,4 +21,6 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
   } else {
     document.getElementById('place_id_field').value = placeID
   }
+
+  
 })
