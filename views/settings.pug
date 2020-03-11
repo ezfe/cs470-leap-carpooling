@@ -1,0 +1,57 @@
+extends base.pug
+
+block content
+  .card.mb-3
+    .card-header 
+      h4 Preferences
+    .card-body
+      .row
+        .col.col-8
+          form#request_form(method="POST", action="/settings/update-user")
+            .row.mb-2
+              .col
+                b Preferred first name
+            .row.mb-4
+              .col
+                input.form-control(name="preferred_name", value=currentUser.preferred_name)
+            .row.mb-2
+              .col
+                b Preferred email
+            .row.mb-4
+              .col
+                input.form-control(name = "preferred_email", value=currentUser.email)
+            .row.mb-2
+              .col
+                b Phone number
+            .row.mb-4
+              .col
+                input.form-control(name= "_phone", value=currentUser.phone_number)
+            .row.mb-2
+              .col
+                b Default location
+            .row.mb-4
+              .col
+                input.form-control(name= "default_location", type="text", value=currentUser.default_location)
+            .row.mb-2
+              .col
+                b Deviation limit
+            .row.mb-4
+              .col
+                input.form-control(name= "deviation_limit", value=currentUser.deviation_limit)
+            .row
+              .col
+                button.btn.btn-primary(type="submit") Update
+        .col.col-4
+          form(method="POST", action="/settings/upload-photo")
+            .row.mb-4
+              .col.text-center
+                img.rounded.img-fluid.mr-3(id="uploadedPhoto", src="/static/blank-profile.png",style="height:300px;width:300px")   
+            .row 
+              .col.text-center
+                  label.btn.btn-primary Upload Photo
+                    input.form-control(style="display: none;", type="file", name="profile_photo", accept="image/*", onchange="displayPhoto(event)")
+
+  script(
+    type="text/javascript",
+    src="/static/settings.js"
+  )
