@@ -38,6 +38,11 @@ async function distanceMatrix(driverPlace, riderPlace, toLafayette) {
 }
 
 async function timeBetween(originPlace, destinationPlace) {
+  const googleMapsKey = process.env.GOOGLE_MAPS_ROUTING_KEY
+  if (!googleMapsKey) {
+    console.error('GOOGLE_MAPS_ROUTING_KEY is not set')
+    return null;
+  }
   const redisKey = `time_placeid:${originPlace}_placeid:${destinationPlace}`
 
   const redisFoundValue = await client.get(redisKey)
@@ -48,7 +53,7 @@ async function timeBetween(originPlace, destinationPlace) {
   const c = new Client({})
   const response = await c.distancematrix({
     params: {
-      key: process.env.GOOGLE_MAPS_ROUTING_KEY,
+      key: googleMapsKey,
       origins: [
         `place_id:${originPlace}`
       ],
