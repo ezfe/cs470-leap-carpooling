@@ -31,7 +31,8 @@ block content
                 b Default location
             .row.mb-4
               .col
-                input.form-control(name= "default_location", type="text", value=currentUser.default_location)
+                input.form-control#location_field(type="text", value=currentUser.default_location)
+                input#place_id_field(type="hidden", name="place_id")
             .row.mb-2
               .col
                 b Deviation limit
@@ -50,6 +51,11 @@ block content
               .col.text-center
                   label.btn.btn-primary Upload Photo
                     input.form-control(style="display: none;", type="file", name="profile_photo", accept="image/*", onchange="displayPhoto(event)")
+
+  script(
+    type="text/javascript",
+    src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`
+  )
 
   script(
     type="text/javascript",

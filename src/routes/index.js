@@ -51,7 +51,7 @@ routes.post('/settings/update-user', async (req, res) => {
         preferred_name: req.body.preferred_name,
         email: req.body.preferred_email,
         phone_number: req.body._phone,
-        default_location: req.body.plac,
+        default_location: req.body.place_id,
         deviation_limit: req.body.deviation_limit
       })
 
