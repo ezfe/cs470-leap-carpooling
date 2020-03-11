@@ -1,5 +1,11 @@
 const Client = require('@googlemaps/google-maps-services-js').Client
 
+const asyncRedis = require('async-redis')
+const client = asyncRedis.createClient()
+client.on('error', function (err) {
+  console.error('Redis Error: ' + err)
+})
+
 // Shared place is Lafayette College, but this doesn't care
 async function distanceMatrix(driverPlace, riderPlace, toLafayette) {
   const lafayettePlace = 'ChIJAZll2E5sxIkRmWtHcAi0le4'
@@ -32,6 +38,13 @@ async function distanceMatrix(driverPlace, riderPlace, toLafayette) {
 }
 
 async function timeBetween(originPlace, destinationPlace) {
+  const redisKey = `time_placeid:${originPlace}_placeid:${destinationPlace}`
+
+  const redisFoundValue = await client.get(redisKey)
+  if (redisFoundValue) {
+    return parseInt(redisFoundValue)
+  }
+
   const c = new Client({})
   const response = await c.distancematrix({
     params: {
@@ -44,9 +57,11 @@ async function timeBetween(originPlace, destinationPlace) {
       ]
     }
   })
-  // console.log(JSON.stringify(response.data.rows))
-  // console.log(response.data.rows[0].elements[0].duration.value)
-  return response.data.rows[0].elements[0].duration.value
+  const time = parseInt(response.data.rows[0].elements[0].duration.value)
+  await client.set(redisKey, time)
+  await client.expire(redisKey, 604800) // 1 week
+
+  return time
 }
 
 module.exports = distanceMatrix
