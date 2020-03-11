@@ -41,7 +41,7 @@ async function timeBetween(originPlace, destinationPlace) {
   const googleMapsKey = process.env.GOOGLE_MAPS_ROUTING_KEY
   if (!googleMapsKey) {
     console.error('GOOGLE_MAPS_ROUTING_KEY is not set')
-    return null;
+    return null
   }
   const redisKey = `time_placeid:${originPlace}_placeid:${destinationPlace}`
 

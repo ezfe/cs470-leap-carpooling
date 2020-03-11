@@ -1,9 +1,9 @@
-const schedule = require('node-schedule')
-
-const sampleJob = require('./sample-job')
+// const schedule = require('node-schedule')
+// const sampleJob = require('./sample-job')
 
 function registerJobs() {
-  schedule.scheduleJob('*/5 * * * * *', sampleJob)
+  // every 5 seconds
+  // schedule.scheduleJob('*/5 * * * * *', sampleJob)
 }
 
 module.exports = registerJobs
