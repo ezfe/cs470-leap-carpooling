@@ -1,6 +1,7 @@
-const routes = require('express').Router()
+import { Router } from 'express'
+import tripCreation from './trip_creation'
 
-const tripCreation = require('./trip_creation')
+const routes = Router()
 
 routes.use('/new', tripCreation)
 
@@ -35,4 +36,4 @@ routes.get('/', (req, res) => {
   res.render('dashboard', { trips })
 })
 
-module.exports = routes
+export default routes
