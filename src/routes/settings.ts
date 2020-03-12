@@ -23,15 +23,15 @@ routes.post('/onboard', requireAuthenticated, async (req: AuthedReq, res: Respon
   }
 
   try {
-    const preferred_name = validate('preferred_name', 100)
-    const preferred_email = validate('preferred_email', 100)
-    const phone_number = validate('phone_number', 30)
+    const preferredName = validate('preferred_name', 100)
+    const preferredEmail = validate('preferred_email', 100)
+    const phoneNumber = validate('phone_number', 30)
 
     await db<User>('users').where({ id: req.user.id })
       .update({
-        preferred_name,
-        email: preferred_email,
-        phone_number
+        preferred_name: preferredName,
+        email: preferredEmail,
+        phone_number: phoneNumber
       })
 
     res.redirect('/')
