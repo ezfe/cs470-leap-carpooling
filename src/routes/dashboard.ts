@@ -1,11 +1,12 @@
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import tripCreation from './trip_creation'
+import { AuthedReq } from '../utils/authed_req'
 
 const routes = Router()
 
 routes.use('/new', tripCreation)
 
-routes.get('/', (req, res) => {
+routes.get('/', (req: AuthedReq, res: Response) => {
   const trips = [
     {
       trip_id: 1,

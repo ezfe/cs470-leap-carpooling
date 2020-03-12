@@ -1,5 +1,5 @@
 // Get an express router
-import { Router } from 'express'
+import { Router, Response } from 'express'
 import db from '../db'
 import { getUserByID, setLoggedInAs, setLoggedOut, User, getUserByNetID } from '../models/users'
 import { AuthedReq } from '../utils/authed_req'
@@ -7,7 +7,7 @@ import { AuthedReq } from '../utils/authed_req'
 const routes = Router()
 
 // Home-page of this route collection
-routes.get('/login', async (req: AuthedReq, res) => {
+routes.get('/login', async (req: AuthedReq, res: Response) => {
   try {
     const users = await db<User>('users')
     const currentUser = req.user
@@ -22,7 +22,7 @@ routes.get('/logout', (req, res) => {
   res.redirect('/')
 })
 
-routes.post('/login', async (req, res) => {
+routes.post('/login', async (req: AuthedReq, res: Response) => {
   const user = await getUserByID(req.body.chosen_user)
   if (user) {
     setLoggedInAs(req, user)
@@ -33,7 +33,7 @@ routes.post('/login', async (req, res) => {
 })
 
 // POST /sessions/create-user
-routes.post('/create-user', async (req, res) => {
+routes.post('/create-user', async (req: AuthedReq, res: Response) => {
   try {
     await db<User>('users').insert({
         netid: req.body.netid,
