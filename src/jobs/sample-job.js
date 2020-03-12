@@ -20,6 +20,14 @@ async function findPairs(pairs) {
         driver_confirmed: 'true',
         created_at: db.fn.now()
       })
+    const driverId = pairs[0].driverRec.id
+    const riderId = pairs[0].riderRec.id
+    pairs.shift()
+    for (let i = pairs.length - 1; i > 0; i--) {
+      if (pairs[i].driverRec.id === driverId || pairs[i].riderRec.id === riderId) {
+        pairs.splice(i, 1)
+      }
+    }
   } catch (err) {
     console.error('There was a database issue')
   }
