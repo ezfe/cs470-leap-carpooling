@@ -5,6 +5,7 @@ import routes from './routes'
 import bodyParser = require('body-parser')
 import session from 'express-session'
 import { authenticateUser } from './middleware/auth'
+import { registerJobs } from './jobs'
 
 /* Load environment variables from .env file */
 dotenv.config()
@@ -27,6 +28,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.use(authenticateUser)
+
+registerJobs()
 
 app.set('view engine', 'pug')
 app.use('/', routes)

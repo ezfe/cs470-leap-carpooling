@@ -1,17 +1,15 @@
-'use strict'
+var displayPhoto = function(event) {
+  var image = document.getElementById('uploadedPhoto')
+  image.src = URL.createObjectURL(event.target.files[0])
+}
 
 const locationField = document.getElementById('location_field')
 const autocomplete = new google.maps.places.Autocomplete(
   locationField,
   {
-    types: ['(cities)'],
     componentRestrictions: { country: 'us' }
   }
 )
-
-// autocomplete.addListener('place_changed', () => {
-//   console.log(autocomplete.getPlace())
-// })
 
 document.getElementById('request_form').addEventListener('submit', (event) => {
   const placeID = autocomplete.getPlace().place_id
