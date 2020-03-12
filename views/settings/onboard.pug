@@ -1,4 +1,4 @@
-extends base.pug
+extends ../base.pug
 
 block navbar_settings
   - var current_page = "onboard"
@@ -10,7 +10,7 @@ block content
         .card-header 
           h4 Onboarding
         .card-body
-          form(method="POST")
+          form#onboard-form(method="POST")
             .row.mb-4
               .col.text-center
                 img.rounded.img-fluid.mr-3(id="uploadedPhoto", src="/static/blank-profile.png",style="height:200px;width:200px")   
@@ -23,24 +23,42 @@ block content
                 h4 Enter your preferred first name
             .row.mb-5.ml-1.mr-1
               .col
-                input.form-control(name="preferred_name")
+                input.form-control(
+                  name="preferred_name"
+                  autocomplete="given-name"
+                  value=(current_user.preferred_name || current_user.first_name)
+                  required
+                  maxlength=100
+                )
             .row.mb-2.ml-1
               .col
                 h4 Enter your preferred email
             .row.mb-5.ml-1.mr-1
               .col
-                input.form-control(name = "preferred_email")
+                input.form-control(
+                  name="preferred_email"
+                  autocomplete="email"
+                  value=(current_user.email || `${current_user.netid}@lafayette.edu`)
+                  required
+                  maxlength=100
+                )
             .row.mb-2.ml-1
               .col
                 h4 Enter your phone number
             .row.mb-4.ml-1.mr-1
               .col
-                input.form-control(name= "_phone")
+                input.form-control(
+                  name= "phone_number"
+                  autocomplete="tel"
+                  value=current_user.phone_number
+                  required
+                  maxlength=30
+                )
             .row
               .col.text-center
                 button.btn.btn-primary(type="submit") Submit
 
   script(
     type="text/javascript",
-    src="/static/onboard.js"
+    src="/static/js/onboard.js"
   )
