@@ -26,6 +26,7 @@ routes.post('/onboard', requireAuthenticated, async (req: AuthedReq, res: Respon
     const preferredName = validate('preferred_name', 100)
     const preferredEmail = validate('preferred_email', 100)
     const phoneNumber = validate('phone_number', 30)
+    console.log(phoneNumber)
 
     await db<User>('users').where({ id: req.user.id })
       .update({
