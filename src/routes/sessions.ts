@@ -1,14 +1,15 @@
 // Get an express router
 import { Router } from 'express'
 import db from '../db'
-import { getUserByID, setLoggedInAs, setLoggedOut } from '../models/users'
+import { getUserByID, setLoggedInAs, setLoggedOut, User } from '../models/users'
+import { AuthedReq } from '../utils/authed_req'
 
 const routes = Router()
 
 // Home-page of this route collection
-routes.get('/login', async (req, res) => {
+routes.get('/login', async (req: AuthedReq, res) => {
   try {
-    const users = await db('users')
+    const users = await db<User>('users')
     const currentUser = req.user
     res.render('sessions/choose-user', { users, currentUser })
   } catch (err) {

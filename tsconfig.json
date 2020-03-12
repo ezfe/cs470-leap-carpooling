@@ -4,14 +4,10 @@
     "module": "commonjs",
     "target": "ES2019",
     "outDir": "build",
-    // "esModuleInterop": true,
-    // "typeRoots" : [
-    //   "@types",
-    //   "node_modules/@types",
-    // ]
+    "esModuleInterop": true
   },
   "include": [
-    "src/**/*", "@types/express/index.d.ts"
+    "src/**/*"
   ],
   
 }

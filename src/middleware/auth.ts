@@ -1,7 +1,8 @@
 import { getUserByID } from '../models/users'
 import { Request, Response, NextFunction } from 'express'
+import { AuthedReq } from '../utils/authed_req'
 
-export async function authenticateUser(req: Request, res: Response, next: NextFunction) {
+export async function authenticateUser(req: AuthedReq, res: Response, next: NextFunction) {
   const user = await getUserByID(req.session.userID)
   req.user = user
   if (user) {
@@ -17,7 +18,7 @@ export async function authenticateUser(req: Request, res: Response, next: NextFu
   next()
 }
 
-export function requireAuthenticated(req: Request, res: Response, next: NextFunction) {
+export function requireAuthenticated(req: AuthedReq, res: Response, next: NextFunction) {
   if (!req.user) {
     console.error('User not logged in, redirecting')
     res.redirect('/sessions/login')

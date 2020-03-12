@@ -1,6 +1,6 @@
 import db from '../db'
 
-export function setLoggedInAs(req, user) {
+export function setLoggedInAs(req, user: User) {
   req.session.userID = user.id
 }
 
