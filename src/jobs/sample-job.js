@@ -14,17 +14,17 @@ async function findPairs(pairs) {
       .insert({
         driver_request_id: pairs[0].driverRec.id,
         rider_request_id: pairs[0].riderRec.id,
-        date : "some date",
-        time: "morning",
-        rider_confirmed = 'false',
-        driver_confirmed = 'true',
-        created_at
+        date: 'some date',
+        time: 'morning',
+        rider_confirmed: 'false',
+        driver_confirmed: 'true',
+        created_at: db.fn.now()
       })
   } catch (err) {
-    console.error("there was a database issue")
+    console.error('There was a database issue')
   }
-  //add the match to the table
-  //delete all records with rider and driver requests 
+  // add the match to the table
+  // delete all records with rider and driver requests 
 }
 
 async function processDirection(direction) {
@@ -65,7 +65,7 @@ async function processDirection(direction) {
       }
     }
     return arr
-    
+
   } catch (err) {
     console.error('in the catch')
     return []
