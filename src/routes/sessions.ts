@@ -1,7 +1,9 @@
 // Get an express router
-const routes = require('express').Router()
-const db = require('../db')
-const { setLoggedOut, setLoggedInAs, getUserByID } = require('../models/users')
+import { Router } from 'express'
+import db from '../db'
+import { getUserByID, setLoggedInAs, setLoggedOut } from '../models/users'
+
+const routes = Router()
 
 // Home-page of this route collection
 routes.get('/login', async (req, res) => {
@@ -15,7 +17,7 @@ routes.get('/login', async (req, res) => {
 })
 
 routes.get('/logout', (req, res) => {
-  setLoggedOut(req, null)
+  setLoggedOut(req)
   res.redirect('/')
 })
 
@@ -47,6 +49,4 @@ routes.post('/create-user', async (req, res) => {
   }
 })
 
-// This file then exports the express router, with
-// all the routes added too it
-module.exports = routes
+export default routes

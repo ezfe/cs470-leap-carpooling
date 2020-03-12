@@ -1,4 +1,6 @@
-const routes = require('express').Router()
+import { Router } from 'express'
+
+const routes = Router()
 
 // /trips/new
 routes.get('/', (req, res) => {
@@ -14,4 +16,4 @@ routes.post('/', (req, res) => {
   res.send(req.body)
 })
 
-module.exports = routes
+export default routes

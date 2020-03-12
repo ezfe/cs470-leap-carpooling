@@ -1,14 +1,13 @@
-const path = require('path')
-const express = require('express')
-const routes = express.Router()
+import { Router, static as expressStatic } from 'express'
+import path from 'path'
+import db from '../db'
+import { requireAuthenticated } from '../middleware/auth'
+import dashboard from './dashboard'
+import sessions from './sessions'
 
-const db = require('../db')
-const { requireAuthenticated } = require('../middleware/auth')
+const routes = Router()
 
-const dashboard = require('./dashboard')
-const sessions = require('./sessions')
-
-routes.use('/static', express.static(path.join(__dirname, '../../static')))
+routes.use('/static', expressStatic(path.join(__dirname, '../../static')))
 
 routes.use('/trips', dashboard)
 
@@ -39,4 +38,4 @@ routes.get('/', async (req, res) => {
   res.render('homepage')
 })
 
-module.exports = routes
+export default routes
