@@ -1,6 +1,6 @@
-const { getUserByID } = require('../models/users')
+import { getUserByID } from '../models/users'
 
-async function authenticateUser(req, res, next) {
+export async function authenticateUser(req, res, next) {
   const user = await getUserByID(req.session.userID)
   req.user = user
   if (user) {
@@ -16,7 +16,7 @@ async function authenticateUser(req, res, next) {
   next()
 }
 
-function requireAuthenticated(req, res, next) {
+export function requireAuthenticated(req, res, next) {
   if (!req.user) {
     console.error('User not logged in, redirecting')
     res.redirect('/sessions/login')
@@ -24,9 +24,4 @@ function requireAuthenticated(req, res, next) {
     console.log(`User logged in as ${req.user.netid}`)
     next()
   }
-}
-
-module.exports = {
-  authenticateUser,
-  requireAuthenticated
 }

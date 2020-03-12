@@ -10,6 +10,7 @@
     "migrate:latest": "knex migrate:latest"
   },
   "dependencies": {
+    "@types/node": "^13.9.0",
     "body-parser": "^1.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -19,11 +20,7 @@
     "pug": "^2.0.4"
   },
   "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-standard": "latest",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-node": "^11.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1"
+    "tslint": "^6.1.0",
+    "typescript": "^3.8.3"
   }
 }
