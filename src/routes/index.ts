@@ -1,9 +1,11 @@
-import { Router, static as expressStatic } from 'express'
+import { Router, static as expressStatic, Request, Response } from 'express'
 import path from 'path'
 import db from '../db'
 import { requireAuthenticated } from '../middleware/auth'
 import dashboard from './dashboard'
 import sessions from './sessions'
+import { User } from '../models/users'
+import { AuthedReq } from '../utils/authed_req'
 
 const routes = Router()
 
@@ -11,9 +13,9 @@ routes.use('/static', expressStatic(path.join(__dirname, '../../static')))
 
 routes.use('/trips', dashboard)
 
-routes.post('/onboard', requireAuthenticated, async(req, res) => {
+routes.post('/onboard', requireAuthenticated, async (req: AuthedReq, res: Response) => {
   try {
-    await db('users').where({ id: req.user.id })
+    await db<User>('users').where({ id: req.user.id })
       .update({
         preferred_name: req.body.preferred_name,
         email: req.body.preferred_email,
@@ -33,7 +35,7 @@ routes.get('/onboard', (req, res) => {
 
 routes.use('/sessions', sessions)
 
-routes.get('/settings', requireAuthenticated, (req, res) => {
+routes.get('/settings', requireAuthenticated, (req: AuthedReq, res) => {
   const currentUser = req.user
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
   if (!googleMapsAPIKey) {
@@ -43,7 +45,7 @@ routes.get('/settings', requireAuthenticated, (req, res) => {
   res.render('settings', { currentUser, googleMapsAPIKey })
 })
 
-routes.post('/settings/update-user', async (req, res) => {
+routes.post('/settings/update-user', async (req: AuthedReq, res) => {
   try {
     await db('users').where({ id: req.user.id })
       .update({
