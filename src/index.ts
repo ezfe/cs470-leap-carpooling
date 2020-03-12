@@ -5,7 +5,7 @@ import routes from './routes'
 import bodyParser = require('body-parser')
 import session from 'express-session'
 import { authenticateUser } from './middleware/auth'
-import { registerJobs } from './jobs'
+import registerJobs from './jobs'
 
 /* Load environment variables from .env file */
 dotenv.config()

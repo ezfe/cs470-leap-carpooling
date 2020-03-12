@@ -1,7 +1,6 @@
-// const db = require('../db')
-const distanceMatrix = require('../utils/distances')
+import { distanceMatrix } from '../utils/distances'
 
-async function job() {
+export default async function job() {
   // do job things!
   console.log('Job triggered!')
   console.log(await distanceMatrix(
@@ -10,5 +9,3 @@ async function job() {
     true
   ))
 }
-
-module.exports = job

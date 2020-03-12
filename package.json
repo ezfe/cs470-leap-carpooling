@@ -1,7 +1,7 @@
 {
   "name": "cs470-leap-carpooling",
   "version": "1.0.0",
-  "main": "main/index.js",
+  "main": "build/index.js",
   "license": "UNLICENSED",
   "scripts": {
     "clean": "rm -rf ./dist/*",
