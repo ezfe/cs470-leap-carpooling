@@ -3,35 +3,44 @@ extends base.pug
 block navbar_settings
   - var current_page = "onboard"
 
-//- block header_extension
-//-   link(rel="stylesheet", href="/static/dashboard.css")
-
 block content
-  form(method="POST")
-    .row.mb-2
-      .col.text-center
-        h4 Upload a Photo
-    .row.mb-5
-      .col.d-flex.justify-content-center
-        div(style="background-color:red;height:150px;width: 150px;")
-    .row.mb-2
-      .col.offset-lg-4
-        h4 Enter your preferred first name
-    .row.mb-5
-      .col.col-lg-4.offset-lg-4
-        input.form-control(name="preferred_name")
-    .row.mb-2
-      .col.offset-lg-4
-        h4 Enter your preferred email
-    .row.mb-5
-      .col.col-lg-4.offset-lg-4
-        input.form-control(name = "preferred_email")
-    .row.mb-2
-      .col.offset-lg-4
-        h4 Enter your phone number
-    .row.mb-5
-      .col.col-lg-4.offset-lg-4
-        input.form-control(name= "_phone")
-    .row
-      .col.text-center
-        button.btn.btn-secondary(type="submit") Submit
+  .row
+    .col-6.offset-3
+      .card.mb-3
+        .card-header 
+          h4 Onboarding
+        .card-body
+          form(method="POST")
+            .row.mb-4
+              .col.text-center
+                img.rounded.img-fluid.mr-3(id="uploadedPhoto", src="/static/blank-profile.png",style="height:200px;width:200px")   
+            .row.mb-4
+              .col.text-center
+                  label.btn.btn-primary Upload Photo
+                    input.form-control(style="display: none;", type="file", name="profile_photo", accept="image/*", onchange="displayPhoto(event)")
+            .row.mb-2.ml-1
+              .col
+                h4 Enter your preferred first name
+            .row.mb-5.ml-1.mr-1
+              .col
+                input.form-control(name="preferred_name")
+            .row.mb-2.ml-1
+              .col
+                h4 Enter your preferred email
+            .row.mb-5.ml-1.mr-1
+              .col
+                input.form-control(name = "preferred_email")
+            .row.mb-2.ml-1
+              .col
+                h4 Enter your phone number
+            .row.mb-4.ml-1.mr-1
+              .col
+                input.form-control(name= "_phone")
+            .row
+              .col.text-center
+                button.btn.btn-primary(type="submit") Submit
+
+  script(
+    type="text/javascript",
+    src="/static/onboard.js"
+  )
