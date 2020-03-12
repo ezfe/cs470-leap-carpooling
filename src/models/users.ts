@@ -1,4 +1,5 @@
 import db from '../db'
+import { Raw } from 'knex'
 
 export function setLoggedInAs(req, user: User) {
   req.session.userID = user.id
@@ -27,13 +28,13 @@ async function getUserByField(field: string, value: number | string): Promise<Us
 export interface User {
   id: number
   netid: string
-  email: string
-  default_location: string
-  deviation_limit: number
+  email?: string
+  default_location?: string
+  deviation_limit?: number
   first_name: string
   last_name: string
-  preferred_name: string
-  phone_number: string
-  profile_image_name: string
-  created_at: Date
+  preferred_name?: string
+  phone_number?: string
+  profile_image_name?: string
+  created_at: Date | Raw<any>
 }

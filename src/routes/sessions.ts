@@ -1,7 +1,7 @@
 // Get an express router
 import { Router } from 'express'
 import db from '../db'
-import { getUserByID, setLoggedInAs, setLoggedOut, User } from '../models/users'
+import { getUserByID, setLoggedInAs, setLoggedOut, User, getUserByNetID } from '../models/users'
 import { AuthedReq } from '../utils/authed_req'
 
 const routes = Router()
@@ -35,15 +35,14 @@ routes.post('/login', async (req, res) => {
 // POST /sessions/create-user
 routes.post('/create-user', async (req, res) => {
   try {
-    const records = await db('users')
-      .returning('*')
-      .insert({
+    await db<User>('users').insert({
         netid: req.body.netid,
         first_name: req.body.first_name,
         last_name: req.body.last_name,
         created_at: db.fn.now()
       })
-    setLoggedInAs(req, records[0])
+    const user = await getUserByNetID(req.body.netid)
+    setLoggedInAs(req, user)
     res.redirect('/')
   } catch (err) {
     res.render('database-error')
