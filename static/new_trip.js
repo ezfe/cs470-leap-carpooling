@@ -4,7 +4,7 @@ const locationField = document.getElementById('location_field')
 const autocomplete = new google.maps.places.Autocomplete(
   locationField,
   {
-    // types: ['(cities)'],
+    types: ['(cities)'],
     componentRestrictions: { country: 'us' }
   }
 )
