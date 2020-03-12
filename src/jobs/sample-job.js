@@ -39,11 +39,11 @@ async function processDirection(direction) {
       .select('*')
     console.log(riderRecords)
 
-    let arr = []
+    const arr = []
     for (const driverRecord of driverRecords) {
       for (const riderRecord of driverRecords) {
         const { driverCost, riderCost } = distanceMatrix(driverRecord.location, riderRecord.location, direction)
-        let pair = { driverRecord, riderRecord }
+        const pair = { driverRecord, riderRecord }
         if (driverCost < driverRecord.deviation_limit) {
           if (riderCost < riderRecord.deviation_limit) {
             arr.push({
