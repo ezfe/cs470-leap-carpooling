@@ -1,5 +1,6 @@
 import { distanceMatrix } from '../utils/distances'
 import db from '../db'
+import { TripMatch } from '../models/trip_matches'
 
 export default async function job() {
   const pairs = await processDirection('towards_lafayette')
@@ -9,15 +10,15 @@ export default async function job() {
 
 async function findPairs(pairs) {
   try {
-    const match = await db('trip_matches')
+    const matches = await db<TripMatch>('trip_matches')
       .returning('*')
       .insert({
         driver_request_id: pairs[0].driverRec.id,
         rider_request_id: pairs[0].riderRec.id,
-        date: 'some date',
+        date: db.fn.now(),
         time: 'morning',
-        rider_confirmed: 'false',
-        driver_confirmed: 'true',
+        rider_confirmed: false,
+        driver_confirmed: true,
         created_at: db.fn.now()
       })
     const driverId = pairs[0].driverRec.id
@@ -38,12 +39,12 @@ async function findPairs(pairs) {
 async function processDirection(direction) {
   try {
     const driverRecords = await db('trip_requests')
-      .where({ role: 'driver', direction: direction })
+      .where({ role: 'driver', direction })
       .select('*')
     console.log(driverRecords)
 
     const riderRecords = await db('trip_requests')
-      .where({ role: 'rider', direction: direction })
+      .where({ role: 'rider', direction })
       .select('*')
     console.log(riderRecords)
 
