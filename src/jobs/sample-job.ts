@@ -1,9 +1,9 @@
-const db = require('../db')
-const distanceMatrix = require('../utils/distances')
+import { distanceMatrix } from '../utils/distances'
+import db from '../db'
 
-async function job() {
+export default async function job() {
   const pairs = await processDirection('towards_lafayette')
-  pairs.sort((a, b) => { return a.cost < b.cost })
+  pairs.sort((a, b) => { return a.cost - b.cost })
   findPairs(pairs)
 }
 
@@ -50,7 +50,7 @@ async function processDirection(direction) {
     const arr = []
     for (const driverRecord of driverRecords) {
       for (const riderRecord of driverRecords) {
-        const { driverCost, riderCost } = distanceMatrix(driverRecord.location, riderRecord.location, direction)
+        const { driverCost, riderCost } = await distanceMatrix(driverRecord.location, riderRecord.location, direction)
         const pair = { driverRecord, riderRecord }
         if (driverCost < driverRecord.deviation_limit) {
           if (riderCost < riderRecord.deviation_limit) {

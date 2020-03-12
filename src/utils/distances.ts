@@ -1,13 +1,12 @@
-const Client = require('@googlemaps/google-maps-services-js').Client
+import { Client } from "@googlemaps/google-maps-services-js"
+import asyncRedis from 'async-redis'
 
-const asyncRedis = require('async-redis')
-const client = asyncRedis.createClient()
-client.on('error', function (err) {
+const redisClient = asyncRedis.createClient()
+redisClient.on('error', (err) => {
   console.error('Redis Error: ' + err)
 })
 
-// Shared place is Lafayette College, but this doesn't care
-async function distanceMatrix(driverPlace, riderPlace, direction) {
+export async function distanceMatrix(driverPlace: string, riderPlace: string, direction: string) {
   const lafayettePlace = 'ChIJAZll2E5sxIkRmWtHcAi0le4'
 
   if (direction == 'towards_lafayette') {
@@ -37,7 +36,7 @@ async function distanceMatrix(driverPlace, riderPlace, direction) {
   }
 }
 
-async function timeBetween(originPlace, destinationPlace) {
+export async function timeBetween(originPlace, destinationPlace): Promise<number> {
   const googleMapsKey = process.env.GOOGLE_MAPS_ROUTING_KEY
   if (!googleMapsKey) {
     console.error('GOOGLE_MAPS_ROUTING_KEY is not set')
@@ -45,9 +44,9 @@ async function timeBetween(originPlace, destinationPlace) {
   }
   const redisKey = `time_placeid:${originPlace}_placeid:${destinationPlace}`
 
-  const redisFoundValue = await client.get(redisKey)
+  const redisFoundValue = await redisClient.get(redisKey)
   if (redisFoundValue) {
-    return parseInt(redisFoundValue)
+    return parseInt(redisFoundValue, 10)
   }
 
   const c = new Client({})
@@ -62,11 +61,10 @@ async function timeBetween(originPlace, destinationPlace) {
       ]
     }
   })
-  const time = parseInt(response.data.rows[0].elements[0].duration.value)
-  await client.set(redisKey, time)
-  await client.expire(redisKey, 604800) // 1 week
+
+  const time: number = response.data.rows[0].elements[0].duration.value
+  await redisClient.set(redisKey, time)
+  await redisClient.expire(redisKey, 604800) // 1 week
 
   return time
 }
-
-module.exports = distanceMatrix
