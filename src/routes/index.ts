@@ -29,7 +29,7 @@ routes.post('/onboard', requireAuthenticated, async (req: AuthedReq, res: Respon
   }
 })
 
-routes.get('/onboard', (req, res) => {
+routes.get('/onboard', (req: AuthedReq, res: Response) => {
   res.render('onboard')
 })
 
@@ -45,7 +45,7 @@ routes.get('/settings', requireAuthenticated, (req: AuthedReq, res) => {
   res.render('settings', { currentUser, googleMapsAPIKey })
 })
 
-routes.post('/settings/update-user', async (req: AuthedReq, res) => {
+routes.post('/settings/update-user', async (req: AuthedReq, res: Response) => {
   try {
     await db('users').where({ id: req.user.id })
       .update({
@@ -63,7 +63,7 @@ routes.post('/settings/update-user', async (req: AuthedReq, res) => {
 })
 
 // This would be the home page
-routes.get('/', async (req, res) => {
+routes.get('/', async (req: AuthedReq, res: Response) => {
   res.render('homepage')
 })
 
