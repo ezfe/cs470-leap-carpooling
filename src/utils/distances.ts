@@ -1,10 +1,5 @@
 import { Client } from "@googlemaps/google-maps-services-js"
-import asyncRedis from 'async-redis'
-
-const redisClient = asyncRedis.createClient()
-redisClient.on('error', (err) => {
-  console.error('Redis Error: ' + err)
-})
+import redisClient from "../db/redis"
 
 export async function distanceMatrix(driverPlace: string, riderPlace: string, direction: string) {
   const lafayettePlace = 'ChIJAZll2E5sxIkRmWtHcAi0le4'
