@@ -12,11 +12,12 @@ const autocomplete = new google.maps.places.Autocomplete(
 )
 
 document.getElementById('request_form').addEventListener('submit', (event) => {
-  const placeID = autocomplete.getPlace().place_id
-  if (!placeID) {
+  const place = autocomplete.getPlace()
+  if (!place) {
     event.preventDefault()
     alert("There's no place ID set")
   } else {
-    document.getElementById('place_id_field').value = placeID
+    document.getElementById('location_field').value = place.formatted_address
+    document.getElementById('place_id_field').value = place.place_id
   }
 })
