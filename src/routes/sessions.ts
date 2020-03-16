@@ -11,7 +11,7 @@ routes.get('/login', async (req: AuthedReq, res: Response) => {
   try {
     const users = await db<User>('users')
     const currentUser = req.user
-    res.render('sessions/choose-user', { users, currentUser })
+    res.render('sessions/choose_user', { users, currentUser })
   } catch (err) {
     res.render('database-error')
   }
