@@ -13,6 +13,20 @@ const autocomplete = new google.maps.places.Autocomplete(
 //   console.log(autocomplete.getPlace())
 // })
 
+function clickRoleButton(event) {
+  for (const button of document.getElementsByClassName('role_button')) {
+    button.classList.remove('active')
+    button.setAttribute('aria-pressed', 'false')
+  }
+  event.target.classList.add('active')
+  event.target.setAttribute('aria-pressed', 'true')
+  document.getElementById('user_role').value = event.target.value
+}
+
+for (const button of document.getElementsByClassName('role_button')) {
+  button.addEventListener('click', clickRoleButton) 
+}
+
 document.getElementById('request_form').addEventListener('submit', (event) => {
   const placeID = autocomplete.getPlace().place_id
   if (!placeID) {

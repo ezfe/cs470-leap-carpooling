@@ -12,8 +12,9 @@ block content
       label.col-sm-2.col-form-label I want to...
       .col-sm-10
         .btn-group(role="group")
-          button.btn.btn-light(type="button", id="drive_role") Drive
-          button.btn.btn-light(type="button", id="ride_role") Ride
+          button.btn.btn-light.role_button(type="button" value="driver") Drive
+          button.btn.btn-light.role_button(type="button" value="rider") Ride
+        input(type="hidden" id="user_role" name="user_role")
     .form-group.row
       .col-4
         span.small From
