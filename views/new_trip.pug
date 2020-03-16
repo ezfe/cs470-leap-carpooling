@@ -50,13 +50,17 @@ block content
         | How far can you travel to get picked up?
       .col-sm-8
         .input-group
-          input.form-control(type="text", id="deviation_limit")
+          input.form-control(
+            type="text"
+            name="deviation_limit"
+            value=defaultDeviationLimit
+          )
           .input-group-append
             span.input-group-text minutes
 
     .form-group.row.mt-5
       .col.text-right
-        a(href="/trips").btn.btn-danger
+        button#discard_button(type="button").btn.btn-danger
           i.fas.fa-times-circle.mr-2
           | Discard
       .col
