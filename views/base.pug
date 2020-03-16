@@ -65,14 +65,14 @@ html(lang="en")
                   {
                     title: 'Onboard',
                     name: 'onboard',
-                    url: '/onboard'
+                    url: '/settings/onboard'
                   }
                 ]
               each nav in navElements
                 li.nav-item(class=(current_page == nav.name ? 'active' : ''))
                   a.nav-link(href=nav.url)= nav.title
             ul.navbar-nav
-              if user_logged_in
+              if current_user
                 li.nav-item.dropdown
                   a.nav-link.dropdown-toggle(
                     href="#",
@@ -82,7 +82,7 @@ html(lang="en")
                     aria-expanded="false"
                   )= user_preferred_name
                   div.dropdown-menu(aria-labelledby="navbarDropdown")
-                    a.dropdown-item(href="#")
+                    a.dropdown-item(href="/settings")
                       i.fas.fa-cog
                       = ' Settings'
                     a.dropdown-item(href="/sessions/logout")

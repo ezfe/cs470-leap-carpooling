@@ -1,12 +1,15 @@
 // Get an express router
-const routes = require('express').Router()
-const db = require('../db')
-const { setLoggedOut, setLoggedInAs, getUserByID } = require('../models/users')
+import { Router, Response } from 'express'
+import db from '../db'
+import { getUserByID, setLoggedInAs, setLoggedOut, User, getUserByNetID } from '../models/users'
+import { AuthedReq } from '../utils/authed_req'
+
+const routes = Router()
 
 // Home-page of this route collection
-routes.get('/login', async (req, res) => {
+routes.get('/login', async (req: AuthedReq, res: Response) => {
   try {
-    const users = await db('users')
+    const users = await db<User>('users')
     const currentUser = req.user
     res.render('sessions/choose-user', { users, currentUser })
   } catch (err) {
@@ -15,11 +18,11 @@ routes.get('/login', async (req, res) => {
 })
 
 routes.get('/logout', (req, res) => {
-  setLoggedOut(req, null)
+  setLoggedOut(req)
   res.redirect('/')
 })
 
-routes.post('/login', async (req, res) => {
+routes.post('/login', async (req: AuthedReq, res: Response) => {
   const user = await getUserByID(req.body.chosen_user)
   if (user) {
     setLoggedInAs(req, user)
@@ -30,23 +33,20 @@ routes.post('/login', async (req, res) => {
 })
 
 // POST /sessions/create-user
-routes.post('/create-user', async (req, res) => {
+routes.post('/create-user', async (req: AuthedReq, res: Response) => {
   try {
-    const records = await db('users')
-      .returning('*')
-      .insert({
+    await db<User>('users').insert({
         netid: req.body.netid,
         first_name: req.body.first_name,
         last_name: req.body.last_name,
         created_at: db.fn.now()
       })
-    setLoggedInAs(req, records[0])
+    const user = await getUserByNetID(req.body.netid)
+    setLoggedInAs(req, user)
     res.redirect('/')
   } catch (err) {
     res.render('database-error')
   }
 })
 
-// This file then exports the express router, with
-// all the routes added too it
-module.exports = routes
+export default routes

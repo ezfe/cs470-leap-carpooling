@@ -1,9 +1,12 @@
-const express = require('express')
-const dotenv = require('dotenv')
-const routes = require('./routes')
-const bodyParser = require('body-parser')
-const session = require('express-session')
-const { authenticateUser } = require('./middleware/auth')
+// import { Request, Response, Application } from 'express';
+import express = require('express');
+import dotenv = require('dotenv')
+import routes from './routes'
+import bodyParser = require('body-parser')
+import session from 'express-session'
+import { authenticateUser } from './middleware/auth'
+import registerJobs from './jobs'
+
 /* Load environment variables from .env file */
 dotenv.config()
 
@@ -18,13 +21,15 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 60000 }
+  cookie: { maxAge: 604800000 } // 7 days
 }))
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.use(authenticateUser)
+
+registerJobs()
 
 app.set('view engine', 'pug')
 app.use('/', routes)

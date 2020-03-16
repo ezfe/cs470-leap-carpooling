@@ -1,10 +1,12 @@
-const routes = require('express').Router()
+import { Router, Response } from 'express'
+import tripCreation from './trip_creation'
+import { AuthedReq } from '../utils/authed_req'
 
-const tripCreation = require('./trip_creation')
+const routes = Router()
 
 routes.use('/new', tripCreation)
 
-routes.get('/', (req, res) => {
+routes.get('/', (req: AuthedReq, res: Response) => {
   const trips = [
     {
       trip_id: 1,
@@ -35,4 +37,4 @@ routes.get('/', (req, res) => {
   res.render('dashboard', { trips })
 })
 
-module.exports = routes
+export default routes
