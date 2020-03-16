@@ -22,8 +22,16 @@ block content
         i.fas.fa-arrows-alt-h
       .col-4
         span.small To
-        input.form-control#location_field(type="text")
-        input#place_id_field(type="hidden", name="place_id")
+        input.form-control#location_field(
+          type="text"
+          name="location_description"
+          value=current_user.default_location_description
+        )
+        input#place_id_field(
+          type="hidden"
+          name="place_id"
+          value=current_user.default_location
+        )
     .row
       .col
         span.small
