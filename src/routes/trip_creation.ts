@@ -33,6 +33,7 @@ routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => 
       member_id: req.user.id,
       role: req.body.user_role,
       location: req.body.place_id,
+      location_description: req.body.location_description,
       deviation_limit: deviationLimit,
       direction: 'from_lafayette', // req.body.direction,
       created_at: db.fn.now()
@@ -40,6 +41,7 @@ routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => 
 
     res.redirect('/trips')
   } catch (err) {
+    console.error(err)
     res.render('database-error')
   }
 })
