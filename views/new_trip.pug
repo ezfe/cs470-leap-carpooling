@@ -12,18 +12,27 @@ block content
       label.col-sm-2.col-form-label I want to...
       .col-sm-10
         .btn-group(role="group")
-          button.btn.btn-light(type="button") Drive
-          button.btn.btn-light(type="button") Ride
+          button.btn.btn-light.role_button(type="button" value="driver") Drive
+          button.btn.btn-light.role_button(type="button" value="rider") Ride
+        input(type="hidden" id="user_role" name="user_role")
     .form-group.row
       .col-4
         span.small From
-        input.form-control(type="text", value="Lafayette College", disabled)
+        input.form-control(type="text", value="Lafayette College", disabled, id="source_location")
       .col-2
         i.fas.fa-arrows-alt-h
       .col-4
         span.small To
-        input.form-control#location_field(type="text")
-        input#place_id_field(type="hidden", name="place_id")
+        input.form-control#location_field(
+          type="text"
+          name="location_description"
+          value=current_user.default_location_description
+        )
+        input#place_id_field(
+          type="hidden"
+          name="place_id"
+          value=current_user.default_location
+        )
     .row
       .col
         span.small
@@ -49,13 +58,17 @@ block content
         | How far can you travel to get picked up?
       .col-sm-8
         .input-group
-          input.form-control(type="text")
+          input.form-control(
+            type="text"
+            name="deviation_limit"
+            value=defaultDeviationLimit
+          )
           .input-group-append
             span.input-group-text minutes
 
     .form-group.row.mt-5
       .col.text-right
-        a(href="/trips").btn.btn-danger
+        button#discard_button(type="button").btn.btn-danger
           i.fas.fa-times-circle.mr-2
           | Discard
       .col
@@ -67,6 +80,10 @@ block content
   script(
     type="text/javascript",
     src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`
+  )
+  script(
+    type="text/javascript",
+    src="/static/js/location_autocomplete.js"
   )
   script(
     type="text/javascript",
