@@ -24,7 +24,7 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     return
   }
 
-  if (formSync()) {
+  if (!formSync()) {
     alert("No Place ID!")
     event.preventDefault()
     return

@@ -23,7 +23,7 @@ function registerAutocomplete(locationFieldID, placeFieldID) {
       locationField.value = place.formatted_address
     }
 
-    return placeField.value.trim().length == 0
+    return placeField.value.trim().length > 0
   }
   
   return formSync

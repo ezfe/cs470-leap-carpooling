@@ -56,7 +56,10 @@ block content
     type="text/javascript",
     src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`
   )
-
+  script(
+    type="text/javascript",
+    src="/static/js/location_autocomplete.js"
+  )
   script(
     type="text/javascript",
     src="/static/js/settings.js"
