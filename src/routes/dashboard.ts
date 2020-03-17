@@ -1,40 +1,39 @@
-import { Router, Response } from 'express'
-import tripCreation from './trip_creation'
+import { Response, Router } from 'express'
+import db from '../db'
+import { requireAuthenticated } from '../middleware/auth'
+import { TripMatch } from '../models/trip_matches'
 import { AuthedReq } from '../utils/authed_req'
+import tripCreation from './trip_creation'
+import { TripRequest } from '../models/trip_requests'
 
 const routes = Router()
 
 routes.use('/new', tripCreation)
 
-routes.get('/', (req: AuthedReq, res: Response) => {
-  const trips = [
-    {
-      trip_id: 1,
-      status: 'confirmed',
-      other_member: {
-        id: 2,
-        name: 'Nicole Kaplan',
-        location: 'Somewhere, New Jersey'
-      },
-      trip: ['Lafayette College', 'Somewhere, New Jersey', 'Hanover, New Hampshire']
-    },
-    {
-      trip_id: 2,
-      status: 'pending',
-      other_member: {
-        id: 2,
-        name: 'Nicole Kaplan',
-        location: 'Somewhere, New Jersey'
-      },
-      trip: ['Hanover, New Hampshire', 'Somewhere, New Jersey', 'Lafayette College']
-    },
-    {
-      trip_id: 3,
-      status: 'processing',
-      trip: ['Lafayette College', 'Hanover, New Hampshire']
-    }
-  ]
-  res.render('dashboard', { trips })
+routes.get('/', requireAuthenticated, async (req: AuthedReq, res: Response) => {
+  try {
+    const matchedRequests = await db('trip_requests')
+      .join('trip_matches', function() {
+        this.on('trip_requests.id', '=', 'trip_matches.driver_request_id')
+          .orOn('trip_requests.id', '=', 'trip_matches.rider_request_id')
+      }).where({
+        'trip_requests.member_id': req.user.id
+      }).select(
+        'trip_requests.role',
+        'trip_requests.location_description',
+        'trip_requests.direction',
+        'trip_matches.date',
+        'trip_matches.time',
+        'trip_matches.rider_confirmed',
+        'trip_matches.driver_confirmed'
+      )
+
+    console.log(matchedRequests)
+
+    res.render('dashboard', { matchedRequests })
+  } catch (err) {
+    res.render('database-error')
+  }
 })
 
 export default routes

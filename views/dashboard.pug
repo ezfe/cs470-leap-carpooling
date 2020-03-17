@@ -12,25 +12,24 @@ block content
       a.btn.btn-info.btn-lg(href="/trips/new", style="width: 200px;")
         i.fas.fa-plus.mr-2
         | New Trip
-  each trip in trips
+  each trip in matchedRequests
     .row.mb-3
       .col
         .card
           h5.card-header(class=`trip-${trip.status}`)
-            if trip.status == 'confirmed'
+            if trip.rider_confirmed && trip.driver_confirmed
               i.mr-2(class='fas fa-check-circle')
               | Confirmed Trip
-            else if trip.status == 'pending'
+            else
               i.mr-2(class='fas fa-exclamation-triangle')
               | Pending Trip
-            else if trip.status == 'processing'
-              i.mr-2(class='fas fa-sync-alt')
-              | Processing Trip
-            else
-              | (Unknown Status)
+            //- else if trip.status == 'processing'
+            //-   i.mr-2(class='fas fa-sync-alt')
+            //-   | Processing Trip
+            //- else
+            //-   | (Unknown Status)
           .card-body
-            if trip.status == 'confirmed' || trip.status == 'pending'
-              h5.card-title
-                = `Trip with ${trip.other_member}`
-              p.card-text This is text
-              button.btn.btn-outline-secondary Trip Details
+            h5.card-title
+              = `Trip ${trip.direction} to/from ${trip.location_description}`
+            p.card-text This is text
+            button.btn.btn-outline-secondary Trip Details
