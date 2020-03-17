@@ -1,13 +1,6 @@
 'use strict'
 
-const locationField = document.getElementById('location_field')
-const autocomplete = new google.maps.places.Autocomplete(
-  locationField,
-  {
-    types: ['(cities)'],
-    componentRestrictions: { country: 'us' }
-  }
-)
+const formSync = registerAutocomplete('location_field', 'place_id_field')
 
 function clickRoleButton(event) {
   for (const button of document.getElementsByClassName('role_button')) {
@@ -31,13 +24,10 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     return
   }
 
-  const place = autocomplete.getPlace()
-  if (!place) {
-    alert("There's no place ID set")
+  if (formSync()) {
+    alert("No Place ID!")
     event.preventDefault()
     return
-  } else {
-    document.getElementById('place_id_field').value = place.place_id
   }
 })
 
