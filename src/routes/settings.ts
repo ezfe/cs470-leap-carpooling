@@ -56,14 +56,15 @@ routes.get('/', requireAuthenticated, (req: AuthedReq, res: Response) => {
   res.render('settings/index', { currentUser, googleMapsAPIKey })
 })
 
-routes.post('/update-user', requireAuthenticated, async (req: AuthedReq, res: Response) => {
+routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => {
   try {
-    await db('users').where({ id: req.user.id })
+    await db<User>('users').where({ id: req.user.id })
       .update({
         preferred_name: req.body.preferred_name,
         email: req.body.preferred_email,
         phone_number: req.body._phone,
         default_location: req.body.place_id,
+        default_location_description: req.body.place_name,
         deviation_limit: req.body.deviation_limit
       })
 

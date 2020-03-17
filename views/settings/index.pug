@@ -7,7 +7,7 @@ block content
     .card-body
       .row
         .col.col-8
-          form#request_form(method="POST", action="/settings/update-user")
+          form#request_form(method="POST")
             .row.mb-2
               .col
                 b Preferred first name
@@ -31,8 +31,8 @@ block content
                 b Default location
             .row.mb-4
               .col
-                input.form-control#location_field(type="text", value=currentUser.default_location)
-                input#place_id_field(type="hidden", name="place_id")
+                input.form-control#location_field(type="text", name="place_name" value=currentUser.default_location_description)
+                input#place_id_field(type="hidden", name="place_id" value=currentUser.default_location)
             .row.mb-2
               .col
                 b Deviation limit
@@ -56,7 +56,10 @@ block content
     type="text/javascript",
     src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`
   )
-
+  script(
+    type="text/javascript",
+    src="/static/js/location_autocomplete.js"
+  )
   script(
     type="text/javascript",
     src="/static/js/settings.js"

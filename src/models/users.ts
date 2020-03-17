@@ -30,6 +30,7 @@ export interface User {
   netid: string
   email?: string
   default_location?: string
+  default_location_description?: string
   deviation_limit?: number
   first_name: string
   last_name: string
