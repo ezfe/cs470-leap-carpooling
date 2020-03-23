@@ -3,33 +3,44 @@ import db from '../db'
 import { TripMatch } from '../models/trip_matches'
 
 export default async function job() {
-  const pairs = await processDirection('towards_lafayette')
+  console.error("were in the job")
+  const pairs = await processDirection('from_lafayette')
   pairs.sort((a, b) => { return a.cost - b.cost })
   findPairs(pairs)
 }
 
 async function findPairs(pairs) {
+if (pairs.length ==0){
+  console.error("in the empty if")
+  return 
+}
+  const dId =  pairs[0].driverRecord.id
+  const rId = pairs[0].riderRecord.id
   try {
     const matches = await db<TripMatch>('trip_matches')
       .returning('*')
       .insert({
-        driver_request_id: pairs[0].driverRec.id,
-        rider_request_id: pairs[0].riderRec.id,
+        driver_request_id: dId,
+        rider_request_id: rId,
         date: db.fn.now(),
         time: 'morning',
         rider_confirmed: false,
-        driver_confirmed: true,
+        driver_confirmed: false,
         created_at: db.fn.now()
       })
-    const driverId = pairs[0].driverRec.id
-    const riderId = pairs[0].riderRec.id
+    //const driverId = dId
+   // const riderId = rId
     pairs.shift()
+
     for (let i = pairs.length - 1; i > 0; i--) {
-      if (pairs[i].driverRec.id === driverId || pairs[i].riderRec.id === riderId) {
+
+      if (pairs[i].driverRecord.id === dId || pairs[i].riderRecord.id === rId) {
         pairs.splice(i, 1)
+
       }
     }
   } catch (err) {
+    console.error(err)
     console.error('There was a database issue')
   }
   // add the match to the table
@@ -49,7 +60,9 @@ async function processDirection(direction) {
     console.log(riderRecords)
 
     const arr = []
+    console.error("before loop")
     for (const driverRecord of driverRecords) {
+      console.error("in the outer loop")
       for (const riderRecord of driverRecords) {
         const { driverCost, riderCost } = await distanceMatrix(driverRecord.location, riderRecord.location, direction)
         const pair = { driverRecord, riderRecord }
@@ -71,10 +84,13 @@ async function processDirection(direction) {
             cost: riderCost
           })
         }
+      else{
+        console.error("in the else where nothing happens");
       }
     }
-    return arr
-
+  }
+  console.error(arr)
+    return arr 
   } catch (err) {
     console.error('in the catch')
     return []
