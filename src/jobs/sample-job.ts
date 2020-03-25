@@ -45,7 +45,7 @@ async function findPairs(pairs: any[]) {
   // add the match to the table
   // delete all records with rider and driver requests
 }
-async function checkForMatch(id: number, personType: 'driver' | 'rider'){
+async function checkForMatch(id: number, personType: 'driver' | 'rider'): Promise<boolean> {
   if(personType === 'driver'){
     try {
       const matchingRecords = await db<TripMatch>('trip_matches')
@@ -75,7 +75,14 @@ async function checkForMatch(id: number, personType: 'driver' | 'rider'){
   }
   return false
 }
-async function processDirection(direction): Promise<any[]> {
+
+interface DirectionResult {
+  driverRecord: TripRequest
+  riderRecord: TripRequest
+  cost: number
+}
+
+async function processDirection(direction): Promise<DirectionResult[]> {
   try {
     const driverRecords = await db<TripRequest>('trip_requests')
       .where({ role: 'driver', direction })
@@ -85,7 +92,8 @@ async function processDirection(direction): Promise<any[]> {
     const riderRecords = await db<TripRequest>('trip_requests')
       .where({ role: 'rider', direction })
       .select('*')
-    const arr = []
+
+    const results = new Array<DirectionResult>()
 
     for (const driverRecord of driverRecords) {
 
@@ -98,18 +106,18 @@ async function processDirection(direction): Promise<any[]> {
             const pair = { driverRecord, riderRecord }
             if (driverCost < driverRecord.deviation_limit) {
               if (riderCost < riderRecord.deviation_limit) {
-                arr.push({
+                results.push({
                   ...pair,
                   cost: Math.min(riderCost, driverCost)
                 })
               } else {
-                arr.push({
+                results.push({
                   ...pair,
                   cost: driverCost
                 })
               }
             } else if (riderCost < riderRecord.deviation_limit) {
-              arr.push({
+              results.push({
                 ...pair,
                 cost: riderCost
               })
@@ -122,7 +130,7 @@ async function processDirection(direction): Promise<any[]> {
       }
     }
 
-    return arr
+    return results
   } catch (err) {
     console.error('in the catch')
     return []
