@@ -128,10 +128,8 @@ async function processDirection(direction) {
     }
   }
 }
-}
-  console.error(arr)
-    return arr 
-  } catch (err) {
+  }
+   catch (err) {
     console.error('in the catch')
     return []
   }
