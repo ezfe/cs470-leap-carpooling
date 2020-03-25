@@ -83,7 +83,7 @@ async function checkForMatch(id: number, personType: 'driver' | 'rider'){
   }
   return false
 }
-async function processDirection(direction) {
+async function processDirection(direction): Promise<any[]> {
   try {
     const driverRecords = await db<TripRequest>('trip_requests')
       .where({ role: 'driver', direction })
@@ -96,6 +96,7 @@ async function processDirection(direction) {
     console.log(riderRecords)
 
     const arr = []
+
     console.log("before loop")
     for (const driverRecord of driverRecords) {
       console.log("in the outer loop")
@@ -132,6 +133,8 @@ async function processDirection(direction) {
         }
       }
     }
+
+    return arr
   } catch (err) {
     console.error('in the catch')
     return []
