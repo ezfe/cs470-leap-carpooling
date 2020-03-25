@@ -10,20 +10,22 @@ export default async function job() {
   findPairs(pairs)
 }
 
-async function findPairs(pairs) {
-  if (pairs.length ==0){
+async function findPairs(pairs: any[]) {
+  if (pairs.length === 0){
     console.error("in the empty if")
     return
   }
 
   const dId = pairs[0].driverRecord.id
   const rId = pairs[0].riderRecord.id
-  console.error("this is the dId")
-  console.error(dId)
-  console.error("this is the rId")
-  console.error(rId)
+
+  console.log("this is the dId")
+  console.log(dId)
+  console.log("this is the rId")
+  console.log(rId)
+
   try {
-    const matches = await db('trip_matches')
+    const match = await db('trip_matches')
       .insert({
         driver_request_id: dId,
         rider_request_id: rId,
@@ -47,38 +49,39 @@ async function findPairs(pairs) {
     console.error(err)
   }
   // add the match to the table
-  // delete all records with rider and driver requests 
+  // delete all records with rider and driver requests
 }
-async function checkForMatch(id, personType){
-if(personType == 'driver'){
-  try{
-    const matchingRecord = await db('trip_matches')
-    .where({driver_request_id:id})
-    .select('*')
-    if (matchingRecord.length!=0){
-      console.error("found a match")
-      return true
+async function checkForMatch(id: number, personType: 'driver' | 'rider'){
+  if(personType === 'driver'){
+    try {
+      const matchingRecords = await db<TripMatch>('trip_matches')
+        .where({driver_request_id:id})
+        .select('*')
+
+      if (matchingRecords.length > 0){
+        console.log("found a match")
+        return true
+      }
+    } catch (err) {
+      console.error(err)
+      console.error('in the catch')
     }
-  } catch (err) {
-    console.error(err)
-  console.error('in the catch')
-}
-}
-else {
-  try{
-    const matchingRecord = await db('trip_matches')
-    .where({rider_request_id:id})
-    .select('*')
-    if (matchingRecord.length!=0){
-      console.error("found a match")
-      return true
+  } else {
+    try{
+      const matchingRecord = await db('trip_matches')
+        .where({rider_request_id:id})
+        .select<TripMatch>('*')
+
+      if (matchingRecord){
+        console.error("found a match")
+        return true
+      }
+    } catch (err) {
+      console.error(err)
+      console.error('in the catch')
     }
-  } catch (err) {
-    console.error(err)
-  console.error('in the catch')
-}
-}
-return false
+  }
+  return false
 }
 async function processDirection(direction) {
   try {
@@ -93,43 +96,43 @@ async function processDirection(direction) {
     console.log(riderRecords)
 
     const arr = []
-    console.error("before loop")
+    console.log("before loop")
     for (const driverRecord of driverRecords) {
-      console.error("in the outer loop")
-      const check = await(checkForMatch(driverRecord.id,'driver'))
+      console.log("in the outer loop")
+
+      const check = await checkForMatch(driverRecord.id,'driver')
       if( !check){
-      for (const riderRecord of riderRecords) {
-        const check1 = await(checkForMatch(riderRecord.id,'rider'))
-        if( !check1){
-        const { driverCost, riderCost } = await distanceMatrix(driverRecord.location, riderRecord.location, direction)
-        const pair = { driverRecord, riderRecord }
-        if (driverCost < driverRecord.deviation_limit) {
-          if (riderCost < riderRecord.deviation_limit) {
-            arr.push({
-              ...pair,
-              cost: Math.min(riderCost, driverCost)
-            })
-          } else {
-            arr.push({
-              ...pair,
-              cost: driverCost
-            })
+        for (const riderRecord of riderRecords) {
+          const check1 = await(checkForMatch(riderRecord.id,'rider'))
+          if( !check1){
+            const { driverCost, riderCost } = await distanceMatrix(driverRecord.location, riderRecord.location, direction)
+            const pair = { driverRecord, riderRecord }
+            if (driverCost < driverRecord.deviation_limit) {
+              if (riderCost < riderRecord.deviation_limit) {
+                arr.push({
+                  ...pair,
+                  cost: Math.min(riderCost, driverCost)
+                })
+              } else {
+                arr.push({
+                  ...pair,
+                  cost: driverCost
+                })
+              }
+            } else if (riderCost < riderRecord.deviation_limit) {
+              arr.push({
+                ...pair,
+                cost: riderCost
+              })
+            }
+            else{
+              console.error("in the else where nothing happens");
+            }
           }
-        } else if (riderCost < riderRecord.deviation_limit) {
-          arr.push({
-            ...pair,
-            cost: riderCost
-          })
-        }
-        else{
-          console.error("in the else where nothing happens");
         }
       }
     }
-  }
-}
-  }
-   catch (err) {
+  } catch (err) {
     console.error('in the catch')
     return []
   }
