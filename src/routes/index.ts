@@ -1,15 +1,16 @@
 import { Response, Router, static as expressStatic } from 'express'
 import path from 'path'
 import { AuthedReq } from '../utils/authed_req'
-import dashboard from './dashboard'
+import trips from './trips'
 import sessions from './sessions'
 import settings from './settings'
+import { requireAuthenticated } from '../middleware/auth'
 
 const routes = Router()
 
 routes.use('/static', expressStatic(path.join(__dirname, '../../static')))
 
-routes.use('/trips', dashboard)
+routes.use('/trips', requireAuthenticated, trips)
 routes.use('/sessions', sessions)
 routes.use('/settings', settings)
 

@@ -1,16 +1,15 @@
 import { Response, Router } from 'express'
-import db from '../db'
-import { requireAuthenticated } from '../middleware/auth'
-import { TripMatch } from '../models/trip_matches'
-import { AuthedReq } from '../utils/authed_req'
-import tripCreation from './trip_creation'
-import { TripRequest } from '../models/trip_requests'
+import db from '../../db'
+import { AuthedReq } from '../../utils/authed_req'
+import tripCreation from './new'
+
+/* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
 const routes = Router()
 
 routes.use('/new', tripCreation)
 
-routes.get('/', requireAuthenticated, async (req: AuthedReq, res: Response) => {
+routes.get('/', async (req: AuthedReq, res: Response) => {
   try {
     const matchedRequests = await db('trip_requests')
       .join('trip_matches', function() {
@@ -34,6 +33,10 @@ routes.get('/', requireAuthenticated, async (req: AuthedReq, res: Response) => {
   } catch (err) {
     res.render('database-error')
   }
+})
+
+routes.get('/:tripId', async (req: AuthedReq, res: Response) => {
+  res.send('NYI')
 })
 
 export default routes

@@ -1,13 +1,12 @@
-import { Router, Response } from 'express'
-import { AuthedReq } from '../utils/authed_req'
-import db from '../db'
-import { requireAuthenticated } from '../middleware/auth'
-import { TripRequest } from '../models/trip_requests'
+import { Response, Router } from 'express'
+import db from '../../db'
+import { TripRequest } from '../../models/trip_requests'
+import { AuthedReq } from '../../utils/authed_req'
 
 const routes = Router()
 
 // GET /trips/new
-routes.get('/', requireAuthenticated, (req: AuthedReq, res: Response) => {
+routes.get('/', (req: AuthedReq, res: Response) => {
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
   if (!googleMapsAPIKey) {
     res.send('GOOGLE_MAPS_PLACES_KEY is unset')
@@ -23,7 +22,7 @@ routes.get('/', requireAuthenticated, (req: AuthedReq, res: Response) => {
 })
 
 // POST /trips/new
-routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => {
+routes.post('/', async (req: AuthedReq, res: Response) => {
   try {
     const deviationLimitString = req.body.deviation_limit
     const deviationLimit = parseInt(deviationLimitString, 10)
