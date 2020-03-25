@@ -1,0 +1,24 @@
+extends ../base.pug
+
+block navbar_settings
+  - var current_page = "trip_detail"
+
+block header_extension
+  link(rel="stylesheet", href="/static/dashboard.css")
+
+block content
+  .row
+    .col
+      = driver.preferred_name || driver.first_name
+      = ' is driving '
+      = rider.preferred_name || rider.first_name
+      if tripMatch.direction == 'from_lafayette'
+        = ' from Lafayette College. '
+      else
+        = ' to Lafayette College. '
+      
+  .row
+    .col
+      span= JSON.stringify(tripMatch)
+      span= JSON.stringify(driverRequest)
+      span= JSON.stringify(riderRequest)

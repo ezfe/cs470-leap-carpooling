@@ -2,12 +2,13 @@ import { Response, Router } from 'express'
 import db from '../../db'
 import { AuthedReq } from '../../utils/authed_req'
 import tripCreation from './new'
-
+import tripDetail from './detail'
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
 const routes = Router()
 
 routes.use('/new', tripCreation)
+routes.use('/:tripId/', tripDetail)
 
 routes.get('/', async (req: AuthedReq, res: Response) => {
   try {
@@ -18,6 +19,7 @@ routes.get('/', async (req: AuthedReq, res: Response) => {
       }).where({
         'trip_requests.member_id': req.user.id
       }).select(
+        'trip_matches.id',
         'trip_requests.role',
         'trip_requests.location_description',
         'trip_requests.direction',
@@ -29,14 +31,10 @@ routes.get('/', async (req: AuthedReq, res: Response) => {
 
     console.log(matchedRequests)
 
-    res.render('dashboard', { matchedRequests })
+    res.render('trips/index', { matchedRequests })
   } catch (err) {
     res.render('database-error')
   }
-})
-
-routes.get('/:tripId', async (req: AuthedReq, res: Response) => {
-  res.send('NYI')
 })
 
 export default routes

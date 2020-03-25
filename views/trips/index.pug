@@ -1,7 +1,7 @@
-extends base.pug
+extends ../base.pug
 
 block navbar_settings
-  - var current_page = "dashboard"
+  - var current_page = "trip_index"
 
 block header_extension
   link(rel="stylesheet", href="/static/dashboard.css")
@@ -32,4 +32,4 @@ block content
             h5.card-title
               = `Trip ${trip.direction} to/from ${trip.location_description}`
             p.card-text This is text
-            button.btn.btn-outline-secondary Trip Details
+            a.btn.btn-outline-secondary(href=`/trips/${trip.id}`) Trip Details
