@@ -16,6 +16,10 @@ if (pairs.length ==0){
 }
   const dId =  pairs[0].driverRecord.id
   const rId = pairs[0].riderRecord.id
+  console.error("this is the dId")
+  console.error(dId)
+  console.error("this is the rId")
+  console.error(rId)
   try {
     const matches = await db<TripMatch>('trip_matches')
       .returning('*')
@@ -46,7 +50,37 @@ if (pairs.length ==0){
   // add the match to the table
   // delete all records with rider and driver requests 
 }
-
+async function checkForMatch(id, personType){
+if(personType == 'driver'){
+  try{
+    const matchingRecord = await db('trip_matches')
+    .where({driver_request_id:id})
+    .select('*')
+    if (matchingRecord.length!=0){
+      console.error("found a match")
+      return true
+    }
+  } catch (err) {
+    console.error(err)
+  console.error('in the catch')
+}
+}
+else {
+  try{
+    const matchingRecord = await db('trip_matches')
+    .where({rider_request_id:id})
+    .select('*')
+    if (matchingRecord.length!=0){
+      console.error("found a match")
+      return true
+    }
+  } catch (err) {
+    console.error(err)
+  console.error('in the catch')
+}
+}
+return false
+}
 async function processDirection(direction) {
   try {
     const driverRecords = await db('trip_requests')
@@ -63,7 +97,11 @@ async function processDirection(direction) {
     console.error("before loop")
     for (const driverRecord of driverRecords) {
       console.error("in the outer loop")
-      for (const riderRecord of driverRecords) {
+      const check = await(checkForMatch(driverRecord.id,'driver'))
+      if( !check){
+      for (const riderRecord of riderRecords) {
+        const check1 = await(checkForMatch(riderRecord.id,'rider'))
+        if( !check1){
         const { driverCost, riderCost } = await distanceMatrix(driverRecord.location, riderRecord.location, direction)
         const pair = { driverRecord, riderRecord }
         if (driverCost < driverRecord.deviation_limit) {
@@ -89,6 +127,8 @@ async function processDirection(direction) {
       }
     }
   }
+}
+}
   console.error(arr)
     return arr 
   } catch (err) {
