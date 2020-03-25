@@ -12,17 +12,11 @@ export default async function job() {
 
 async function findPairs(pairs: any[]) {
   if (pairs.length === 0){
-    console.error("in the empty if")
     return
   }
 
   const dId = pairs[0].driverRecord.id
   const rId = pairs[0].riderRecord.id
-
-  console.log("this is the dId")
-  console.log(dId)
-  console.log("this is the rId")
-  console.log(rId)
 
   try {
     const match = await db('trip_matches')
@@ -59,7 +53,6 @@ async function checkForMatch(id: number, personType: 'driver' | 'rider'){
         .select('*')
 
       if (matchingRecords.length > 0){
-        console.log("found a match")
         return true
       }
     } catch (err) {
@@ -73,7 +66,6 @@ async function checkForMatch(id: number, personType: 'driver' | 'rider'){
         .select<TripMatch>('*')
 
       if (matchingRecord){
-        console.error("found a match")
         return true
       }
     } catch (err) {
@@ -93,13 +85,9 @@ async function processDirection(direction): Promise<any[]> {
     const riderRecords = await db<TripRequest>('trip_requests')
       .where({ role: 'rider', direction })
       .select('*')
-    console.log(riderRecords)
-
     const arr = []
 
-    console.log("before loop")
     for (const driverRecord of driverRecords) {
-      console.log("in the outer loop")
 
       const check = await checkForMatch(driverRecord.id,'driver')
       if( !check){
