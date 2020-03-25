@@ -1,6 +1,7 @@
 import { distanceMatrix } from '../utils/distances'
 import db from '../db'
 import { TripMatch } from '../models/trip_matches'
+import { TripRequest } from '../models/trip_requests'
 
 export default async function job() {
   console.error("were in the job")
@@ -10,19 +11,19 @@ export default async function job() {
 }
 
 async function findPairs(pairs) {
-if (pairs.length ==0){
-  console.error("in the empty if")
-  return 
-}
-  const dId =  pairs[0].driverRecord.id
+  if (pairs.length ==0){
+    console.error("in the empty if")
+    return
+  }
+
+  const dId = pairs[0].driverRecord.id
   const rId = pairs[0].riderRecord.id
   console.error("this is the dId")
   console.error(dId)
   console.error("this is the rId")
   console.error(rId)
   try {
-    const matches = await db<TripMatch>('trip_matches')
-      .returning('*')
+    const matches = await db('trip_matches')
       .insert({
         driver_request_id: dId,
         rider_request_id: rId,
@@ -32,20 +33,18 @@ if (pairs.length ==0){
         driver_confirmed: false,
         created_at: db.fn.now()
       })
-    //const driverId = dId
-   // const riderId = rId
+      .returning<TripMatch>('*')
+
     pairs.shift()
 
     for (let i = pairs.length - 1; i > 0; i--) {
-
       if (pairs[i].driverRecord.id === dId || pairs[i].riderRecord.id === rId) {
         pairs.splice(i, 1)
-
       }
     }
   } catch (err) {
-    console.error(err)
     console.error('There was a database issue')
+    console.error(err)
   }
   // add the match to the table
   // delete all records with rider and driver requests 
@@ -83,12 +82,12 @@ return false
 }
 async function processDirection(direction) {
   try {
-    const driverRecords = await db('trip_requests')
+    const driverRecords = await db<TripRequest>('trip_requests')
       .where({ role: 'driver', direction })
       .select('*')
     console.log(driverRecords)
 
-    const riderRecords = await db('trip_requests')
+    const riderRecords = await db<TripRequest>('trip_requests')
       .where({ role: 'rider', direction })
       .select('*')
     console.log(riderRecords)
@@ -122,8 +121,9 @@ async function processDirection(direction) {
             cost: riderCost
           })
         }
-      else{
-        console.error("in the else where nothing happens");
+        else{
+          console.error("in the else where nothing happens");
+        }
       }
     }
   }
@@ -136,5 +136,3 @@ async function processDirection(direction) {
     return []
   }
 }
-
-module.exports = job
