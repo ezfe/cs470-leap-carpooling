@@ -9,7 +9,38 @@ export default async function job() {
   pairs.sort((a, b) => { return a.cost - b.cost })
   findPairs(pairs)
 }
-
+async function checkMathingTimes(riderId, driverId){
+  try {
+    const driverTimes= await db('trip_times')
+      .where({ request_id: driverId })
+      .select('*')
+    console.log(driverTimes)
+    const riderTimes= await db('trip_times')
+      .where({ request_id: riderId })
+      .select('*')
+    console.log(riderTimes)
+    let arr =[]
+    for (const driverTime of driverTimes)
+    {
+      for(const riderTime of riderTimes){
+        if (driverTime.date == riderTime.date)
+        {
+          if(driverTime.time == riderTime.time)
+          {
+            arr.push({
+             time:driverTime.time, date : driverTime.date
+            })
+          }
+        }
+      }
+    }
+  
+  }catch (err) {
+    console.error('There was a database issue')
+    console.error(err)
+  }
+ 
+}
 async function findPairs(pairs: any[]) {
   if (pairs.length === 0){
     return
