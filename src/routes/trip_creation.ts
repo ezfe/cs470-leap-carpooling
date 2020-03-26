@@ -50,7 +50,7 @@ routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => 
     })
     .select('*')
     console.error("this is the time from the request")
-    console.error(req.body.time)
+    console.error(req.body)
     await db('trip_times').insert({
       request_id:reqid[0].id,
       date:req.body.date,
