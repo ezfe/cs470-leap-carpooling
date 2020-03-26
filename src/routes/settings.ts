@@ -3,8 +3,22 @@ import db from '../db'
 import { requireAuthenticated } from '../middleware/auth'
 import { User } from '../models/users'
 import { AuthedReq } from '../utils/authed_req'
+import multer from 'multer'
+import path from 'path'
+import crypto from 'crypto'
 
 const routes = Router()
+
+const storage = multer.diskStorage({
+  destination: 'public/uploads/',
+  filename: function (req, file, callback) {
+    crypto.randomBytes(16, function(err, raw) {
+      callback(null, Date.now() + '-' + raw.toString('hex') + path.extname(file.originalname));
+    });
+  }
+});
+
+var upload = multer({storage: storage});
 
 routes.get('/onboard', requireAuthenticated, (req: AuthedReq, res: Response) => {
   res.render('settings/onboard')
@@ -68,6 +82,18 @@ routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => 
         deviation_limit: req.body.deviation_limit
       })
 
+    res.redirect('/settings')
+  } catch (err) {
+    res.render('database-error')
+  }
+})
+
+routes.post('/upload-photo', upload.single('profile_photo'), requireAuthenticated, async (req: AuthedReq, res: Response) => {
+  try {
+    await db<User>('users').where({ id: req.user.id })
+    .update({
+      profile_image_name: req.file.path
+    })
     res.redirect('/settings')
   } catch (err) {
     res.render('database-error')

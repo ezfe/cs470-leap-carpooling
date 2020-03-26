@@ -43,10 +43,10 @@ block content
               .col
                 button.btn.btn-primary(type="submit") Update
         .col.col-4
-          form(method="POST", action="/settings/upload-photo")
+          form#photo_form(method="POST", action="/settings/upload-photo", enctype="multipart/form-data")
             .row.mb-4
               .col.text-center
-                img.rounded.img-fluid.mr-3(id="uploadedPhoto", src="/static/blank-profile.png",style="height:300px;width:300px")   
+                img.rounded.img-fluid.mr-3(id="uploadedPhoto", src=currentUser.profile_image_name, style="height:300px;width:300px")   
             .row 
               .col.text-center
                   label.btn.btn-primary Upload Photo
