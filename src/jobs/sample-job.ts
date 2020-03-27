@@ -9,7 +9,7 @@ export default async function job() {
   pairs.sort((a, b) => { return a.cost - b.cost })
   findPairs(pairs)
 }
-async function checkMathingTimes(riderId, driverId){
+async function checkMatchingTimes(riderId, driverId){
   try {
     const driverTimes= await db('trip_times')
       .where({ request_id: driverId })
@@ -30,11 +30,12 @@ async function checkMathingTimes(riderId, driverId){
             arr.push({
              time:driverTime.time, date : driverTime.date
             })
+            return arr;
           }
         }
       }
     }
-  
+    return arr;
   }catch (err) {
     console.error('There was a database issue')
     console.error(err)
@@ -94,9 +95,9 @@ async function checkForMatch(id: number, personType: 'driver' | 'rider'): Promis
     try{
       const matchingRecord = await db('trip_matches')
         .where({rider_request_id:id})
-        .select<TripMatch>('*')
+        .select('*')
 
-      if (matchingRecord){
+      if (matchingRecord.length!=0){
         return true
       }
     } catch (err) {
@@ -135,6 +136,9 @@ async function processDirection(direction): Promise<DirectionResult[]> {
           if( !check1){
             const { driverCost, riderCost } = await distanceMatrix(driverRecord.location, riderRecord.location, direction)
             const pair = { driverRecord, riderRecord }
+            //const timeDate =await checkMatchingTimes(riderRecord.id,driverRecord.id)
+            //if(timeDate.length!=0)
+            //{
             if (driverCost < driverRecord.deviation_limit) {
               if (riderCost < riderRecord.deviation_limit) {
                 results.push({
@@ -156,7 +160,8 @@ async function processDirection(direction): Promise<DirectionResult[]> {
             else{
               console.error("in the else where nothing happens");
             }
-          }
+          //}
+        }
         }
       }
     }
