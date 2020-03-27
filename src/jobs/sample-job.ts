@@ -44,72 +44,58 @@ async function checkMatchingTimes(riderId, driverId){
     console.error('There was a database issue')
     console.error(err)
   }
- 
+
 }
-async function findPairs(pairs: any[]) {
+async function findPairs(pairs: DirectionResult[]) {
   if (pairs.length === 0){
     return
   }
 
-  const dId = pairs[0].driverRecord.id
-  const rId = pairs[0].riderRecord.id
+  const { driverRecord, riderRecord } = pairs[0]
 
   try {
-    const timeDate =await checkMatchingTimes(pairs[0].riderRecord.id,pairs[0].driverRecord.id)
-    const match = await db('trip_matches')
+    const timeDate =await checkMatchingTimes(riderRecord.id, driverRecord.id)
+    await db<TripMatch>('trip_matches')
       .insert({
-        driver_request_id: dId,
-        rider_request_id: rId,
+        driver_request_id: driverRecord.id,
+        rider_request_id: riderRecord.id,
         date: timeDate[0].date,
         time: timeDate[0].time,
         rider_confirmed: false,
         driver_confirmed: false,
+        // first_portion: ,
         created_at: db.fn.now()
       })
       .returning<TripMatch>('*')
 
-    pairs.shift()
+    return
+    // pairs.shift()
 
-    for (let i = pairs.length - 1; i > 0; i--) {
-      if (pairs[i].driverRecord.id === dId || pairs[i].riderRecord.id === rId) {
-        pairs.splice(i, 1)
-      }
-    }
+    // pairs = pairs.filter((pair) => {
+    //   return pair.driverRecord.id == driverRecord.id || pair.riderRecord.id == riderRecord.id
+    // })
   } catch (err) {
     console.error('There was a database issue')
     console.error(err)
   }
-  // add the match to the table
-  // delete all records with rider and driver requests
 }
+
 async function checkForMatch(id: number, personType: 'driver' | 'rider'): Promise<boolean> {
-  if(personType === 'driver'){
-    try {
-      const matchingRecords = await db<TripMatch>('trip_matches')
-        .where({driver_request_id:id})
-        .select('*')
+  const idParameter = personType === 'driver' ? 'driver_request_id' : 'rider_request_id'
 
-      if (matchingRecords.length > 0){
-        return true
-      }
-    } catch (err) {
-      console.error(err)
-      console.error('in the catch')
-    }
-  } else {
-    try{
-      const matchingRecord = await db('trip_matches')
-        .where({rider_request_id:id})
-        .select('*')
+  try {
+    const matchingRecords = await db<TripMatch>('trip_matches')
+      .where(idParameter, id)
+      .select('*')
 
-      if (matchingRecord.length!=0){
-        return true
-      }
-    } catch (err) {
-      console.error(err)
-      console.error('in the catch')
+    if (matchingRecords.length > 0) {
+      return true
     }
+  } catch (err) {
+    console.error(err)
+    console.error('in the catch')
   }
+
   return false
 }
 
