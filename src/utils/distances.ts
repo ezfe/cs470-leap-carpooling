@@ -1,10 +1,10 @@
 import { Client } from "@googlemaps/google-maps-services-js"
 import redisClient from "../db/redis"
 
-export async function distanceMatrix(driverPlace: string, riderPlace: string, toLafayette: boolean) {
+export async function distanceMatrix(driverPlace: string, riderPlace: string, direction: string) {
   const lafayettePlace = 'ChIJAZll2E5sxIkRmWtHcAi0le4'
 
-  if (toLafayette) {
+  if (direction == 'towards_lafayette') {
     const driverBaseCost = await timeBetween(driverPlace, lafayettePlace)
     const driverToRider = await timeBetween(driverPlace, riderPlace)
     const riderToLafayette = await timeBetween(riderPlace, lafayettePlace)

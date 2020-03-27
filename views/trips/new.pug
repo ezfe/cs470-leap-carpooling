@@ -44,11 +44,12 @@ block content
 
     .form-group.row
       .col
-        input.form-control(type="text", value="3/10/2020")
+        input.form-control(type="text", value="3/10/2020",name="date")
       .col
         .btn-group(role="group")
-          button.btn.btn-light(type="button") AM
-          button.btn.btn-light(type="button") PM
+          button.btn.btn-light.time_button(type="button" value="morning") AM
+          button.btn.btn-light.time_button(type="button" value="afternoon") PM
+        input(type="hidden" id="time" name="time")
     .form-group.row
       .col
         button.btn.btn-outline-secondary(role="button") Add Date
