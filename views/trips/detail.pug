@@ -7,6 +7,51 @@ block header_extension
   link(rel="stylesheet", href="/static/dashboard.css")
 
 block content
+
+
+  .row.mb-3
+    .col
+      .card
+        h5.card-header
+          if rider.id == current_user.id
+            | Driving You
+          else
+            | Driver
+        .card-body
+          h5.card-title
+            = driver.preferred_name || driver.first_name
+          p.card-text
+            = 'Location: '
+            = driverRequest.location_description
+
+  .row.mb-3
+    .col
+      .card
+        h5.card-header
+          if driver.id == current_user.id
+            | Riding With You
+          else
+            | Rider
+        .card-body
+          .row
+            .col
+              h5.card-title
+                = rider.preferred_name || rider.first_name
+              p.card-text
+                = 'Location: '
+                = riderRequest.location_description
+
+  .row
+    .col
+      p
+        = driver.preferred_name || driver.first_name
+        if tripMatch.first_portion == 'driver'
+          = ' will pick up '
+        else
+          = ' will wait for '
+        = rider.preferred_name || rider.first_name
+
+
   .row
     .col
       = driver.preferred_name || driver.first_name
