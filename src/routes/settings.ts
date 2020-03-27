@@ -6,6 +6,7 @@ import { AuthedReq } from '../utils/authed_req'
 import multer from 'multer'
 import path from 'path'
 import crypto from 'crypto'
+import fs from 'fs'
 
 const routes = Router()
 
@@ -70,6 +71,20 @@ routes.get('/', requireAuthenticated, (req: AuthedReq, res: Response) => {
   res.render('settings/index', { currentUser, googleMapsAPIKey })
 })
 
+routes.get('/remove', requireAuthenticated, async (req: AuthedReq, res: Response) => {
+  try {
+    await db<User>('users').where({ id: req.user.id })
+      .update({
+        profile_image_name: null
+      })
+
+     fs.unlinkSync(req.user.profile_image_name)
+  } catch (err) {
+    res.render('database-error')
+  }
+  res.redirect('/settings')
+})
+
 routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => {
   try {
     await db<User>('users').where({ id: req.user.id })
@@ -89,6 +104,7 @@ routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => 
 })
 
 routes.post('/upload-photo', upload.single('profile_photo'), requireAuthenticated, async (req: AuthedReq, res: Response) => {
+  console.log('got to upload')
   try {
     await db<User>('users').where({ id: req.user.id })
     .update({

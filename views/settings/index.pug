@@ -1,12 +1,23 @@
 extends ../base.pug
 
 block content
-  .card.mb-3
+  .card.mb-lg-3
     .card-header 
       h4 Preferences
     .card-body
       .row
-        .col.col-8
+        .col-12.col-lg-4
+          form#photo_form(method="POST", action="/settings/upload-photo", enctype="multipart/form-data")
+            .row.mb-4
+              .col.text-center
+                a.btn.btn-dark.ml-2.mt-2(id="exitButton", href="/settings/remove", style="position:absolute; opacity:0.8;")
+                  img(src="/static/exit.svg")
+                img.rounded.img-fluid(id="uploadedPhoto", src=currentUser.profile_image_name, style="width: 300px;")   
+            .row.mb-4 
+              .col.text-center
+                  label.btn.btn-primary Upload Photo
+                    input.form-control(style="display: none;", type="file", name="profile_photo", accept="image/*", onchange="submitForm(event)")
+        .col-12.col-lg-8
           form#request_form(method="POST")
             .row.mb-2
               .col
@@ -39,18 +50,9 @@ block content
             .row.mb-4
               .col
                 input.form-control(name= "deviation_limit", value=currentUser.deviation_limit)
-            .row
-              .col
+            .row.mb-2
+              .col.text-center
                 button.btn.btn-primary(type="submit") Update
-        .col.col-4
-          form#photo_form(method="POST", action="/settings/upload-photo", enctype="multipart/form-data")
-            .row.mb-4
-              .col.text-center
-                img.rounded.img-fluid.mr-3(id="uploadedPhoto", src=currentUser.profile_image_name, style="height:300px;width:300px")   
-            .row 
-              .col.text-center
-                  label.btn.btn-primary Upload Photo
-                    input.form-control(style="display: none;", type="file", name="profile_photo", accept="image/*", onchange="displayPhoto(event)")
 
   script(
     type="text/javascript",
