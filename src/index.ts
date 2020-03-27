@@ -29,6 +29,8 @@ app.use(bodyParser.json())
 
 app.use(authenticateUser)
 
+app.use('/public/uploads', express.static('public/uploads'));
+
 registerJobs()
 
 app.set('view engine', 'pug')
