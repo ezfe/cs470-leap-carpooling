@@ -12,14 +12,14 @@ const routes = Router()
 
 const storage = multer.diskStorage({
   destination: 'public/uploads/',
-  filename: function (req, file, callback) {
-    crypto.randomBytes(16, function(err, raw) {
+  filename: (req, file, callback) => {
+    crypto.randomBytes(16, (err, raw) => {
       callback(null, Date.now() + '-' + raw.toString('hex') + path.extname(file.originalname));
     });
   }
 });
 
-var upload = multer({storage: storage});
+const upload = multer({ storage });
 
 routes.get('/onboard', requireAuthenticated, (req: AuthedReq, res: Response) => {
   res.render('settings/onboard')
