@@ -4,9 +4,18 @@ import { TripMatch } from '../models/trip_matches'
 import { TripRequest } from '../models/trip_requests'
 
 export default async function job() {
-  console.error("were in the job")
-  const pairs = await generatePairs('from_lafayette')
+  console.log("Starting Pairing Process")
+
+  console.log('Generating Pairs From Lafayette')
+  const pairsFromLafayette = await generatePairs('from_lafayette')
+
+  console.log('Generating Pairs Towards Lafayette')
+  const pairsTowardsLafayette = await generatePairs('towards_lafayette')
+
+  const pairs = [...pairsFromLafayette, ...pairsTowardsLafayette]
   pairs.sort((a, b) => { return a.cost - b.cost })
+
+  console.log('Matching Pairs')
   matchPairs(pairs)
 }
 
@@ -99,7 +108,6 @@ async function matchPairs(pairs: GeneratedPair[]) {
         first_portion: firstPortion,
         created_at: db.fn.now()
       })
-      .returning<TripMatch>('*')
 
     return
     // pairs.shift()
