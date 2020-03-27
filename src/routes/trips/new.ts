@@ -28,33 +28,27 @@ routes.post('/', async (req: AuthedReq, res: Response) => {
     const deviationLimit = parseInt(deviationLimitString, 10)
     console.log(deviationLimit)
 
-    await db<TripRequest>('trip_requests').insert({
-      member_id: req.user.id,
-      role: req.body.user_role,
-      location: req.body.place_id,
-      location_description: req.body.location_description,
-      deviation_limit: deviationLimit,
-      direction: 'from_lafayette', // req.body.direction,
-      created_at: db.fn.now()
-    })
-    //get request id of the record just created
-   const reqid= await db<TripRequest>('trip_requests')
-    .where({
-      member_id: req.user.id,
-      role: req.body.user_role,
-      location: req.body.place_id,
-      location_description: req.body.location_description,
-      deviation_limit: deviationLimit,
-      direction: 'from_lafayette', // req.body.direction,
-    })
-    .select('*')
-    console.error("this is the time from the request")
-    console.error(req.body)
+    const requests = await db<TripRequest>('trip_requests').insert({
+        member_id: req.user.id,
+        role: req.body.user_role,
+        location: req.body.place_id,
+        location_description: req.body.location_description,
+        deviation_limit: deviationLimit,
+        direction: 'from_lafayette', // req.body.direction,
+        created_at: db.fn.now()
+      })
+      .returning('id')
+
+    const requestID: number = requests[0]
+
+    console.log("Request body:")
+    console.log(req.body)
     await db('trip_times').insert({
-      request_id:reqid[0].id,
-      date:req.body.date,
-      time:req.body.time
+      request_id: requestID,
+      date: req.body.date,
+      time: req.body.time
     })
+
     res.redirect('/trips')
   } catch (err) {
     console.error(err)
