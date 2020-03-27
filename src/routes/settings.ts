@@ -80,11 +80,11 @@ routes.get('/remove', requireAuthenticated, async (req: AuthedReq, res: Response
         profile_image_name: null
       })
 
-     fs.unlinkSync(req.user.profile_image_name)
+    fs.unlinkSync(req.user.profile_image_name)
+    res.redirect('/settings')
   } catch (err) {
     res.render('database-error')
   }
-  res.redirect('/settings')
 })
 
 routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => {
