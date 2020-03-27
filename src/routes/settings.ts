@@ -25,7 +25,7 @@ routes.get('/onboard', requireAuthenticated, (req: AuthedReq, res: Response) => 
   res.render('settings/onboard')
 })
 
-routes.post('/onboard', upload.single('profile_photo'), requireAuthenticated, async (req: AuthedReq, res: Response) => {
+routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), async (req: AuthedReq, res: Response) => {
   const fileName = (req.file) ? req.file.path : null;
 
   function validate(bodyField: string, length: number): string {
