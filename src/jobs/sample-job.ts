@@ -10,6 +10,7 @@ export default async function job() {
   findPairs(pairs)
 }
 async function checkMatchingTimes(riderId, driverId){
+
   try {
     const driverTimes= await db('trip_times')
       .where({ request_id: driverId })
@@ -23,18 +24,21 @@ async function checkMatchingTimes(riderId, driverId){
     for (const driverTime of driverTimes)
     {
       for(const riderTime of riderTimes){
-        if (driverTime.date == riderTime.date)
+
+        if ((""+driverTime.date )=== (""+riderTime.date))
         {
-          if(driverTime.time == riderTime.time)
+          if(driverTime.time === riderTime.time)
           {
             arr.push({
              time:driverTime.time, date : driverTime.date
             })
+
             return arr;
           }
         }
       }
     }
+    console.log("returning nothing")
     return arr;
   }catch (err) {
     console.error('There was a database issue')
@@ -51,12 +55,13 @@ async function findPairs(pairs: any[]) {
   const rId = pairs[0].riderRecord.id
 
   try {
+    const timeDate =await checkMatchingTimes(pairs[0].riderRecord.id,pairs[0].driverRecord.id)
     const match = await db('trip_matches')
       .insert({
         driver_request_id: dId,
         rider_request_id: rId,
-        date: db.fn.now(),
-        time: 'morning',
+        date: timeDate[0].date,
+        time: timeDate[0].time,
         rider_confirmed: false,
         driver_confirmed: false,
         created_at: db.fn.now()
@@ -136,9 +141,9 @@ async function processDirection(direction): Promise<DirectionResult[]> {
           if( !check1){
             const { driverCost, riderCost } = await distanceMatrix(driverRecord.location, riderRecord.location, direction)
             const pair = { driverRecord, riderRecord }
-            //const timeDate =await checkMatchingTimes(riderRecord.id,driverRecord.id)
-            //if(timeDate.length!=0)
-            //{
+            const timeDate =await checkMatchingTimes(riderRecord.id,driverRecord.id)
+            if(timeDate.length!=0)
+            {
             if (driverCost < driverRecord.deviation_limit) {
               if (riderCost < riderRecord.deviation_limit) {
                 results.push({
@@ -160,7 +165,7 @@ async function processDirection(direction): Promise<DirectionResult[]> {
             else{
               console.error("in the else where nothing happens");
             }
-          //}
+          }
         }
         }
       }
