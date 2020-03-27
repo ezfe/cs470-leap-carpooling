@@ -25,7 +25,8 @@ routes.get('/onboard', requireAuthenticated, (req: AuthedReq, res: Response) => 
   res.render('settings/onboard')
 })
 
-routes.post('/onboard', requireAuthenticated, async (req: AuthedReq, res: Response) => {
+routes.post('/onboard', upload.single('profile_photo'), requireAuthenticated, async (req: AuthedReq, res: Response) => {
+  const fileName = (req.file) ? req.file.path : null;
 
   function validate(bodyField: string, length: number): string {
     const foundValue = req.body[bodyField]
@@ -47,7 +48,8 @@ routes.post('/onboard', requireAuthenticated, async (req: AuthedReq, res: Respon
       .update({
         preferred_name: preferredName,
         email: preferredEmail,
-        phone_number: phoneNumber
+        phone_number: phoneNumber,
+        profile_image_name: fileName
       })
 
     res.redirect('/')
@@ -104,7 +106,6 @@ routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => 
 })
 
 routes.post('/upload-photo', upload.single('profile_photo'), requireAuthenticated, async (req: AuthedReq, res: Response) => {
-  console.log('got to upload')
   try {
     await db<User>('users').where({ id: req.user.id })
     .update({

@@ -5,12 +5,12 @@ block navbar_settings
 
 block content
   .row
-    .col-6.offset-3
-      .card.mb-3
+    .col-lg-6.offset-lg-3
+      .card
         .card-header 
           h4.mb-0 Welcome!
         .card-body
-          form#onboard-form(method="POST")
+          form#onboard-form(method="POST", enctype="multipart/form-data")
             .row.mb-4
               .col.text-center
                 img.rounded.img-fluid.mr-3(id="uploadedPhoto", src="/static/blank-profile.png",style="height:200px;width:200px")   
