@@ -41,7 +41,7 @@ export async function timeBetween(originPlace, destinationPlace): Promise<number
 
   const redisFoundValue = await redisClient.get(redisKey)
   if (redisFoundValue) {
-    return parseInt(redisFoundValue, 10)
+    return parseInt(redisFoundValue, 10) / 60
   }
 
   const c = new Client({})
@@ -61,5 +61,5 @@ export async function timeBetween(originPlace, destinationPlace): Promise<number
   await redisClient.set(redisKey, time)
   await redisClient.expire(redisKey, 604800) // 1 week
 
-  return time
+  return time / 60
 }

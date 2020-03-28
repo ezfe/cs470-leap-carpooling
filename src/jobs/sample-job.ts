@@ -7,103 +7,151 @@ export default async function job() {
   console.log("Starting Pairing Process")
 
   console.log('Generating Pairs From Lafayette')
-  const pairsFromLafayette = await generatePairs('from_lafayette')
+  const pairsFromLafayette = await calculatePairsWithCost('from_lafayette')
+  console.log('Found pairs', pairsFromLafayette)
 
   console.log('Generating Pairs Towards Lafayette')
-  const pairsTowardsLafayette = await generatePairs('towards_lafayette')
+  const pairsTowardsLafayette = await calculatePairsWithCost('towards_lafayette')
+  console.log('Found pairs', pairsTowardsLafayette)
 
   const pairs = [...pairsFromLafayette, ...pairsTowardsLafayette]
   pairs.sort((a, b) => { return a.cost - b.cost })
 
   console.log('Matching Pairs')
-  matchPairs(pairs)
+  matchFirstPair(pairs)
 }
 
-interface GeneratedPair {
-  driverRecord: TripRequest
-  riderRecord: TripRequest
-  firstPortion: 'rider' | 'driver'
-  cost: number
+interface PotentialPair {
+  driver_request_id: number
+  driver_id: number
+  driver_location: string
+  driver_deviation_limit: number
+  rider_request_id: number
+  rider_id: number
+  rider_location: string
+  rider_deviation_limit: number
 }
 
-async function generatePairs(direction: 'from_lafayette' | 'towards_lafayette'): Promise<GeneratedPair[]> {
+async function generatePotentialPairs(direction: 'from_lafayette' | 'towards_lafayette'): Promise<PotentialPair[]> {
   try {
-    const driverRecords = await db<TripRequest>('trip_requests')
-      .where({ role: 'driver', direction })
-      .select('*')
-    console.log('Driver Records', driverRecords)
+    const res = await db.transaction(async (trx) => {
+      // Create View
+      const rawViewQuery = trx.raw(`
+        SELECT
+          trip_requests.id AS trip_request_id,
+          trip_requests.member_id AS member_id,
+          trip_requests.role AS role,
+          trip_requests.location AS location,
+          trip_requests.deviation_limit AS deviation_limit,
+          trip_times.id as trip_time_id,
+          trip_times.date as trip_date,
+          trip_times.time as trip_time
+        FROM trip_requests
+        RIGHT JOIN trip_times
+        ON trip_requests.id=trip_times.request_id
+        WHERE
+          trip_requests.direction = ?`, direction)
+      await trx.raw(`CREATE OR REPLACE TEMPORARY VIEW trip_requests_times AS (${rawViewQuery})`)
 
-    const riderRecords = await db<TripRequest>('trip_requests')
-      .where({ role: 'rider', direction })
-      .select('*')
-    console.log('Rider Records', riderRecords)
+      // Query Pairs
+      return await trx.raw(`
+        SELECT
+          left_t.trip_request_id AS driver_request_id,
+          left_t.member_id AS driver_id,
+          left_t.location AS driver_location,
+          left_t.deviation_limit AS driver_deviation_limit,
+          right_t.trip_request_id AS rider_request_id,
+          right_t.member_id AS rider_id,
+          right_t.location AS rider_location,
+          right_t.deviation_limit AS rider_deviation_limit
+        FROM (
+          SELECT * FROM trip_requests_times WHERE role='driver'
+        ) as left_t
+        INNER JOIN (
+          SELECT * FROM trip_requests_times WHERE role='rider'
+        ) as right_t
+        ON
+          left_t.trip_request_id < right_t.trip_request_id
+          AND left_t.trip_date = right_t.trip_date
+          AND left_t.trip_time = right_t.trip_time
+        `)
+    })
 
-    const results = new Array<GeneratedPair>()
-
-    for (const driverRecord of driverRecords) {
-
-      const check = await checkForMatch(driverRecord.id,'driver')
-      if( !check){
-        for (const riderRecord of riderRecords) {
-          const check1 = await(checkForMatch(riderRecord.id,'rider'))
-          if( !check1){
-            const { driverCost, riderCost } = await distanceMatrix(driverRecord.location, riderRecord.location, direction)
-            const pair = { driverRecord, riderRecord }
-            const timeDate =await checkMatchingTimes(riderRecord.id,driverRecord.id)
-            if(timeDate.length != 0)
-            {
-            if (driverCost < driverRecord.deviation_limit) {
-              if (riderCost < riderRecord.deviation_limit) {
-                results.push({
-                  ...pair,
-                  cost: Math.min(riderCost, driverCost),
-                  firstPortion: riderCost < driverCost ? 'rider' : 'driver'
-                })
-              } else {
-                results.push({
-                  ...pair,
-                  cost: driverCost,
-                  firstPortion: 'driver'
-                })
-              }
-            } else if (riderCost < riderRecord.deviation_limit) {
-              results.push({
-                ...pair,
-                cost: riderCost,
-                firstPortion: 'rider'
-              })
-            }
-            else{
-              console.error("in the else where nothing happens");
-            }
-          }
-        }
-        }
-      }
-    }
-
-    return results
+    return res.rows
   } catch (err) {
-    console.error('in the catch')
+    console.error('An error occurred generating potential pairs')
+    console.error(err)
     return []
   }
 }
 
-async function matchPairs(pairs: GeneratedPair[]) {
+interface PricedPair {
+  driver_request_id: number
+  rider_request_id: number
+  cost: number
+  firstPortion: 'driver' | 'rider'
+}
+
+async function calculatePairsWithCost(direction: 'from_lafayette' | 'towards_lafayette'): Promise<PricedPair[]> {
+  const potentialPairs = await generatePotentialPairs(direction)
+  const pricedPairs = Array<PricedPair>()
+
+  for (const potential of potentialPairs) {
+    console.log('Pricing potential pair', potential)
+
+    const mtrx = await distanceMatrix(potential.driver_location, potential.rider_location, direction)
+    console.log('Found cost information', mtrx)
+
+    const res = {
+      driver_request_id: potential.driver_request_id,
+      rider_request_id: potential.rider_request_id,
+    }
+
+    if (mtrx.driverCost <= potential.driver_deviation_limit) {
+      // driver could pay
+      // rider unknown
+      if (mtrx.riderCost <= potential.rider_deviation_limit) {
+        // either could pay
+        pricedPairs.push({
+          ...res,
+          cost: Math.min(mtrx.driverCost, mtrx.riderCost),
+          firstPortion: (mtrx.driverCost <= mtrx.riderCost) ? 'driver' : 'rider'
+        })
+      } else {
+        // only driver could pay
+        pricedPairs.push({
+          ...res,
+          cost: mtrx.driverCost,
+          firstPortion: 'driver'
+        })
+      }
+    } else if (mtrx.riderCost <= potential.rider_deviation_limit) {
+      // only rider could pay
+      pricedPairs.push({
+        ...res,
+        cost: mtrx.riderCost,
+        firstPortion: 'rider'
+      })
+    }
+  }
+
+  return pricedPairs
+}
+
+async function matchFirstPair(pairs: PricedPair[]) {
   if (pairs.length === 0){
     return
   }
 
-  const { driverRecord, riderRecord, firstPortion } = pairs[0]
+  const { driver_request_id, rider_request_id, firstPortion } = pairs[0]
 
   try {
-    const timeDate = await checkMatchingTimes(riderRecord.id, driverRecord.id)
     await db<TripMatch>('trip_matches')
       .insert({
-        driver_request_id: driverRecord.id,
-        rider_request_id: riderRecord.id,
-        date: timeDate[0].date,
-        time: timeDate[0].time,
+        driver_request_id,
+        rider_request_id,
+        date: db.fn.now(), // timeDate[0].date,
+        time: 'morning',   // time: timeDate[0].time,
         rider_confirmed: false,
         driver_confirmed: false,
         first_portion: firstPortion,
@@ -111,67 +159,8 @@ async function matchPairs(pairs: GeneratedPair[]) {
       })
 
     return
-    // pairs.shift()
-
-    // pairs = pairs.filter((pair) => {
-    //   return pair.driverRecord.id == driverRecord.id || pair.riderRecord.id == riderRecord.id
-    // })
   } catch (err) {
     console.error('There was a database issue')
     console.error(err)
   }
-}
-
-async function checkMatchingTimes(riderId: number, driverId: number) {
-  try {
-    const driverTimes= await db('trip_times')
-      .where({ request_id: driverId })
-      .select('*')
-    console.log(driverTimes)
-    const riderTimes= await db('trip_times')
-      .where({ request_id: riderId })
-      .select('*')
-    console.log(riderTimes)
-    let arr =[]
-    for (const driverTime of driverTimes)
-    {
-      for(const riderTime of riderTimes){
-
-        if ((""+driverTime.date ) === (""+riderTime.date))
-        {
-          if (driverTime.time === riderTime.time) {
-            arr.push({
-             time:driverTime.time, date : driverTime.date
-            })
-
-            return arr;
-          }
-        }
-      }
-    }
-    console.log("returning nothing")
-    return arr
-  }catch (err) {
-    console.error('There was a database issue')
-    console.error(err)
-  }
-}
-
-async function checkForMatch(id: number, personType: 'driver' | 'rider'): Promise<boolean> {
-  const idParameter = personType === 'driver' ? 'driver_request_id' : 'rider_request_id'
-
-  try {
-    const matchingRecords = await db<TripMatch>('trip_matches')
-      .where(idParameter, id)
-      .select('*')
-
-    if (matchingRecords.length > 0) {
-      return true
-    }
-  } catch (err) {
-    console.error(err)
-    console.error('in the catch')
-  }
-
-  return false
 }
