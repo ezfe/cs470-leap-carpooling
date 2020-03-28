@@ -38,19 +38,28 @@ async function generatePotentialPairs(direction: 'from_lafayette' | 'towards_laf
       // Create View
       const rawViewQuery = trx.raw(`
         SELECT
-          trip_requests.id AS trip_request_id,
-          trip_requests.member_id AS member_id,
-          trip_requests.role AS role,
-          trip_requests.location AS location,
-          trip_requests.deviation_limit AS deviation_limit,
+          trip_requests_t.id AS trip_request_id,
+          trip_requests_t.member_id AS member_id,
+          trip_requests_t.role AS role,
+          trip_requests_t.location AS location,
+          trip_requests_t.deviation_limit AS deviation_limit,
           trip_times.id as trip_time_id,
           trip_times.date as trip_date,
           trip_times.time as trip_time
-        FROM trip_requests
+        FROM (
+          SELECT trip_requests.*
+          FROM trip_requests
+          LEFT JOIN trip_matches
+          ON
+            trip_requests.id=trip_matches.driver_request_id
+            OR trip_requests.id=trip_matches.RIDER_request_id
+          WHERE
+            trip_matches.id IS NULL
+        ) as trip_requests_t
         RIGHT JOIN trip_times
-        ON trip_requests.id=trip_times.request_id
-        WHERE
-          trip_requests.direction = ?`, direction)
+        ON trip_requests_t.id=trip_times.request_id
+        WHERE trip_requests_t.direction = ?`, direction)
+
       await trx.raw(`CREATE OR REPLACE TEMPORARY VIEW trip_requests_times AS (${rawViewQuery})`)
 
       // Query Pairs
