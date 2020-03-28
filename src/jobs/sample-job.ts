@@ -116,10 +116,10 @@ async function calculatePairsWithCost(direction: 'from_lafayette' | 'towards_laf
       rider_request_id: potential.rider_request_id,
     }
 
-    if (mtrx.driverCost <= potential.driver_deviation_limit) {
+    if (mtrx.driverCost/60 <= potential.driver_deviation_limit) {
       // driver could pay
       // rider unknown
-      if (mtrx.riderCost <= potential.rider_deviation_limit) {
+      if (mtrx.riderCost/60 <= potential.rider_deviation_limit) {
         // either could pay
         pricedPairs.push({
           ...res,
@@ -134,7 +134,7 @@ async function calculatePairsWithCost(direction: 'from_lafayette' | 'towards_laf
           firstPortion: 'driver'
         })
       }
-    } else if (mtrx.riderCost <= potential.rider_deviation_limit) {
+    } else if (mtrx.riderCost/60 <= potential.rider_deviation_limit) {
       // only rider could pay
       pricedPairs.push({
         ...res,
