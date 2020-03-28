@@ -22,3 +22,10 @@
 # Google Maps
 
 A project must be created at [console.cloud.google.com](https://console.cloud.google.com).
+
+# HTTPS
+
+1. Install NGINX
+2. Install and configure certbot: https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx 
+3. Run certbot for the domain name of choice (carpool.cs.lafayette.edu currently), with the `certonly` option
+3. Use configuration in `nginx/`, modify if the domain name was changed
