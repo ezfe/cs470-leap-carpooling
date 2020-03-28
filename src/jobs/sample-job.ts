@@ -31,11 +31,12 @@ async function generatePairs(direction: 'from_lafayette' | 'towards_lafayette'):
     const driverRecords = await db<TripRequest>('trip_requests')
       .where({ role: 'driver', direction })
       .select('*')
-    console.log(driverRecords)
+    console.log('Driver Records', driverRecords)
 
     const riderRecords = await db<TripRequest>('trip_requests')
       .where({ role: 'rider', direction })
       .select('*')
+    console.log('Rider Records', riderRecords)
 
     const results = new Array<GeneratedPair>()
 
