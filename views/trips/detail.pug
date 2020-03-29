@@ -8,38 +8,38 @@ block header_extension
 
 block content
 
-  if driver.id != current_user.id
+  if driver.id != currentUser.id
     .row.mb-3
       .col
         .card
           h5.card-header
-            if rider.id == current_user.id
+            if rider.id == currentUser.id
               | Driving You
             else
               | Driver
           .card-body
             .row
               .col-2
-                | Profile Img
+                img.rounded.img-fluid(src=driver.profile_image_name, style="width: 300px;")   
               .col
                 h5.card-title
                   = driver.preferred_name || driver.first_name
                 p.card-text
                   = 'Location: '
                   = driverRequest.location_description
-  if rider.id != current_user.id
+  if rider.id != currentUser.id
     .row.mb-3
       .col
         .card
           h5.card-header
-            if driver.id == current_user.id
+            if driver.id == currentUser.id
               | Riding With You
             else
               | Rider
           .card-body
             .row
               .col-2
-                | Profile Img
+                include ../modules/photo
               .col
                 h5.card-title
                   = rider.preferred_name || rider.first_name

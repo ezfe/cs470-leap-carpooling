@@ -72,7 +72,7 @@ html(lang="en")
                 li.nav-item(class=(current_page == nav.name ? 'active' : ''))
                   a.nav-link(href=nav.url)= nav.title
             ul.navbar-nav
-              if current_user
+              if currentUser
                 li.nav-item.dropdown
                   a.nav-link.dropdown-toggle(
                     href="#",

@@ -49,7 +49,7 @@ routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), as
         preferred_name: preferredName,
         email: preferredEmail,
         phone_number: phoneNumber,
-        profile_image_name: fileName
+        profile_image_name: `/${fileName}`
       })
 
     res.redirect('/')
@@ -64,13 +64,12 @@ routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), as
 })
 
 routes.get('/', requireAuthenticated, (req: AuthedReq, res: Response) => {
-  const currentUser = req.user
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
   if (!googleMapsAPIKey) {
     res.send('GOOGLE_MAPS_PLACES_KEY is unset')
     return
   }
-  res.render('settings/index', { currentUser, googleMapsAPIKey })
+  res.render('settings/index', { googleMapsAPIKey })
 })
 
 routes.get('/remove', requireAuthenticated, async (req: AuthedReq, res: Response) => {
