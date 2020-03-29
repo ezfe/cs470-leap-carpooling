@@ -34,59 +34,54 @@ interface PotentialPair {
 
 async function generatePotentialPairs(direction: TripDirection): Promise<PotentialPair[]> {
   try {
-    const res = await db.transaction(async (trx) => {
+    return await db.transaction(async (trx) => {
       // Create View
-      const rawViewQuery = trx.raw(`
-        SELECT
-          trip_requests_t.id AS trip_request_id,
-          trip_requests_t.member_id AS member_id,
-          trip_requests_t.role AS role,
-          trip_requests_t.location AS location,
-          trip_requests_t.deviation_limit AS deviation_limit,
-          trip_times.id as trip_time_id,
-          trip_times.date as trip_date,
-          trip_times.time as trip_time
-        FROM (
-          SELECT trip_requests.*
-          FROM trip_requests
-          LEFT JOIN trip_matches
-          ON
-            trip_requests.id=trip_matches.driver_request_id
-            OR trip_requests.id=trip_matches.RIDER_request_id
-          WHERE
-            trip_matches.id IS NULL
-        ) as trip_requests_t
-        RIGHT JOIN trip_times
-        ON trip_requests_t.id=trip_times.request_id
-        WHERE trip_requests_t.direction = ?`, direction)
+      const rawViewQuery = trx.select([
+        db.ref('trip_requests_t.id').as('trip_request_id'),
+        db.ref('trip_requests_t.member_id').as('member_id'),
+        db.ref('trip_requests_t.role').as('role'),
+        db.ref('trip_requests_t.location').as('location'),
+        db.ref('trip_requests_t.deviation_limit').as('deviation_limit'),
+        db.ref('trip_times.id').as('trip_time_id'),
+        db.ref('trip_times.date').as('trip_date'),
+        db.ref('trip_times.time').as('trip_time')
+      ]).from(function() {
+        this.select('trip_requests.*')
+          .from('trip_requests')
+          .leftJoin('trip_matches', function() {
+            this.on('trip_requests.id', '=', 'trip_matches.driver_request_id')
+            .orOn('trip_requests.id', '=', 'trip_matches.rider_request_id')
+          })
+          .whereNull('trip_matches.id')
+          .as('trip_requests_t')
+      }).rightJoin(
+        'trip_times',
+        'trip_requests_t.id', 'trip_times.request_id'
+      ).where('trip_requests_t.direction', '=', direction)
 
       await trx.raw(`CREATE OR REPLACE TEMPORARY VIEW trip_requests_times AS (${rawViewQuery})`)
 
       // Query Pairs
-      return await trx.raw(`
-        SELECT
-          left_t.trip_request_id AS driver_request_id,
-          left_t.member_id AS driver_id,
-          left_t.location AS driver_location,
-          left_t.deviation_limit AS driver_deviation_limit,
-          right_t.trip_request_id AS rider_request_id,
-          right_t.member_id AS rider_id,
-          right_t.location AS rider_location,
-          right_t.deviation_limit AS rider_deviation_limit
-        FROM (
-          SELECT * FROM trip_requests_times WHERE role='driver'
-        ) as left_t
-        INNER JOIN (
-          SELECT * FROM trip_requests_times WHERE role='rider'
-        ) as right_t
-        ON
-          left_t.trip_request_id < right_t.trip_request_id
-          AND left_t.trip_date = right_t.trip_date
-          AND left_t.trip_time = right_t.trip_time
-        `)
+      return await trx.select([
+        db.ref('driver_t.trip_request_id').as('driver_request_id'),
+        db.ref('driver_t.member_id').as('driver_id'),
+        db.ref('driver_t.location').as('driver_location'),
+        db.ref('driver_t.deviation_limit').as('driver_deviation_limit'),
+        db.ref('rider_t.trip_request_id').as('rider_request_id'),
+        db.ref('rider_t.member_id').as('rider_id'),
+        db.ref('rider_t.location').as('rider_location'),
+        db.ref('rider_t.deviation_limit').as('rider_deviation_limit'),
+      ]).from(function() {
+        this.select('*').from('trip_requests_times').where('role', '=', 'driver').as('driver_t')
+      }).innerJoin(function() {
+        this.select('*').from('trip_requests_times').where('role', '=', 'rider').as('rider_t')
+      }, function() {
+          this.on('driver_t.trip_request_id', '<', 'rider_t.trip_request_id')
+          .andOn('driver_t.trip_date', '=', 'rider_t.trip_date')
+          .andOn('driver_t.trip_time', '=', 'rider_t.trip_time')
+        } 
+      )
     })
-
-    return res.rows
   } catch (err) {
     console.error('An error occurred generating potential pairs')
     console.error(err)
@@ -148,7 +143,7 @@ async function calculatePairsWithCost(direction: TripDirection): Promise<PricedP
 }
 
 async function matchFirstPair(pairs: PricedPair[]) {
-  if (pairs.length === 0){
+  if (pairs.length === 0) {
     return
   }
 
