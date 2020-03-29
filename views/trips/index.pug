@@ -16,11 +16,12 @@ block content
     .row.mb-3
       .col
         .card
-          h5.card-header(class=`trip-${trip.status}`)
-            if trip.rider_confirmed && trip.driver_confirmed
+          if trip.rider_confirmed && trip.driver_confirmed
+            h5.card-header(class=`trip-confirmed`)
               i.mr-2(class='fas fa-check-circle')
               | Confirmed Trip
-            else
+          else
+            h5.card-header(class=`trip-pending`)
               i.mr-2(class='fas fa-exclamation-triangle')
               | Pending Trip
             //- else if trip.status == 'processing'
@@ -30,6 +31,24 @@ block content
             //-   | (Unknown Status)
           .card-body
             h5.card-title
-              = `Trip ${trip.direction} to/from ${trip.location_description}`
-            p.card-text This is text
+              if trip.direction == 'towards_lafayette'
+                = `Trip to Lafayette College from ${trip.location_description}`
+              else
+                = `Trip from ${trip.location_description} to Lafayette College`
+            ul
+              each time in trip.times
+                li= `${time.date} ${time.time}`
             a.btn.btn-outline-secondary(href=`/trips/${trip.id}`) Trip Details
+  each trip in unmatchedRequests
+    .row.mb-3
+      .col
+        .card
+          h5.card-header(class=`trip-processing`)
+            i.mr-2(class='fas fa-sync-alt')
+            | Processing Trip
+          .card-body
+            h5.card-title
+              = `Trip ${trip.direction} to/from ${trip.location_description}`
+            ul
+              each time in trip.times
+                li= `${time.date} ${time.time}`
