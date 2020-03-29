@@ -8,38 +8,38 @@ block header_extension
 
 block content
 
-  if driver.id != current_user.id
+  if driver.id != currentUser.id
     .row.mb-3
       .col
         .card
           h5.card-header
-            if rider.id == current_user.id
+            if rider.id == currentUser.id
               | Driving You
             else
               | Driver
           .card-body
             .row
               .col-2
-                | Profile Img
+                img.rounded.img-fluid(src=driver.profile_image_name, style="width: 300px;")   
               .col
                 h5.card-title
                   = driver.preferred_name || driver.first_name
                 p.card-text
                   = 'Location: '
                   = driverRequest.location_description
-  if rider.id != current_user.id
+  if rider.id != currentUser.id
     .row.mb-3
       .col
         .card
           h5.card-header
-            if driver.id == current_user.id
+            if driver.id == currentUser.id
               | Riding With You
             else
               | Rider
           .card-body
             .row
               .col-2
-                | Profile Img
+                img.rounded.img-fluid(src=rider.profile_image_name, style="width: 300px;")   
               .col
                 h5.card-title
                   = rider.preferred_name || rider.first_name
@@ -48,41 +48,50 @@ block content
                   = riderRequest.location_description
 
   .row
-    .col
-      p
-        if tripMatch.direction == 'from_lafayette'
-          = driver.preferred_name || driver.first_name
-          if tripMatch.first_portion == 'driver'
-            = ' will drop off '
-            = rider.preferred_name || rider.first_name
-            = '. '
-          else
-            = ' will drive to '
-            = driverRequest.location_description
-            = ' where '
-            = rider.preferred_name || rider.first_name
-            = ' will continue on alone.'
-        else
-          = driver.preferred_name || driver.first_name
-          if tripMatch.first_portion == 'driver'
-            = ' will pick up '
-          else
-            = ' will wait for '
-          = rider.preferred_name || rider.first_name
+    .col-1.order-4
+      span.fas.fa-arrow-right
+    .col-1(class=(tripMatch.direction == 'from_lafayette' ? 'order-2' : 'order-6'))
+      span.fas.fa-arrow-right
 
+    .col(
+      class=(tripMatch.direction == 'from_lafayette' ? 'order-1' : 'order-7')
+    )
+      .row
+        .col
+          p Lafayette College
+    .col(
+      class=(tripMatch.first_portion == 'driver' ? 'order-3' : 'order-5')
+    )
+      .row
+        .col
+          p= driverRequest.location_description
+      .row
+        .col
+          a.btn.btn-outline-info(
+            href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(driverRequest.location_description)}&query_place_id=${driverRequest.location}`
+          )
+            fa.fas.fa-location-arrow
+            = ' Google Maps'
+    .col(
+      class=(tripMatch.first_portion == 'rider' ? 'order-3' : 'order-5')
+    )
+      .row
+        .col
+          p= riderRequest.location_description
+      .row
+        .col
+          a.btn.btn-outline-info(
+            href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(riderRequest.location_description)}&query_place_id=${riderRequest.location}`
+          )
+            fa.fas.fa-location-arrow
+            = ' Google Maps'
+
+  hr.my-4
 
   .row
     .col
-      = driver.preferred_name || driver.first_name
-      = ' is driving '
-      = rider.preferred_name || rider.first_name
-      if tripMatch.direction == 'from_lafayette'
-        = ' from Lafayette College. '
+      if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
+        form(method="POST" action=`/trips/${tripMatch.id}/confirm`)
+          button.btn.btn-outline-success(role="submit") Confirm Trip
       else
-        = ' to Lafayette College. '
-      
-  .row
-    .col
-      span= JSON.stringify(tripMatch)
-      span= JSON.stringify(driverRequest)
-      span= JSON.stringify(riderRequest)
+        span Waiting for the other person to confirm...

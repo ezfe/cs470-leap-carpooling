@@ -26,7 +26,7 @@ block content
                 input.form-control(
                   name="preferred_name"
                   autocomplete="given-name"
-                  value=(current_user.preferred_name || current_user.first_name)
+                  value=(currentUser.preferred_name || currentUser.first_name)
                   required
                   maxlength=100
                 )
@@ -38,7 +38,7 @@ block content
                 input.form-control(
                   name="preferred_email"
                   autocomplete="email"
-                  value=(current_user.email || `${current_user.netid}@lafayette.edu`)
+                  value=(currentUser.email || `${currentUser.netid}@lafayette.edu`)
                   required
                   maxlength=100
                 )
@@ -50,7 +50,7 @@ block content
                 input.form-control(
                   name= "phone_number"
                   autocomplete="tel"
-                  value=current_user.phone_number
+                  value=currentUser.phone_number
                   required
                   maxlength=30
                 )

@@ -6,14 +6,14 @@ export async function authenticateUser(req: AuthedReq, res: Response, next: Next
   const user = await getUserByID(req?.session?.userID)
   req.user = user
   if (user) {
-    res.locals.current_user = user
+    res.locals.currentUser = user
     if (user.preferred_name && user.preferred_name.length > 0) {
       res.locals.user_preferred_name = user.preferred_name
     } else {
       res.locals.user_preferred_name = user.first_name
     }
   } else {
-    res.locals.current_user = null
+    res.locals.currentUser = null
   }
   next()
 }
