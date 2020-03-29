@@ -22,7 +22,9 @@ routes.get('/', async (req: AuthedReq, res: Response) => {
         'trip_matches.date',
         'trip_matches.time',
         'trip_matches.rider_confirmed',
-        'trip_matches.driver_confirmed'
+        'trip_matches.driver_confirmed',
+        'trip_matches.driver_request_id',
+        'trip_matches.rider_request_id',
       ).join('trip_matches', function() {
         this.on('trip_requests.id', '=', 'trip_matches.driver_request_id')
           .orOn('trip_requests.id', '=', 'trip_matches.rider_request_id')
@@ -33,6 +35,7 @@ routes.get('/', async (req: AuthedReq, res: Response) => {
     let unmatchedRequests = await db('trip_requests')
       .select(
         'trip_requests.role',
+        db.ref('trip_requests.id').as('trip_request_id'),
         'trip_requests.location_description',
         'trip_requests.direction'
       ).leftJoin('trip_matches', function() {
@@ -56,6 +59,7 @@ routes.get('/', async (req: AuthedReq, res: Response) => {
 
     res.render('trips/index', context)
   } catch (err) {
+    console.error(err)
     res.render('database-error')
   }
 })

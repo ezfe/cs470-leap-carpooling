@@ -85,3 +85,13 @@ block content
           )
             fa.fas.fa-location-arrow
             = ' Google Maps'
+
+  hr.my-4
+
+  .row
+    .col
+      if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
+        form(method="POST" action=`/trips/${tripMatch.id}/confirm`)
+          button.btn.btn-outline-success(role="submit") Confirm Trip
+      else
+        span Waiting for the other person to confirm...
