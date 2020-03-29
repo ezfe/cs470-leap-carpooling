@@ -13,7 +13,7 @@ routes.get('/', (req: AuthedReq, res: Response) => {
     return
   }
 
-  const defaultDeviationLimit = req.user.deviation_limit
+  const defaultDeviationLimit = req.user?.deviation_limit
 
   res.render('trips/new', {
     googleMapsAPIKey,
@@ -29,7 +29,7 @@ routes.post('/', async (req: AuthedReq, res: Response) => {
     console.log(deviationLimit)
 
     const requests = await db<TripRequest>('trip_requests').insert({
-        member_id: req.user.id,
+        member_id: req.user?.id,
         role: req.body.user_role,
         location: req.body.place_id,
         location_description: req.body.location_description,

@@ -1,11 +1,11 @@
 import { Raw } from "knex";
 import db from "../db";
 
-export async function getTripMatchByID(id: number): Promise<TripMatch> {
-  if (!id) return null
+export async function getTripMatchByID(id: number): Promise<TripMatch | undefined> {
+  if (!id) return undefined
 
   const match = await db<TripMatch>('trip_matches').where('id', id).first()
-  return match || null
+  return match || undefined
 }
 
 export interface TripMatch {

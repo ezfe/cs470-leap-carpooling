@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express'
 import { AuthedReq } from '../utils/authed_req'
 
 export async function authenticateUser(req: AuthedReq, res: Response, next: NextFunction) {
-  const user = await getUserByID(req.session.userID)
+  const user = await getUserByID(req?.session?.userID)
   req.user = user
   if (user) {
     res.locals.current_user = user

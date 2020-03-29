@@ -26,7 +26,7 @@ routes.get('/onboard', requireAuthenticated, (req: AuthedReq, res: Response) => 
 })
 
 routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), async (req: AuthedReq, res: Response) => {
-  const fileName = (req.file) ? req.file.path : null;
+  const fileName = (req.file) ? req.file.path : undefined;
 
   function validate(bodyField: string, length: number): string {
     const foundValue = req.body[bodyField]
@@ -44,7 +44,7 @@ routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), as
     const phoneNumber = validate('phone_number', 30)
     console.log(phoneNumber)
 
-    await db<User>('users').where({ id: req.user.id })
+    await db<User>('users').where({ id: req.user?.id })
       .update({
         preferred_name: preferredName,
         email: preferredEmail,
@@ -75,12 +75,14 @@ routes.get('/', requireAuthenticated, (req: AuthedReq, res: Response) => {
 
 routes.get('/remove', requireAuthenticated, async (req: AuthedReq, res: Response) => {
   try {
-    await db<User>('users').where({ id: req.user.id })
+    await db<User>('users').where({ id: req.user?.id })
       .update({
-        profile_image_name: null
+        profile_image_name: undefined
       })
 
-    fs.unlinkSync(req.user.profile_image_name)
+    if (req.user?.profile_image_name) {
+      fs.unlinkSync(req.user?.profile_image_name)
+    }
     res.redirect('/settings')
   } catch (err) {
     res.render('database-error')
@@ -89,7 +91,7 @@ routes.get('/remove', requireAuthenticated, async (req: AuthedReq, res: Response
 
 routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => {
   try {
-    await db<User>('users').where({ id: req.user.id })
+    await db<User>('users').where({ id: req.user?.id })
       .update({
         preferred_name: req.body.preferred_name,
         email: req.body.preferred_email,
@@ -107,7 +109,7 @@ routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => 
 
 routes.post('/upload-photo', upload.single('profile_photo'), requireAuthenticated, async (req: AuthedReq, res: Response) => {
   try {
-    await db<User>('users').where({ id: req.user.id })
+    await db<User>('users').where({ id: req.user?.id })
     .update({
       profile_image_name: req.file.path
     })

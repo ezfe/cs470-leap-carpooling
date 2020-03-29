@@ -17,7 +17,7 @@ routes.get('/', async (req: AuthedReq, res: Response) => {
         this.on('trip_requests.id', '=', 'trip_matches.driver_request_id')
           .orOn('trip_requests.id', '=', 'trip_matches.rider_request_id')
       }).where({
-        'trip_requests.member_id': req.user.id
+        'trip_requests.member_id': req.user?.id
       }).select(
         'trip_matches.id',
         'trip_requests.role',
