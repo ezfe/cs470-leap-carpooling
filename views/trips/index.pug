@@ -1,0 +1,35 @@
+extends ../base.pug
+
+block navbar_settings
+  - var current_page = "trip_index"
+
+block header_extension
+  link(rel="stylesheet", href="/static/dashboard.css")
+
+block content
+  .row.mb-3
+    .col.text-center
+      a.btn.btn-info.btn-lg(href="/trips/new", style="width: 200px;")
+        i.fas.fa-plus.mr-2
+        | New Trip
+  each trip in matchedRequests
+    .row.mb-3
+      .col
+        .card
+          h5.card-header(class=`trip-${trip.status}`)
+            if trip.rider_confirmed && trip.driver_confirmed
+              i.mr-2(class='fas fa-check-circle')
+              | Confirmed Trip
+            else
+              i.mr-2(class='fas fa-exclamation-triangle')
+              | Pending Trip
+            //- else if trip.status == 'processing'
+            //-   i.mr-2(class='fas fa-sync-alt')
+            //-   | Processing Trip
+            //- else
+            //-   | (Unknown Status)
+          .card-body
+            h5.card-title
+              = `Trip ${trip.direction} to/from ${trip.location_description}`
+            p.card-text This is text
+            a.btn.btn-outline-secondary(href=`/trips/${trip.id}`) Trip Details

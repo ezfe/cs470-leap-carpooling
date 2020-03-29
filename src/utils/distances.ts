@@ -1,10 +1,10 @@
 import { Client } from "@googlemaps/google-maps-services-js"
 import redisClient from "../db/redis"
 
-export async function distanceMatrix(driverPlace: string, riderPlace: string, toLafayette: boolean) {
+export async function distanceMatrix(driverPlace: string, riderPlace: string, direction: string) {
   const lafayettePlace = 'ChIJAZll2E5sxIkRmWtHcAi0le4'
 
-  if (toLafayette) {
+  if (direction == 'towards_lafayette') {
     const driverBaseCost = await timeBetween(driverPlace, lafayettePlace)
     const driverToRider = await timeBetween(driverPlace, riderPlace)
     const riderToLafayette = await timeBetween(riderPlace, lafayettePlace)
@@ -41,7 +41,7 @@ export async function timeBetween(originPlace, destinationPlace): Promise<number
 
   const redisFoundValue = await redisClient.get(redisKey)
   if (redisFoundValue) {
-    return parseInt(redisFoundValue, 10)
+    return parseInt(redisFoundValue, 10) / 60
   }
 
   const c = new Client({})
@@ -61,5 +61,5 @@ export async function timeBetween(originPlace, destinationPlace): Promise<number
   await redisClient.set(redisKey, time)
   await redisClient.expire(redisKey, 604800) // 1 week
 
-  return time
+  return time / 60
 }

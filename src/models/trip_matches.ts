@@ -13,8 +13,9 @@ export interface TripMatch {
   driver_request_id: number
   rider_request_id: number
   date: Date | Raw<any>
-  time: string
+  time: 'morning' | 'afternoon'
   rider_confirmed: boolean
   driver_confirmed: boolean
+  first_portion: 'driver' | 'rider'
   created_at: Date | Raw<any>
 }

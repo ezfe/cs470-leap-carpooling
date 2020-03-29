@@ -1,0 +1,88 @@
+extends ../base.pug
+
+block navbar_settings
+  - var current_page = "trip_detail"
+
+block header_extension
+  link(rel="stylesheet", href="/static/dashboard.css")
+
+block content
+
+  if driver.id != current_user.id
+    .row.mb-3
+      .col
+        .card
+          h5.card-header
+            if rider.id == current_user.id
+              | Driving You
+            else
+              | Driver
+          .card-body
+            .row
+              .col-2
+                | Profile Img
+              .col
+                h5.card-title
+                  = driver.preferred_name || driver.first_name
+                p.card-text
+                  = 'Location: '
+                  = driverRequest.location_description
+  if rider.id != current_user.id
+    .row.mb-3
+      .col
+        .card
+          h5.card-header
+            if driver.id == current_user.id
+              | Riding With You
+            else
+              | Rider
+          .card-body
+            .row
+              .col-2
+                | Profile Img
+              .col
+                h5.card-title
+                  = rider.preferred_name || rider.first_name
+                p.card-text
+                  = 'Location: '
+                  = riderRequest.location_description
+
+  .row
+    .col
+      p
+        if tripMatch.direction == 'from_lafayette'
+          = driver.preferred_name || driver.first_name
+          if tripMatch.first_portion == 'driver'
+            = ' will drop off '
+            = rider.preferred_name || rider.first_name
+            = '. '
+          else
+            = ' will drive to '
+            = driverRequest.location_description
+            = ' where '
+            = rider.preferred_name || rider.first_name
+            = ' will continue on alone.'
+        else
+          = driver.preferred_name || driver.first_name
+          if tripMatch.first_portion == 'driver'
+            = ' will pick up '
+          else
+            = ' will wait for '
+          = rider.preferred_name || rider.first_name
+
+
+  .row
+    .col
+      = driver.preferred_name || driver.first_name
+      = ' is driving '
+      = rider.preferred_name || rider.first_name
+      if tripMatch.direction == 'from_lafayette'
+        = ' from Lafayette College. '
+      else
+        = ' to Lafayette College. '
+      
+  .row
+    .col
+      span= JSON.stringify(tripMatch)
+      span= JSON.stringify(driverRequest)
+      span= JSON.stringify(riderRequest)
