@@ -1,4 +1,5 @@
 import { Raw } from "knex";
+import { TripDirection } from "./misc_types";
 
 export interface TripRequest {
   id: number
@@ -7,6 +8,6 @@ export interface TripRequest {
   location: string
   location_description: string
   deviation_limit: number,
-  direction: 'towards_lafayette' | 'from_lafayette'
+  direction: TripDirection
   created_at: Date | Raw<any>
 }

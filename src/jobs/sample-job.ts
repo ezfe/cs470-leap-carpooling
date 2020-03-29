@@ -1,7 +1,7 @@
-import { distanceMatrix } from '../utils/distances'
 import db from '../db'
+import { TripDirection } from '../models/misc_types'
 import { TripMatch } from '../models/trip_matches'
-import { TripRequest } from '../models/trip_requests'
+import { distanceMatrix } from '../utils/distances'
 
 export default async function job() {
   console.log("Starting Pairing Process")
@@ -32,7 +32,7 @@ interface PotentialPair {
   rider_deviation_limit: number
 }
 
-async function generatePotentialPairs(direction: 'from_lafayette' | 'towards_lafayette'): Promise<PotentialPair[]> {
+async function generatePotentialPairs(direction: TripDirection): Promise<PotentialPair[]> {
   try {
     const res = await db.transaction(async (trx) => {
       // Create View
@@ -101,7 +101,7 @@ interface PricedPair {
   firstPortion: 'driver' | 'rider'
 }
 
-async function calculatePairsWithCost(direction: 'from_lafayette' | 'towards_lafayette'): Promise<PricedPair[]> {
+async function calculatePairsWithCost(direction: TripDirection): Promise<PricedPair[]> {
   const potentialPairs = await generatePotentialPairs(direction)
   const pricedPairs = Array<PricedPair>()
 
@@ -116,10 +116,10 @@ async function calculatePairsWithCost(direction: 'from_lafayette' | 'towards_laf
       rider_request_id: potential.rider_request_id,
     }
 
-    if (mtrx.driverCost/60 <= potential.driver_deviation_limit) {
+    if (mtrx.driverCost <= potential.driver_deviation_limit) {
       // driver could pay
       // rider unknown
-      if (mtrx.riderCost/60 <= potential.rider_deviation_limit) {
+      if (mtrx.riderCost <= potential.rider_deviation_limit) {
         // either could pay
         pricedPairs.push({
           ...res,
@@ -134,7 +134,7 @@ async function calculatePairsWithCost(direction: 'from_lafayette' | 'towards_laf
           firstPortion: 'driver'
         })
       }
-    } else if (mtrx.riderCost/60 <= potential.rider_deviation_limit) {
+    } else if (mtrx.riderCost <= potential.rider_deviation_limit) {
       // only rider could pay
       pricedPairs.push({
         ...res,
