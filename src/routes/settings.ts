@@ -49,7 +49,7 @@ routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), as
         preferred_name: preferredName,
         email: preferredEmail,
         phone_number: phoneNumber,
-        profile_image_name: `/${fileName}`
+        profile_image_name: fileName
       })
 
     res.redirect('/')
