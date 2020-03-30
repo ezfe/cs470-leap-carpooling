@@ -74,12 +74,12 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
       ]).from(function() {
         this.select('*').from('trip_requests_times').where('role', '=', 'driver').as('driver_t')
       }).innerJoin(function() {
-        this.select('*').from('trip_requests_times').where('role', '=', 'rider').as('rider_t')
-      }, function() {
+          this.select('*').from('trip_requests_times').where('role', '=', 'rider').as('rider_t')
+        }, function() {
           this.on('driver_t.trip_request_id', '<', 'rider_t.trip_request_id')
-          .andOn('driver_t.trip_date', '=', 'rider_t.trip_date')
-          .andOn('driver_t.trip_time', '=', 'rider_t.trip_time')
-        } 
+            .andOn('driver_t.trip_date', '=', 'rider_t.trip_date')
+            .andOn('driver_t.trip_time', '=', 'rider_t.trip_time')
+        }
       )
     })
   } catch (err) {
