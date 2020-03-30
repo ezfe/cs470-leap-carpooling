@@ -61,8 +61,11 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
 
       await trx.raw(`CREATE OR REPLACE TEMPORARY VIEW trip_requests_times AS (${rawViewQuery})`)
 
+      console.log('All merged date/times')
+      console.log(await trx.select('*').from('trip_requests_times'))
+
       // Query Pairs
-      return await trx.select([
+      const potentialPairs = await trx.select([
         db.ref('driver_t.trip_request_id').as('driver_request_id'),
         db.ref('driver_t.member_id').as('driver_id'),
         db.ref('driver_t.location').as('driver_location'),
@@ -76,11 +79,36 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
       }).innerJoin(function() {
           this.select('*').from('trip_requests_times').where('role', '=', 'rider').as('rider_t')
         }, function() {
-          this.on('driver_t.trip_request_id', '<', 'rider_t.trip_request_id')
-            .andOn('driver_t.trip_date', '=', 'rider_t.trip_date')
-            .andOn('driver_t.trip_time', '=', 'rider_t.trip_time')
+            this.on('driver_t.trip_date', '=', 'rider_t.trip_date')
+              .andOn('driver_t.trip_time', '=', 'rider_t.trip_time')
         }
       )
+
+      const query = await trx.select([
+        db.ref('driver_t.trip_request_id').as('driver_request_id'),
+        db.ref('driver_t.member_id').as('driver_id'),
+        db.ref('driver_t.location').as('driver_location'),
+        db.ref('driver_t.deviation_limit').as('driver_deviation_limit'),
+        db.ref('rider_t.trip_request_id').as('rider_request_id'),
+        db.ref('rider_t.member_id').as('rider_id'),
+        db.ref('rider_t.location').as('rider_location'),
+        db.ref('rider_t.deviation_limit').as('rider_deviation_limit'),
+      ]).from(function() {
+        this.select('*').from('trip_requests_times').where('role', '=', 'driver').as('driver_t')
+      }).innerJoin(function() {
+          this.select('*').from('trip_requests_times').where('role', '=', 'rider').as('rider_t')
+        }, function() {
+            this.on('driver_t.trip_date', '=', 'rider_t.trip_date')
+              .andOn('driver_t.trip_time', '=', 'rider_t.trip_time')
+        }
+      ).toSQL()
+
+      console.log(`Identified potential pairs for direction ${direction}`)
+      console.log('Used:')
+      console.log(query)
+      console.log(potentialPairs)
+
+      return potentialPairs
     })
   } catch (err) {
     console.error('An error occurred generating potential pairs')
