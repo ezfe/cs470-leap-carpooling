@@ -12,6 +12,18 @@ block content
       a.btn.btn-info.btn-lg(href="/trips/new", style="width: 200px;")
         i.fas.fa-plus.mr-2
         | New Trip
+
+  -
+    function prettyDate(dateString){
+      //if it's already a date object and not a string you don't need this line:
+      var date = new Date(dateString);
+      var d = date.getDate();
+      var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+      var m = monthNames[date.getMonth()];
+      var y = date.getFullYear();
+      return `${m} ${d}, ${y}`;
+    }
+
   each trip in matchedRequests
     .row.mb-3
       .col
@@ -32,7 +44,7 @@ block content
                 = `Trip from ${trip.location_description} to Lafayette College`
             ul
               each time in trip.times
-                li= `${time.date} ${time.time}`
+                li= `${prettyDate(time.date)} in the ${time.time}`
             
             .row
               .col
@@ -52,4 +64,4 @@ block content
                 = `Trip from ${trip.location_description} to Lafayette College`
             ul
               each time in trip.times
-                li= `${time.date} ${time.time}`
+                li= `${prettyDate(time.date)} in the ${time.time}`
