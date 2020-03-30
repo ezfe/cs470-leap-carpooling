@@ -36,6 +36,6 @@ export interface User {
   last_name: string
   preferred_name?: string
   phone_number?: string
-  profile_image_name?: string
+  profile_image_name?: string | null
   created_at: Date | Raw<any>
 }
