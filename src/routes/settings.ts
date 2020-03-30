@@ -71,7 +71,7 @@ routes.get('/', requireAuthenticated, (req: AuthedReq, res: Response) => {
   }
 
   const profileImageURL = req.user?.profile_image_name || '/static/blank-profile.png'
-  
+
   res.render('settings/index', { googleMapsAPIKey, profileImageURL })
 })
 
@@ -112,9 +112,10 @@ routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => 
 
 routes.post('/upload-photo', upload.single('profile_photo'), requireAuthenticated, async (req: AuthedReq, res: Response) => {
   try {
+    // Prepend a / so that public/uploads/file.jpg becomes /public/uploads/file.jpg
     await db<User>('users').where({ id: req.user?.id })
     .update({
-      profile_image_name: req.file.path
+      profile_image_name: `/${req.file.path}`
     })
     res.redirect('/settings')
   } catch (err) {
