@@ -76,7 +76,7 @@ routes.get('/remove', requireAuthenticated, async (req: AuthedReq, res: Response
   try {
     await db<User>('users').where({ id: req.user?.id })
       .update({
-        profile_image_name: undefined
+        profile_image_name: null
       })
 
     if (req.user?.profile_image_name) {
@@ -84,6 +84,7 @@ routes.get('/remove', requireAuthenticated, async (req: AuthedReq, res: Response
     }
     res.redirect('/settings')
   } catch (err) {
+    console.error(err)
     res.render('database-error')
   }
 })
