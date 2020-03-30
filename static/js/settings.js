@@ -3,8 +3,8 @@ var submitForm = function(event) {
 }
 
 window.onload = function () {
-  if (document.getElementById("uploadedPhoto").src == '') {
-    document.getElementById("uploadedPhoto").src = "/static/blank-profile.png"
+  if (document.getElementById("uploadedPhoto").src == '/static/blank-profile.png') {
+    // document.getElementById("uploadedPhoto").src = "/static/blank-profile.png"
     document.getElementById("exitButton").style.visibility = "hidden";
   }
 }

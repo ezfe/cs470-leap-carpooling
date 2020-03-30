@@ -69,7 +69,10 @@ routes.get('/', requireAuthenticated, (req: AuthedReq, res: Response) => {
     res.send('GOOGLE_MAPS_PLACES_KEY is unset')
     return
   }
-  res.render('settings/index', { googleMapsAPIKey })
+
+  const profileImageURL = req.user?.profile_image_name || '/static/blank-profile.png'
+  
+  res.render('settings/index', { googleMapsAPIKey, profileImageURL })
 })
 
 routes.get('/remove', requireAuthenticated, async (req: AuthedReq, res: Response) => {
