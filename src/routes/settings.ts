@@ -75,7 +75,7 @@ routes.get('/', requireAuthenticated, (req: AuthedReq, res: Response) => {
   res.render('settings/index', { googleMapsAPIKey, profileImageURL })
 })
 
-routes.get('/remove', requireAuthenticated, async (req: AuthedReq, res: Response) => {
+routes.get('/remove-profile-image', requireAuthenticated, async (req: AuthedReq, res: Response) => {
   try {
     await db<User>('users').where({ id: req.user?.id })
       .update({
@@ -83,7 +83,13 @@ routes.get('/remove', requireAuthenticated, async (req: AuthedReq, res: Response
       })
 
     if (req.user?.profile_image_name) {
-      fs.unlinkSync(req.user?.profile_image_name)
+      try {
+        fs.unlinkSync(req.user?.profile_image_name)
+      } catch (err) {
+        // An error deleting the file shouldn't be a failure,
+        // since it probably means the file doesn't exist
+        console.error(err)
+      }
     }
     res.redirect('/settings')
   } catch (err) {
@@ -115,7 +121,7 @@ routes.post('/upload-photo', upload.single('profile_photo'), requireAuthenticate
     // Prepend a / so that public/uploads/file.jpg becomes /public/uploads/file.jpg
     await db<User>('users').where({ id: req.user?.id })
     .update({
-      profile_image_name: `/${req.file.path}`
+      profile_image_name: req.file.path
     })
     res.redirect('/settings')
   } catch (err) {
