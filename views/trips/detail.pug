@@ -106,10 +106,13 @@ block content
           i.fas.fa-sync-alt
           = ' Reject Match'
 
-
-
     .col-2
       form#cancel-trip-form(method="POST" action=`/trips/${tripMatch.id}/cancel`)
         button.btn.btn-block.btn-danger(role="submit")
           i.fas.fa-times
           = ' Cancel Trip'
+
+  script(
+    type="text/javascript",
+    src="/static/js/trip_detail.js"
+  )
