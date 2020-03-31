@@ -122,7 +122,6 @@ routes.post('/cancel', async (req: AuthedReq, res: Response) => {
     await db('trip_requests').where('id', myRequest.id).del()
 
     res.redirect(`/trips?delete=success`)
-    return
   } catch (err) {
     console.error(err)
     res.render('database-error')
