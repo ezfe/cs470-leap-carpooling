@@ -7,6 +7,13 @@ block header_extension
   link(rel="stylesheet", href="/static/dashboard.css")
 
 block content
+
+  if alerts.delete
+    .row.mb-3
+      .col
+        .alert.alert-success(role="alert")
+          | Successfully removed your trip request
+
   .row.mb-3
     .col.text-center
       a.btn.btn-info.btn-lg(href="/trips/new", style="width: 200px;")

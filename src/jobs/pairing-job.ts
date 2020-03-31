@@ -1,5 +1,5 @@
 import db from '../db'
-import { TripDirection } from '../models/misc_types'
+import { TripDirection, UserRole } from '../models/misc_types'
 import { TripMatch } from '../models/trip_matches'
 import { distanceMatrix } from '../utils/distances'
 
@@ -121,7 +121,7 @@ interface PricedPair {
   driver_request_id: number
   rider_request_id: number
   cost: number
-  firstPortion: 'driver' | 'rider'
+  firstPortion: UserRole
 }
 
 async function calculatePairsWithCost(direction: TripDirection): Promise<PricedPair[]> {
