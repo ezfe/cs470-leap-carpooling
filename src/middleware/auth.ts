@@ -20,10 +20,16 @@ export async function authenticateUser(req: AuthedReq, res: Response, next: Next
 
 export function requireAuthenticated(req: AuthedReq, res: Response, next: NextFunction) {
   if (!req.user) {
-    console.error('User not logged in, redirecting')
-    res.redirect('/sessions/login')
+    const key = Date.now()
+    if (req.session && req.method === 'GET') {
+      req.session.loginRedirect = {
+        key,
+        value: req.originalUrl
+      }
+    }
+
+    res.redirect(`/sessions/login?next=${key}`)
   } else {
-    console.log(`User logged in as ${req.user.netid}`)
     next()
   }
 }

@@ -1,12 +1,17 @@
 import db from '../db'
 import { Raw } from 'knex'
+import { Request } from 'express'
 
-export function setLoggedInAs(req, user: User | undefined) {
-  req.session.userID = user?.id
+export function setLoggedInAs(req: Request, user: User | undefined) {
+  if (req.session) {
+    req.session.userID = user?.id
+  }
 }
 
-export function setLoggedOut(req) {
-  req.session.userID = undefined
+export function setLoggedOut(req: Request) {
+  if (req.session) {
+    req.session.userID = undefined
+  }
 }
 
 export async function getUserByID(id: number): Promise<User | undefined> {
