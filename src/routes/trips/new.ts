@@ -46,7 +46,6 @@ routes.post('/', async (req: AuthedReq, res: Response) => {
     await db('trip_times').insert({
       request_id: requestID,
       date: req.body.date,
-      time: req.body.time
     })
 
     res.redirect('/trips')

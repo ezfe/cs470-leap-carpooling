@@ -44,7 +44,6 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
         db.ref('trip_requests_t.deviation_limit').as('deviation_limit'),
         db.ref('trip_times.id').as('trip_time_id'),
         db.ref('trip_times.date').as('trip_date'),
-        db.ref('trip_times.time').as('trip_time')
       ]).from(function() {
         this.select('trip_requests.*')
           .from('trip_requests')
@@ -78,30 +77,9 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
         this.select('*').from('trip_requests_times').where('role', '=', 'driver').as('driver_t')
       }).innerJoin(function() {
           this.select('*').from('trip_requests_times').where('role', '=', 'rider').as('rider_t')
-        }, function() {
-            this.on('driver_t.trip_date', '=', 'rider_t.trip_date')
-              .andOn('driver_t.trip_time', '=', 'rider_t.trip_time')
-        }
+        },
+        'driver_t.trip_date', 'rider_t.trip_date'
       )
-
-      const query = await trx.select([
-        db.ref('driver_t.trip_request_id').as('driver_request_id'),
-        db.ref('driver_t.member_id').as('driver_id'),
-        db.ref('driver_t.location').as('driver_location'),
-        db.ref('driver_t.deviation_limit').as('driver_deviation_limit'),
-        db.ref('rider_t.trip_request_id').as('rider_request_id'),
-        db.ref('rider_t.member_id').as('rider_id'),
-        db.ref('rider_t.location').as('rider_location'),
-        db.ref('rider_t.deviation_limit').as('rider_deviation_limit'),
-      ]).from(function() {
-        this.select('*').from('trip_requests_times').where('role', '=', 'driver').as('driver_t')
-      }).innerJoin(function() {
-          this.select('*').from('trip_requests_times').where('role', '=', 'rider').as('rider_t')
-        }, function() {
-            this.on('driver_t.trip_date', '=', 'rider_t.trip_date')
-              .andOn('driver_t.trip_time', '=', 'rider_t.trip_time')
-        }
-      ).toSQL()
 
       // console.log(`Identified potential pairs for direction ${direction}`)
       // console.log('Used:')
@@ -183,7 +161,6 @@ async function matchFirstPair(pairs: PricedPair[]) {
         driver_request_id,
         rider_request_id,
         date: db.fn.now(), // timeDate[0].date,
-        time: 'morning',   // time: timeDate[0].time,
         rider_confirmed: false,
         driver_confirmed: false,
         first_portion: firstPortion,

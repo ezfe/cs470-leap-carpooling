@@ -47,17 +47,17 @@ block content
             h5.card-title
               -
                 let currentUserLocationDescription =
-                  (trip.rider_id == currentUser.id)
+                  (trip.driver_id == currentUser.id)
                     ? trip.driver_location_description
                     : trip.rider_location_description
 
               if trip.direction == 'towards_lafayette'
-                = `Trip to Lafayette College from ${currentUserLocationDescription}`
+                = `Trip to Lafayette College from ${trip.driver_location_description}`
               else
                 = `Trip from Lafayette College to ${currentUserLocationDescription}`
             //- ul
             //-   each time in trip.times
-            //-     li= `${prettyDate(time.date)} in the ${time.time}`
+            //-     li= prettyDate(time.date)
             
             .row
               .col
@@ -77,4 +77,4 @@ block content
                 = `Trip from Lafayette College to ${trip.location_description}`
             ul
               each time in trip.times
-                li= `${prettyDate(time.date)} in the ${time.time}`
+                li= prettyDate(time.date)

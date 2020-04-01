@@ -8,7 +8,6 @@ export interface TripMatch {
   driver_request_id: number
   rider_request_id: number
   date: Date | Raw<any>
-  time: 'morning' | 'afternoon'
   rider_confirmed: boolean
   driver_confirmed: boolean
   first_portion: UserRole
@@ -18,7 +17,6 @@ export interface TripMatch {
 export interface AnnotatedTripMatch {
   id: number
   date: Date | Raw<any>
-  time: 'morning' | 'afternoon'
   rider_confirmed: boolean
   driver_confirmed: boolean
   direction: TripDirection
@@ -35,7 +33,6 @@ function tripMatchesBuilder(user: User | null) {
     .select(
       'trip_matches.id',
       'trip_matches.date',
-      'trip_matches.time',
       'trip_matches.rider_confirmed',
       'trip_matches.driver_confirmed',
       db.ref('driver_t.id').as('driver_request_id'),

@@ -12,7 +12,6 @@ function setUnclicked(button) {
   button.setAttribute('aria-pressed', 'false')
 }
 
-
 function clickRoleButton(event) {
   for (const button of document.getElementsByClassName('role_button')) {
     setUnclicked(button)
@@ -21,20 +20,8 @@ function clickRoleButton(event) {
   document.getElementById('user_role').value = event.target.value
 }
 
-function clickTimeButton(event) {
-  for (const button of document.getElementsByClassName('time_button')) {
-    setUnclicked(button)
-  }
-  setClicked(event.target)
-  document.getElementById('time').value = event.target.value
-}
-
 for (const button of document.getElementsByClassName('role_button')) {
   button.addEventListener('click', clickRoleButton) 
-}
-
-for (const button of document.getElementsByClassName('time_button')) {
-  button.addEventListener('click', clickTimeButton) 
 }
 
 document.getElementById('request_form').addEventListener('submit', (event) => {
