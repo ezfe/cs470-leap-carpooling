@@ -49,7 +49,7 @@ function tripMatchesBuilder(user: User | null) {
       'trip_matches.driver_request_id', 'driver_t.id'
     ).join(
       'trip_requests as rider_t',
-      'trip_matches.driver_request_id', 'rider_t.id'
+      'trip_matches.rider_request_id', 'rider_t.id'
     )
 
   if (user) {
@@ -64,7 +64,9 @@ function tripMatchesBuilder(user: User | null) {
 }
 
 export async function getTripMatches(user: User | null): Promise<AnnotatedTripMatch[]> {
-  const tripRequests: AnnotatedTripMatch[] = await tripMatchesBuilder(user)
+  const tripRequests = await tripMatchesBuilder(user) // .toSQL()
+  // console.log(tripRequests)
+
 
   return tripRequests
 }
