@@ -1,10 +1,10 @@
 import { Raw } from "knex";
-import { TripDirection } from "./misc_types";
+import { TripDirection, UserRole } from "./misc_types";
 
 export interface TripRequest {
   id: number
   member_id: number
-  role: 'driver' | 'rider'
+  role: UserRole
   location: string
   location_description: string
   deviation_limit: number,

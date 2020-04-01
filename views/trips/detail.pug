@@ -88,10 +88,33 @@ block content
 
   hr.my-4
 
-  .row
-    .col
+  .row.mb-2
+    .col-2
       if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
         form(method="POST" action=`/trips/${tripMatch.id}/confirm`)
-          button.btn.btn-outline-success(role="submit") Confirm Trip
-      else
+          button.btn.btn-block.btn-success(role="submit")
+            i.fas.fa-check
+            = ' Confirm Trip'
+      else if (!tripMatch.driver_confirmed || !tripMatch.rider_confirmed)
         span Waiting for the other person to confirm...
+      else
+        span
+          i.fas.fa-check
+          = ' Trip Confirmed'
+
+    .col-2
+      form(method="POST" action=`/trips/${tripMatch.id}/reject`)
+        button.btn.btn-block.btn-warning(role="submit")
+          i.fas.fa-sync-alt
+          = ' Reject Match'
+
+    .col-2
+      form#cancel-trip-form(method="POST" action=`/trips/${tripMatch.id}/cancel`)
+        button.btn.btn-block.btn-danger(role="submit")
+          i.fas.fa-times
+          = ' Cancel Trip'
+
+  script(
+    type="text/javascript",
+    src="/static/js/trip_detail.js"
+  )

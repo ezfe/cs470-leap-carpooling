@@ -91,4 +91,41 @@ routes.post('/confirm', async (req: AuthedReq, res: Response) => {
   }
 })
 
+routes.post('/cancel', async (req: AuthedReq, res: Response) => {
+  try {
+    const { tripMatch, driverRequest, riderRequest } = await preprocess(req)
+
+    if (!tripMatch) {
+      res.sendStatus(404)
+      return
+    }
+
+    if (!driverRequest || !riderRequest) {
+      console.error(`The trip match ${JSON.stringify(tripMatch)} has invalid requests?`)
+      res.sendStatus(510)
+      return
+    }
+
+    let myRequest: TripRequest | null = null
+    if (req.user?.id === driverRequest.member_id) {
+      myRequest = driverRequest
+    } else if (req.user?.id === riderRequest.member_id) {
+      myRequest = riderRequest
+    }
+
+    if (!myRequest) {
+      console.error('Forbidden to confirm trip when not a member of the trip')
+      res.sendStatus(403)
+      return
+    }
+
+    await db('trip_requests').where('id', myRequest.id).del()
+
+    res.redirect(`/trips?delete=success`)
+  } catch (err) {
+    console.error(err)
+    res.render('database-error')
+  }
+})
+
 export default routes
