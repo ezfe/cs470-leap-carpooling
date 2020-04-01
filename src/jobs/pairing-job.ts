@@ -4,20 +4,20 @@ import { TripMatch } from '../models/trip_matches'
 import { distanceMatrix } from '../utils/distances'
 
 export default async function job() {
-  console.log("Starting Pairing Process")
+  // console.log("Starting Pairing Process")
 
-  console.log('Generating Pairs From Lafayette')
+  // console.log('Generating Pairs From Lafayette')
   const pairsFromLafayette = await calculatePairsWithCost('from_lafayette')
-  console.log('Found pairs', pairsFromLafayette)
+  // console.log('Found pairs', pairsFromLafayette)
 
-  console.log('Generating Pairs Towards Lafayette')
+  // console.log('Generating Pairs Towards Lafayette')
   const pairsTowardsLafayette = await calculatePairsWithCost('towards_lafayette')
-  console.log('Found pairs', pairsTowardsLafayette)
+  // console.log('Found pairs', pairsTowardsLafayette)
 
   const pairs = [...pairsFromLafayette, ...pairsTowardsLafayette]
   pairs.sort((a, b) => { return a.cost - b.cost })
 
-  console.log('Matching Pairs')
+  // console.log('Matching Pairs')
   matchFirstPair(pairs)
 }
 
@@ -61,8 +61,8 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
 
       await trx.raw(`CREATE OR REPLACE TEMPORARY VIEW trip_requests_times AS (${rawViewQuery})`)
 
-      console.log('All merged date/times')
-      console.log(await trx.select('*').from('trip_requests_times'))
+      // console.log('All merged date/times')
+      // console.log(await trx.select('*').from('trip_requests_times'))
 
       // Query Pairs
       const potentialPairs = await trx.select([
@@ -103,10 +103,10 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
         }
       ).toSQL()
 
-      console.log(`Identified potential pairs for direction ${direction}`)
-      console.log('Used:')
-      console.log(query)
-      console.log(potentialPairs)
+      // console.log(`Identified potential pairs for direction ${direction}`)
+      // console.log('Used:')
+      // console.log(query)
+      // console.log(potentialPairs)
 
       return potentialPairs
     })
@@ -129,10 +129,10 @@ async function calculatePairsWithCost(direction: TripDirection): Promise<PricedP
   const pricedPairs = Array<PricedPair>()
 
   for (const potential of potentialPairs) {
-    console.log('Pricing potential pair', potential)
+    // console.log('Pricing potential pair', potential)
 
     const mtrx = await distanceMatrix(potential.driver_location, potential.rider_location, direction)
-    console.log('Found cost information', mtrx)
+    // console.log('Found cost information', mtrx)
 
     const res = {
       driver_request_id: potential.driver_request_id,

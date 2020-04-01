@@ -1,6 +1,6 @@
 import { Response, Router } from 'express'
 import db from '../../db'
-import { getTripMatchesForUser } from '../../models/trip_matches'
+import { getTripMatches } from '../../models/trip_matches'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import tripDetail from './detail'
 import tripCreation from './new'
@@ -17,7 +17,9 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     console.log(req.query.delete === 'success')
     const alerts = { delete: req.query.delete === 'success'  }
 
-    let matchedRequests = await getTripMatchesForUser(req.user)
+    const matchedRequests = await getTripMatches(req.user)
+    console.log('Found matched requests')
+    console.log(matchedRequests)
 
     let unmatchedRequests = await db('trip_requests')
       .select(
@@ -38,7 +40,8 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       }
     }
 
-    matchedRequests = await Promise.all(matchedRequests.map(annotateRequests))
+    // will add time annotations elsewhere
+    // matchedRequests = await Promise.all(matchedRequests.map(annotateRequests))
     unmatchedRequests = await Promise.all(unmatchedRequests.map(annotateRequests))
 
     const context = { matchedRequests, unmatchedRequests, alerts }

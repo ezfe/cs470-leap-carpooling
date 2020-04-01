@@ -15,42 +15,62 @@ export interface TripMatch {
   created_at: Date | Raw<any>
 }
 
-interface AnnotatedTripMatch {
+export interface AnnotatedTripMatch {
   id: number
-  role: UserRole
-  location_description: string
-  direction: TripDirection
   date: Date | Raw<any>
   time: 'morning' | 'afternoon'
   rider_confirmed: boolean
   driver_confirmed: boolean
-  my_request_id: number
+  direction: TripDirection
   driver_request_id: number
   rider_request_id: number
+  driver_id: number,
+  rider_id: number,
+  driver_location_description: number
+  rider_location_description: number
 }
 
-export async function getTripMatchesForUser(user: User): Promise<AnnotatedTripMatch[]> {
-  const tripRequests = await db<AnnotatedTripMatch>('trip_requests')
+function tripMatchesBuilder(user: User | null) {
+  const query = db('trip_matches')
     .select(
       'trip_matches.id',
-      'trip_requests.role',
-      'trip_requests.location_description',
-      'trip_requests.direction',
       'trip_matches.date',
       'trip_matches.time',
       'trip_matches.rider_confirmed',
       'trip_matches.driver_confirmed',
-      db.ref('trip_requests.id').as('trip_request_id'),
-      'trip_matches.driver_request_id',
-      'trip_matches.rider_request_id',
-    ).join('trip_matches', function() {
-      this.on('trip_requests.id', '=', 'trip_matches.driver_request_id')
-        .orOn('trip_requests.id', '=', 'trip_matches.rider_request_id')
-    }).where({
-      'trip_requests.member_id': user.id
-    })
+      db.ref('driver_t.id').as('driver_request_id'),
+      db.ref('rider_t.id').as('rider_request_id'),
+      db.ref('driver_t.member_id').as('driver_id'),
+      db.ref('rider_t.member_id').as('rider_id'),
+      db.ref('driver_t.location_description').as('driver_location_description'),
+      db.ref('rider_t.location_description').as('rider_location_description'),
+    ).join(
+      'trip_requests as driver_t',
+      'trip_matches.driver_request_id', 'driver_t.id'
+    ).join(
+      'trip_requests as rider_t',
+      'trip_matches.driver_request_id', 'rider_t.id'
+    )
+
+  if (user) {
+    return query.where(
+        'driver_t.member_id', user.id,
+      ).orWhere(
+        'rider_t.member_id', user.id
+      )
+  } else {
+    return query
+  }
+}
+
+export async function getTripMatches(user: User | null): Promise<AnnotatedTripMatch[]> {
+  const tripRequests: AnnotatedTripMatch[] = await tripMatchesBuilder(user)
 
   return tripRequests
+}
+
+export async function getTripMatch(matchID: number): Promise<AnnotatedTripMatch> {
+  return await tripMatchesBuilder(null).andWhere('trip_matches.id', matchID).first<AnnotatedTripMatch>()
 }
 
 // export async function getTripMatchByID(id: number): Promise<TripMatch | undefined> {
