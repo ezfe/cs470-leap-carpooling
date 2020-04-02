@@ -103,16 +103,53 @@ block content
           = ' Trip Confirmed'
 
     .col-2
-      form(method="POST" action=`/trips/${tripMatch.id}/reject`)
-        button.btn.btn-block.btn-warning(role="submit")
-          i.fas.fa-sync-alt
-          = ' Reject Match'
+      button.btn.btn-block.btn-warning(type="button" data-toggle="modal" data-target="#rejectModal")
+        i.fas.fa-sync-alt
+        = ' Reject Match'
 
     .col-2
       form#cancel-trip-form(method="POST" action=`/trips/${tripMatch.id}/cancel`)
-        button.btn.btn-block.btn-danger(role="submit")
+        button.btn.btn-block.btn-danger(type="submit")
           i.fas.fa-times
           = ' Cancel Trip'
+
+    .col.col-sm-5
+      p
+        | You've been matched! Contact ... and make sure that both of you can agree on
+        | when you will leave (and any other details that concern you).
+      p If everything checks out, click "Confirm Trip" to finalize the match.
+      p
+        | If you're unable to agree on something, or don't want to ride with this person,
+        | click "Reject Match" and indicate a reason (so that we can most efficiently find
+        | you another match).
+      p
+        | If you need to change details like when you are travelling or where you are travelling
+        | to, click "Cancel Trip" and request another trip with the corrected details.
+
+  .modal.fade#rejectModal(
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="rejectModalLabel"
+    aria-hidden="true"
+  )
+    .modal-dialog(role="document")
+      .modal-content
+        form(method="POST" action=`/trips/${tripMatch.id}/reject`)
+          .modal-header
+            h5.modal-title#rejectModalLabel Reject Match
+            button.close(type="button" data-dismiss="modal" aria-label="Close")
+              span(aria-hidden="true") &times;
+          .modal-body
+            .form-check
+              input.form-check-input#radio-block-person(type="radio" name="block-reason" value="person-block")
+              label.form-check-label(for="radio-block-person") Do not want to ride with ...
+            .form-check
+              input.form-check-input#radio-block-person(type="radio" name="block-reason" value="person-block")
+              label.form-check-label(for="radio-block-person") Cannot agree on when to travel
+          .modal-footer
+            button.btn.btn-secondary(type="button" data-dismiss="modal") Cancel
+            button.btn.btn-primary(type="submit") Confirm
+
 
   script(
     type="text/javascript",

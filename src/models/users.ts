@@ -2,7 +2,7 @@ import db from '../db'
 import { Raw } from 'knex'
 import { Request } from 'express'
 
-export function setLoggedInAs(req: Request, user: User | undefined) {
+export function setLoggedInAs(req: Request, user: User | null) {
   if (req.session) {
     req.session.userID = user?.id
   }
@@ -10,24 +10,24 @@ export function setLoggedInAs(req: Request, user: User | undefined) {
 
 export function setLoggedOut(req: Request) {
   if (req.session) {
-    req.session.userID = undefined
+    req.session.userID = null
   }
 }
 
-export async function getUserByID(id: number): Promise<User | undefined> {
+export async function getUserByID(id: number): Promise<User | null> {
   return getUserByField('id', id)
 }
 
-export async function getUserByNetID(netid: string): Promise<User | undefined> {
+export async function getUserByNetID(netid: string): Promise<User | null> {
   return getUserByField('netid', netid)
 }
 
-async function getUserByField(field: string, value: number | string): Promise<User | undefined> {
-  if (!field) return undefined
-  if (!value) return undefined
+async function getUserByField(field: string, value: number | string): Promise<User | null> {
+  if (!field) return null
+  if (!value) return null
 
   const user = await db<User>('users').where(field, value).first()
-  return user || undefined
+  return user || null
 }
 
 export interface User {
