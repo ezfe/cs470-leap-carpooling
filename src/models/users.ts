@@ -1,6 +1,7 @@
 import db from '../db'
 import { Raw } from 'knex'
 import { Request } from 'express'
+import { UserRole } from './misc_types'
 
 export function setLoggedInAs(req: Request, user: User | undefined) {
   if (req.session) {
@@ -34,6 +35,7 @@ export interface User {
   id: number
   netid: string
   email?: string
+  default_role?: UserRole
   default_location?: string
   default_location_description?: string
   deviation_limit?: number

@@ -7,7 +7,8 @@ export interface TripMatch {
   id: number
   driver_request_id: number
   rider_request_id: number
-  date: Date | Raw<any>
+  first_date: Date | Raw<any>
+  last_date: Date | Raw<any>
   rider_confirmed: boolean
   driver_confirmed: boolean
   first_portion: UserRole
@@ -62,8 +63,6 @@ function tripMatchesBuilder(user: User | null) {
 
 export async function getTripMatches(user: User | null): Promise<AnnotatedTripMatch[]> {
   const tripRequests = await tripMatchesBuilder(user) // .toSQL()
-  // console.log(tripRequests)
-
 
   return tripRequests
 }
