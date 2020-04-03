@@ -70,16 +70,19 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
 
   if(firstDate == 'a'){
     alert('Please use a valid start date.')
+    event.preventDefault()
     return
   }
   /* if(!(moment(startDate, 'MM-DD-YYYY', true))){
     alert('Please use a valid start date.')
+    event.preventDefault()
     return
   } */
 
   const lastDate = document.getElementById('last_date').value
   if(!(moment(lastDate, 'MM-DD-YYYY', true))){
     alert('Please use a valid final date.')
+    event.preventDefault()
     return
   }
 })
