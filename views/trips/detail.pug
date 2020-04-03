@@ -115,7 +115,9 @@ block content
 
     .col.col-sm-5
       p
-        | You've been matched! Contact ... and make sure that both of you can agree on
+        = 'You\'ve been matched! Contact '
+        = otherUser.preferred_name || otherUser.first_name
+        = ' and make sure that both of you can agree on '
         | when you will leave (and any other details that concern you).
       p If everything checks out, click "Confirm Trip" to finalize the match.
       p
@@ -141,11 +143,19 @@ block content
               span(aria-hidden="true") &times;
           .modal-body
             .form-check
-              input.form-check-input#radio-block-person(type="radio" name="block-reason" value="person-block")
-              label.form-check-label(for="radio-block-person") Do not want to ride with ...
+              input.form-check-input#radio-block-person(type="radio" name="block-reason" value="block-person")
+              label.form-check-label(for="radio-block-person")
+                = 'Do not want to ride with '
+                = otherUser.preferred_name || otherUser.first_name
             .form-check
-              input.form-check-input#radio-block-person(type="radio" name="block-reason" value="person-block")
-              label.form-check-label(for="radio-block-person") Cannot agree on when to travel
+              input.form-check-input#radio-incompatible-times(type="radio" name="block-reason" value="incompatible-times")
+              label.form-check-label(for="radio-incompatible-times") Cannot agree on when to travel
+            if driverRequest.member_id == currentUser.id && tripMatch.first_portion == 'driver'
+              .form-check
+                input.form-check-input#radio-incompatible-location(type="radio" name="block-reason" value="incompatible-location")
+                label.form-check-label(for="radio-incompatible-location")
+                  = 'Prefer picking someone up at another location'
+
           .modal-footer
             button.btn.btn-secondary(type="button" data-dismiss="modal") Cancel
             button.btn.btn-primary(type="submit") Confirm

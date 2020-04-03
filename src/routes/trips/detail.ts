@@ -40,7 +40,9 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       return
     }
 
-    res.render('trips/detail', { tripMatch, driverRequest, riderRequest, driver, rider })
+    const otherUser = driver.id === req.user.id ? rider : driver
+
+    res.render('trips/detail', { tripMatch, driverRequest, riderRequest, driver, rider, otherUser })
   } catch (err) {
     console.error(err)
     res.render('database-error')
@@ -56,11 +58,11 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
     }
     const { tripMatch, driverRequest, riderRequest } = processed
 
-    if (req.user?.id === driverRequest.member_id) {
+    if (req.user.id === driverRequest.member_id) {
       await db<TripMatch>('trip_matches').update({
         driver_confirmed: true
       }).where('id', tripMatch.id)
-    } else if (req.user?.id === riderRequest.member_id) {
+    } else if (req.user.id === riderRequest.member_id) {
       await db<TripMatch>('trip_matches').update({
         rider_confirmed: true
       }).where('id', tripMatch.id)
@@ -88,9 +90,9 @@ routes.post('/cancel', async (req: ReqAuthedReq, res: Response) => {
     const { driverRequest, riderRequest } = processed
 
     let myRequest: TripRequest | null = null
-    if (req.user?.id === driverRequest.member_id) {
+    if (req.user.id === driverRequest.member_id) {
       myRequest = driverRequest
-    } else if (req.user?.id === riderRequest.member_id) {
+    } else if (req.user.id === riderRequest.member_id) {
       myRequest = riderRequest
     }
 
@@ -117,7 +119,7 @@ routes.get('/reject', async (req: ReqAuthedReq, res: Response) => {
   }
   const { driverRequest, riderRequest } = processed
 
-  if (driverRequest.member_id == req.user.id || riderRequest.member_id == req.user.id) {
+  if (driverRequest.member_id === req.user.id || riderRequest.member_id === req.user.id) {
     const otherMemberID = (driverRequest.member_id === req.user.id) ? riderRequest.member_id : driverRequest.member_id
 
     const otherUser = await getUserByID(otherMemberID)
