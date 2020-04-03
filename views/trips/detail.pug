@@ -47,6 +47,7 @@ block content
                   = 'Location: '
                   = riderRequest.location_description
 
+  
   .row
     .col-1.order-4
       span.fas.fa-arrow-right
@@ -86,8 +87,13 @@ block content
             fa.fas.fa-location-arrow
             = ' Google Maps'
 
-  hr.my-4
 
+  hr.my-4
+  .row.mb-2
+    .col
+      h5 Trip Date Range:  3/20/2020-3/30/2020
+      h5 
+  hr.my-4
   .row.mb-2
     .col-2
       if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
