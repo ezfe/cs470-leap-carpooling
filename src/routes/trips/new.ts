@@ -37,6 +37,8 @@ routes.post('/', async (req: AuthedReq, res: Response) => {
         last_date: req.body.last_date,
         deviation_limit: deviationLimit,
         direction: 'from_lafayette', // req.body.direction,
+        start_date: req.body.start_date,
+        end_date: req.body.end_date,
         created_at: db.fn.now()
       })
 
