@@ -66,9 +66,9 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     return
   }
 
-  const startDate = document.getElementById('start_date').value
+  const firstDate = document.getElementById('first_date').value
 
-  if(startDate == 'a'){
+  if(firstDate == 'a'){
     alert('Please use a valid start date.')
     return
   }
@@ -77,8 +77,8 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     return
   } */
 
-  const endDate = document.getElementById('end_date').value
-  if(!(moment(endDate, 'MM-DD-YYYY', true))){
+  const lastDate = document.getElementById('last_date').value
+  if(!(moment(lastDate, 'MM-DD-YYYY', true))){
     alert('Please use a valid final date.')
     return
   }
