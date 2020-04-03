@@ -16,14 +16,15 @@ block content
           button.btn.btn-light.role_button(type="button" value="rider") Ride
         input(type="hidden" id="user_role" name="user_role")
     .form-group.row
-      .col-4
-        span.small From
+      .col-4.order-1#lafayette_column
+        span.small#lafayette_loc_header From
         input.form-control(type="text", value="Lafayette College", disabled, id="source_location")
-      .col-2
-        .button(type="button", id="reverse_loactions", onclick="reverseLocations()")
+      .col-2.order-2.d-flex.align-items-end
+        button.btn.btn-light.btn-block#reverse_locations(type="button")
           i.fas.fa-arrows-alt-h
-      .col-4
-        span.small To
+          = ' Swap'
+      .col-4.order-3#other_loc_column
+        span.small#other_loc_header To
         input.form-control#location_field(
           type="text"
           name="location_description"
@@ -34,6 +35,7 @@ block content
           name="place_id"
           value=currentUser.default_location
         )
+      input#trip_direction(type="hidden" name="trip_direction" value="from_lafayette")
     .row
       .col
         span.small
