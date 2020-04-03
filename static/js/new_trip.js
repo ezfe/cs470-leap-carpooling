@@ -37,6 +37,23 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     event.preventDefault()
     return
   }
+
+  const startDate = document.getElementById('start_date').value
+
+  if(startDate == 'a'){
+    alert('Please use a valid start date.')
+    return
+  }
+  /* if(!(moment(startDate, 'MM-DD-YYYY', true))){
+    alert('Please use a valid start date.')
+    return
+  } */
+
+  const endDate = document.getElementById('end_date').value
+  if(!(moment(endDate, 'MM-DD-YYYY', true))){
+    alert('Please use a valid final date.')
+    return
+  }
 })
 
 document.getElementById('discard_button').addEventListener('click', () => {

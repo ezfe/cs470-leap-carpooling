@@ -5,7 +5,9 @@
     "target": "ES2019",
     "outDir": "build",
     "esModuleInterop": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node"
   },
   "include": [
     "src/**/*"
