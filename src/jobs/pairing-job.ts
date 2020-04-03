@@ -42,8 +42,8 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
         db.ref('trip_requests_t.role').as('role'),
         db.ref('trip_requests_t.location').as('location'),
         db.ref('trip_requests_t.deviation_limit').as('deviation_limit'),
-        db.ref('trip_times.id').as('trip_time_id'),
-        db.ref('trip_times.date').as('trip_date'),
+        db.ref('trip_requests_t.first_date').as('first_date'),
+        db.ref('trip_requests_t.last_date').as('last_date'),
       ]).from(function() {
         this.select('trip_requests.*')
           .from('trip_requests')
@@ -53,10 +53,7 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
           })
           .whereNull('trip_matches.id')
           .as('trip_requests_t')
-      }).rightJoin(
-        'trip_times',
-        'trip_requests_t.id', 'trip_times.request_id'
-      ).where('trip_requests_t.direction', '=', direction)
+      }).where('trip_requests_t.direction', '=', direction)
 
       await trx.raw(`CREATE OR REPLACE TEMPORARY VIEW trip_requests_times AS (${rawViewQuery})`)
 
@@ -77,8 +74,7 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
         this.select('*').from('trip_requests_times').where('role', '=', 'driver').as('driver_t')
       }).innerJoin(function() {
           this.select('*').from('trip_requests_times').where('role', '=', 'rider').as('rider_t')
-        },
-        'driver_t.trip_date', 'rider_t.trip_date'
+      }, db.raw('GREATEST(driver_t.first_date, rider_t.first_date) <= LEAST(driver_t.last_date, rider_t.last_date)')
       )
 
       // console.log(`Identified potential pairs for direction ${direction}`)
@@ -160,7 +156,8 @@ async function matchFirstPair(pairs: PricedPair[]) {
       .insert({
         driver_request_id,
         rider_request_id,
-        date: db.fn.now(), // timeDate[0].date,
+        first_date: db.fn.now(),
+        last_date: db.fn.now(), // timeDate[0].date,
         rider_confirmed: false,
         driver_confirmed: false,
         first_portion: firstPortion,

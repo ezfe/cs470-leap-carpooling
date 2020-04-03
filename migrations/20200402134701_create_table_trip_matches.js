@@ -13,13 +13,14 @@ exports.up = function(knex) {
       .notNullable()
       .onDelete('cascade')
     
-    t.date('date').notNullable()
-    // defined in times_create, reused here
-    t.enu('time', null, { useNative: true, existingType: true, enumName: 'trip_time' })
-      .notNullable()
+    t.date('first_date').notNullable()
+    t.date('last_date').notNullable()
   
     t.boolean('rider_confirmed').notNullable()
     t.boolean('driver_confirmed').notNullable()
+
+    t.enu('first_portion', null, { existingType: true, useNative: true, enumName: 'user_role' })
+      .notNullable()
 
     t.timestamp('created_at').notNullable()
   })
