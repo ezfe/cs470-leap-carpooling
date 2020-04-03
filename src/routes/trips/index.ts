@@ -21,7 +21,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     console.log('Found matched requests')
     console.log(matchedRequests)
 
-    let unmatchedRequests = await db('trip_requests')
+    const unmatchedRequests = await db('trip_requests')
       .select(
         'trip_requests.role',
         db.ref('trip_requests.id').as('trip_request_id'),
@@ -31,18 +31,6 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
         this.on('trip_requests.id', '=', 'trip_matches.driver_request_id')
           .orOn('trip_requests.id', '=', 'trip_matches.rider_request_id')
       }).whereNull('trip_matches.id').andWhere('trip_requests.member_id', req.user?.id)
-
-    async function annotateRequests(request) {
-      const times = await db('trip_times').select('*').where('request_id', request.trip_request_id)
-      return {
-        ...request,
-        times
-      }
-    }
-
-    // will add time annotations elsewhere
-    // matchedRequests = await Promise.all(matchedRequests.map(annotateRequests))
-    unmatchedRequests = await Promise.all(unmatchedRequests.map(annotateRequests))
 
     const context = { matchedRequests, unmatchedRequests, alerts }
     console.log(context)

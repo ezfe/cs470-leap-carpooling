@@ -3,3 +3,4 @@ build/
 public/uploads
 
 .env
+package-lock.json # npm package lock
