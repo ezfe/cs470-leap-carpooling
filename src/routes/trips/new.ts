@@ -33,12 +33,10 @@ routes.post('/', async (req: AuthedReq, res: Response) => {
         role: req.body.user_role,
         location: req.body.place_id,
         location_description: req.body.location_description,
-        first_date: req.body.first_date,
-        last_date: req.body.last_date,
         deviation_limit: deviationLimit,
         direction: 'from_lafayette', // req.body.direction,
-        start_date: req.body.start_date,
-        end_date: req.body.end_date,
+        first_date: req.body.first_date,
+        last_date: req.body.last_date,
         created_at: db.fn.now()
       })
 

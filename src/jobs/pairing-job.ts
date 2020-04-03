@@ -122,8 +122,8 @@ async function calculatePairsWithCost(direction: TripDirection): Promise<PricedP
     const res = {
       driver_request_id: potential.driver_request_id,
       rider_request_id: potential.rider_request_id,
-      first_date: potential.driver_first_date < potential.rider_first_date ? potential.driver_first_date : potential.rider_first_date,
-      last_date: potential.driver_last_date > potential.rider_last_date ? potential.driver_last_date : potential.rider_first_date
+      first_date: potential.driver_first_date > potential.rider_first_date ? potential.driver_first_date : potential.rider_first_date,
+      last_date: potential.driver_last_date < potential.rider_last_date ? potential.driver_last_date : potential.rider_last_date
     }
 
     if (mtrx.driverCost <= potential.driver_deviation_limit) {

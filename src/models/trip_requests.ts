@@ -9,8 +9,8 @@ export interface TripRequest {
   location_description: string
   deviation_limit: number
   direction: TripDirection
-  first_date: Date | Raw<any>
-  last_date: Date | Raw<any>
+  first_date: Date | Raw<any> | string
+  last_date: Date | Raw<any> | string
 
   created_at: Date | Raw<any>
 }
