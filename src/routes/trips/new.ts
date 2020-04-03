@@ -37,8 +37,8 @@ routes.post('/', async (req: AuthedReq, res: Response) => {
         location_description: req.body.location_description,
         deviation_limit: deviationLimit,
         direction: req.body.trip_direction,
-        start_date: req.body.start_date,
-        end_date: req.body.end_date,
+        first_date: req.body.first_date,
+        last_date: req.body.last_date,
         created_at: db.fn.now()
       })
 

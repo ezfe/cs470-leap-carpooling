@@ -4,7 +4,9 @@ exports.up = function(knex) {
     t.increments('id').primary().unsigned()
     t.text('netid').notNullable()
     t.text('email')
+    t.enu('default_role', ['rider', 'driver'], { useNative: true, enumName: 'user_role' })
     t.text('default_location')
+    t.text('default_location_description')
     t.integer('deviation_limit')
     t.text('first_name').notNullable()
     t.text('last_name').notNullable()
@@ -18,5 +20,11 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-  return knex.schema.dropTable('users')
+  return Promise.all(
+    [
+      knex.schema.dropTable('users'),
+      knex.raw('DROP TYPE user_role')
+    ]
+  )
 };
+
