@@ -2,6 +2,7 @@ import db from '../db'
 import { TripDirection, UserRole } from '../models/misc_types'
 import { TripMatch } from '../models/trip_matches'
 import { distanceMatrix } from '../utils/distances'
+import { Raw } from 'knex'
 
 export default async function job() {
   // console.log("Starting Pairing Process")
@@ -26,10 +27,14 @@ interface PotentialPair {
   driver_id: number
   driver_location: string
   driver_deviation_limit: number
+  driver_first_date: Date | Raw<any>
+  driver_last_date: Date | Raw<any>
   rider_request_id: number
   rider_id: number
   rider_location: string
   rider_deviation_limit: number
+  rider_first_date: Date | Raw<any>
+  rider_last_date: Date | Raw<any>
 }
 
 async function generatePotentialPairs(direction: TripDirection): Promise<PotentialPair[]> {
@@ -66,10 +71,14 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
         db.ref('driver_t.member_id').as('driver_id'),
         db.ref('driver_t.location').as('driver_location'),
         db.ref('driver_t.deviation_limit').as('driver_deviation_limit'),
+        db.ref('driver_t.first_date').as('driver_first_date'),
+        db.ref('driver_t.last_date').as('driver_last_date'),
         db.ref('rider_t.trip_request_id').as('rider_request_id'),
         db.ref('rider_t.member_id').as('rider_id'),
         db.ref('rider_t.location').as('rider_location'),
         db.ref('rider_t.deviation_limit').as('rider_deviation_limit'),
+        db.ref('rider_t.first_date').as('rider_first_date'),
+        db.ref('rider_t.last_date').as('rider_last_date'),
       ]).from(function() {
         this.select('*').from('trip_requests_times').where('role', '=', 'driver').as('driver_t')
       }).innerJoin(function() {
@@ -94,6 +103,8 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
 interface PricedPair {
   driver_request_id: number
   rider_request_id: number
+  first_date: Date | Raw<any>
+  last_date: Date | Raw<any>
   cost: number
   firstPortion: UserRole
 }
@@ -111,6 +122,8 @@ async function calculatePairsWithCost(direction: TripDirection): Promise<PricedP
     const res = {
       driver_request_id: potential.driver_request_id,
       rider_request_id: potential.rider_request_id,
+      first_date: potential.driver_first_date < potential.rider_first_date ? potential.driver_first_date : potential.rider_first_date,
+      last_date: potential.driver_last_date > potential.rider_last_date ? potential.driver_last_date : potential.rider_first_date
     }
 
     if (mtrx.driverCost <= potential.driver_deviation_limit) {
@@ -149,15 +162,15 @@ async function matchFirstPair(pairs: PricedPair[]) {
     return
   }
 
-  const { driver_request_id, rider_request_id, firstPortion } = pairs[0]
+  const { driver_request_id, rider_request_id, firstPortion, first_date, last_date } = pairs[0]
 
   try {
     await db<TripMatch>('trip_matches')
       .insert({
         driver_request_id,
         rider_request_id,
-        first_date: db.fn.now(),
-        last_date: db.fn.now(), // timeDate[0].date,
+        first_date,
+        last_date,
         rider_confirmed: false,
         driver_confirmed: false,
         first_portion: firstPortion,
