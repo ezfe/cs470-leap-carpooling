@@ -1,0 +1,80 @@
+extends ../base.pug
+
+block navbar_settings
+  - var current_page = "trip_index"
+
+block header_extension
+  link(rel="stylesheet", href="/static/dashboard.css")
+
+block content
+
+  if alerts.delete
+    .row.mb-3
+      .col
+        .alert.alert-success(role="alert")
+          | Successfully removed your trip request
+
+  .row.mb-3
+    .col.text-center
+      a.btn.btn-info.btn-lg(href="/trips/new", style="width: 200px;")
+        i.fas.fa-plus.mr-2
+        | New Trip
+
+  -
+    function prettyDate(dateString){
+      //if it's already a date object and not a string you don't need this line:
+      var date = new Date(dateString);
+      var d = date.getDate();
+      var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+      var m = monthNames[date.getMonth()];
+      var y = date.getFullYear();
+      return `${m} ${d}, ${y}`;
+    }
+
+  each trip in matchedRequests
+    .row.mb-3
+      .col
+        .card
+          if trip.rider_confirmed && trip.driver_confirmed
+            h5.card-header(class=`trip-confirmed`)
+              i.mr-2(class='fas fa-check-circle')
+              | Confirmed Trip
+          else
+            h5.card-header(class=`trip-pending`)
+              i.mr-2(class='fas fa-exclamation-triangle')
+              | Pending Trip
+          .card-body
+            h5.card-title
+              -
+                let currentUserLocationDescription =
+                  (trip.driver_id == currentUser.id)
+                    ? trip.driver_location_description
+                    : trip.rider_location_description
+
+              if trip.direction == 'towards_lafayette'
+                = `Trip to Lafayette College from ${trip.driver_location_description}`
+              else
+                = `Trip from Lafayette College to ${currentUserLocationDescription}`
+            //- ul
+            //-   each time in trip.times
+            //-     li= prettyDate(time.date)
+            
+            .row
+              .col
+                a.btn.btn-link(href=`/trips/${trip.id}`) Trip Details
+  each trip in unmatchedRequests
+    .row.mb-3
+      .col
+        .card
+          h5.card-header(class=`trip-processing`)
+            i.mr-2(class='fas fa-sync-alt')
+            | Processing Trip
+          .card-body
+            h5.card-title
+              if trip.direction == 'towards_lafayette'
+                = `Trip to Lafayette College from ${trip.location_description}`
+              else
+                = `Trip from Lafayette College to ${trip.location_description}`
+            ul
+              each time in trip.times
+                li= prettyDate(time.date)

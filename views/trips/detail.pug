@@ -1,0 +1,120 @@
+extends ../base.pug
+
+block navbar_settings
+  - var current_page = "trip_detail"
+
+block header_extension
+  link(rel="stylesheet", href="/static/dashboard.css")
+
+block content
+
+  if driver.id != currentUser.id
+    .row.mb-3
+      .col
+        .card
+          h5.card-header
+            if rider.id == currentUser.id
+              | Driving You
+            else
+              | Driver
+          .card-body
+            .row
+              .col-2
+                img.rounded.img-fluid(src='/'+driver.profile_image_name, style="width: 300px;")   
+              .col
+                h5.card-title
+                  = driver.preferred_name || driver.first_name
+                p.card-text
+                  = 'Location: '
+                  = driverRequest.location_description
+  if rider.id != currentUser.id
+    .row.mb-3
+      .col
+        .card
+          h5.card-header
+            if driver.id == currentUser.id
+              | Riding With You
+            else
+              | Rider
+          .card-body
+            .row
+              .col-2
+                img.rounded.img-fluid(src='/'+rider.profile_image_name, style="width: 300px;")   
+              .col
+                h5.card-title
+                  = rider.preferred_name || rider.first_name
+                p.card-text
+                  = 'Location: '
+                  = riderRequest.location_description
+
+  .row
+    .col-1.order-4
+      span.fas.fa-arrow-right
+    .col-1(class=(tripMatch.direction == 'from_lafayette' ? 'order-2' : 'order-6'))
+      span.fas.fa-arrow-right
+
+    .col(
+      class=(tripMatch.direction == 'from_lafayette' ? 'order-1' : 'order-7')
+    )
+      .row
+        .col
+          p Lafayette College
+    .col(
+      class=(tripMatch.first_portion == 'driver' ? 'order-3' : 'order-5')
+    )
+      .row
+        .col
+          p= driverRequest.location_description
+      .row
+        .col
+          a.btn.btn-outline-info(
+            href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(driverRequest.location_description)}&query_place_id=${driverRequest.location}`
+          )
+            fa.fas.fa-location-arrow
+            = ' Google Maps'
+    .col(
+      class=(tripMatch.first_portion == 'rider' ? 'order-3' : 'order-5')
+    )
+      .row
+        .col
+          p= riderRequest.location_description
+      .row
+        .col
+          a.btn.btn-outline-info(
+            href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(riderRequest.location_description)}&query_place_id=${riderRequest.location}`
+          )
+            fa.fas.fa-location-arrow
+            = ' Google Maps'
+
+  hr.my-4
+
+  .row.mb-2
+    .col-2
+      if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
+        form(method="POST" action=`/trips/${tripMatch.id}/confirm`)
+          button.btn.btn-block.btn-success(role="submit")
+            i.fas.fa-check
+            = ' Confirm Trip'
+      else if (!tripMatch.driver_confirmed || !tripMatch.rider_confirmed)
+        span Waiting for the other person to confirm...
+      else
+        span
+          i.fas.fa-check
+          = ' Trip Confirmed'
+
+    .col-2
+      form(method="POST" action=`/trips/${tripMatch.id}/reject`)
+        button.btn.btn-block.btn-warning(role="submit")
+          i.fas.fa-sync-alt
+          = ' Reject Match'
+
+    .col-2
+      form#cancel-trip-form(method="POST" action=`/trips/${tripMatch.id}/cancel`)
+        button.btn.btn-block.btn-danger(role="submit")
+          i.fas.fa-times
+          = ' Cancel Trip'
+
+  script(
+    type="text/javascript",
+    src="/static/js/trip_detail.js"
+  )

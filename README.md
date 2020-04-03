@@ -19,6 +19,17 @@
 4. Run `yarn migrate:latest` to configure your database tables
 5. Run `yarn start` to run the server
 
+You may receive errors referencing missing environment variables. `.env_template` will need to be copied as `.env` and modified appropriately.
+
 # Google Maps
 
-A project must be created at [console.cloud.google.com](https://console.cloud.google.com).
+A project must be created at [console.cloud.google.com](https://console.cloud.google.com). Generate 1 key capable of using the Javascript Autocomplete APIs, and 1 key for the server side requests to the distance matrix.
+
+# HTTPS
+
+HTTPS is managed by separate software and doesn't interact with the code in this repository. Our deployment uses NGINX.
+
+1. Install [NGINX](http://nginx.org/en/download.html) appropriately for your system
+2. Install and configure [Certbot](https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx)
+3. Run certbot for the domain name of choice (carpool.cs.lafayette.edu currently), with the `certonly` option
+3. Use configuration in `nginx/`, modify if the domain name was changed

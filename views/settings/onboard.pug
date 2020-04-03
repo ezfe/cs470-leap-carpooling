@@ -5,12 +5,12 @@ block navbar_settings
 
 block content
   .row
-    .col-6.offset-3
-      .card.mb-3
+    .col-lg-6.offset-lg-3
+      .card
         .card-header 
           h4.mb-0 Welcome!
         .card-body
-          form#onboard-form(method="POST")
+          form#onboard-form(method="POST", enctype="multipart/form-data")
             .row.mb-4
               .col.text-center
                 img.rounded.img-fluid.mr-3(id="uploadedPhoto", src="/static/blank-profile.png",style="height:200px;width:200px")   
@@ -26,7 +26,7 @@ block content
                 input.form-control(
                   name="preferred_name"
                   autocomplete="given-name"
-                  value=(current_user.preferred_name || current_user.first_name)
+                  value=(currentUser.preferred_name || currentUser.first_name)
                   required
                   maxlength=100
                 )
@@ -38,7 +38,7 @@ block content
                 input.form-control(
                   name="preferred_email"
                   autocomplete="email"
-                  value=(current_user.email || `${current_user.netid}@lafayette.edu`)
+                  value=(currentUser.email || `${currentUser.netid}@lafayette.edu`)
                   required
                   maxlength=100
                 )
@@ -50,7 +50,7 @@ block content
                 input.form-control(
                   name= "phone_number"
                   autocomplete="tel"
-                  value=current_user.phone_number
+                  value=currentUser.phone_number
                   required
                   maxlength=30
                 )

@@ -1,7 +1,7 @@
-extends base.pug
+extends ../base.pug
 
 block navbar_settings
-  - var current_page = "new_trip"
+  - var current_page = "trip_new"
 
 block header_extension
   link(rel="stylesheet", href="/static/dashboard.css")
@@ -27,12 +27,12 @@ block content
         input.form-control#location_field(
           type="text"
           name="location_description"
-          value=current_user.default_location_description
+          value=currentUser.default_location_description
         )
         input#place_id_field(
           type="hidden"
           name="place_id"
-          value=current_user.default_location
+          value=currentUser.default_location
         )
     .row
       .col
@@ -78,7 +78,6 @@ block content
           i.fas.fa-check-circle.mr-2
           | Submit
 
-    
   script(
     type="text/javascript",
     src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`

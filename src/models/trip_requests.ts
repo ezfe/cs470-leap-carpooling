@@ -1,12 +1,13 @@
 import { Raw } from "knex";
+import { TripDirection, UserRole } from "./misc_types";
 
 export interface TripRequest {
   id: number
   member_id: number
-  role: 'driver' | 'rider'
+  role: UserRole
   location: string
   location_description: string
   deviation_limit: number,
-  direction: 'towards_lafayette' | 'from_lafayette'
+  direction: TripDirection
   created_at: Date | Raw<any>
 }

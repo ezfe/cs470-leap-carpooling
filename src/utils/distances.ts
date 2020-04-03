@@ -1,10 +1,23 @@
 import { Client } from "@googlemaps/google-maps-services-js"
 import redisClient from "../db/redis"
+import { TripDirection } from "../models/misc_types"
 
-export async function distanceMatrix(driverPlace: string, riderPlace: string, toLafayette: boolean) {
+/**
+ * Compute the distance matrix concerning a driver, rider, and direction
+ * @param driverPlace The driver's location
+ * @param riderPlace The rider's location
+ * @param direction The direction to or from Lafayette
+ * @returns The cost the driver or the rider must spend to complete the trip as a pair
+ */
+export async function distanceMatrix(
+  driverPlace: string, riderPlace: string, direction: TripDirection): Promise<{
+    riderCost: number,
+    driverCost: number
+  }> {
+
   const lafayettePlace = 'ChIJAZll2E5sxIkRmWtHcAi0le4'
 
-  if (toLafayette) {
+  if (direction === 'towards_lafayette') {
     const driverBaseCost = await timeBetween(driverPlace, lafayettePlace)
     const driverToRider = await timeBetween(driverPlace, riderPlace)
     const riderToLafayette = await timeBetween(riderPlace, lafayettePlace)
@@ -31,17 +44,24 @@ export async function distanceMatrix(driverPlace: string, riderPlace: string, to
   }
 }
 
+/**
+ * Calculate the time to travel between two places
+ * @param originPlace The starting location
+ * @param destinationPlace The ending location
+ * @returns The time in minutes to travel between the two places
+ */
 export async function timeBetween(originPlace, destinationPlace): Promise<number> {
   const googleMapsKey = process.env.GOOGLE_MAPS_ROUTING_KEY
   if (!googleMapsKey) {
     console.error('GOOGLE_MAPS_ROUTING_KEY is not set')
-    return null
+    return Infinity
   }
+
   const redisKey = `time_placeid:${originPlace}_placeid:${destinationPlace}`
 
   const redisFoundValue = await redisClient.get(redisKey)
   if (redisFoundValue) {
-    return parseInt(redisFoundValue, 10)
+    return parseInt(redisFoundValue, 10) / 60
   }
 
   const c = new Client({})
@@ -61,5 +81,5 @@ export async function timeBetween(originPlace, destinationPlace): Promise<number
   await redisClient.set(redisKey, time)
   await redisClient.expire(redisKey, 604800) // 1 week
 
-  return time
+  return time / 60
 }
