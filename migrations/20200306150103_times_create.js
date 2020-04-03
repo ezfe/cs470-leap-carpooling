@@ -14,5 +14,10 @@ exports.up = function(knex) {
 };
 
 exports.down = function(knex) {
-  return knex.schema.dropTable('trip_times')
+  return Promise.all(
+    [
+      knex.schema.dropTable('trip_times'),
+      knex.raw('DROP TYPE trip_time')
+    ]
+  )
 };

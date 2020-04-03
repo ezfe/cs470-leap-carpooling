@@ -7,7 +7,9 @@ export interface TripRequest {
   role: UserRole
   location: string
   location_description: string
-  deviation_limit: number,
+  deviation_limit: number
   direction: TripDirection
+  start_date: Date | Raw<any>
+  end_date: Date | Raw<any>
   created_at: Date | Raw<any>
 }
