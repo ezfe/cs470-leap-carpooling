@@ -28,25 +28,17 @@ routes.post('/', async (req: AuthedReq, res: Response) => {
     const deviationLimit = parseInt(deviationLimitString, 10)
     console.log(deviationLimit)
 
-    const requests = await db<TripRequest>('trip_requests').insert({
+    await db<TripRequest>('trip_requests').insert({
         member_id: req.user?.id,
         role: req.body.user_role,
         location: req.body.place_id,
         location_description: req.body.location_description,
+        first_date: req.body.first_date,
+        last_date: req.body.last_date,
         deviation_limit: deviationLimit,
         direction: 'from_lafayette', // req.body.direction,
         created_at: db.fn.now()
       })
-      .returning('id')
-
-    const requestID: number = requests[0]
-
-    console.log("Request body:")
-    console.log(req.body)
-    await db('trip_times').insert({
-      request_id: requestID,
-      date: req.body.date,
-    })
 
     res.redirect('/trips')
   } catch (err) {

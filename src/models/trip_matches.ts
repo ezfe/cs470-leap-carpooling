@@ -17,7 +17,8 @@ export interface TripMatch {
 
 export interface AnnotatedTripMatch {
   id: number
-  date: Date | Raw<any>
+  first_date: Date | Raw<any>
+  last_date: Date | Raw<any>
   rider_confirmed: boolean
   driver_confirmed: boolean
   direction: TripDirection
@@ -33,7 +34,8 @@ function tripMatchesBuilder(user: User | null) {
   const query = db('trip_matches')
     .select(
       'trip_matches.id',
-      'trip_matches.date',
+      'trip_matches.first_date',
+      'trip_matches.last_date',
       'trip_matches.rider_confirmed',
       'trip_matches.driver_confirmed',
       db.ref('driver_t.id').as('driver_request_id'),
