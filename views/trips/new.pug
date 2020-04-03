@@ -20,7 +20,8 @@ block content
         span.small From
         input.form-control(type="text", value="Lafayette College", disabled, id="source_location")
       .col-2
-        i.fas.fa-arrows-alt-h
+        .button(type="button", id="reverse_loactions", onclick="reverseLocations()")
+          i.fas.fa-arrows-alt-h
       .col-4
         span.small To
         input.form-control#location_field(
@@ -44,10 +45,15 @@ block content
 
     .form-group.row
       .col
-        input.form-control(type="text", value="3/10/2020",name="date")
+        label.col-form-label First available travel date:
+      .col
+        label.col-form-label Last available travel date:
+
     .form-group.row
       .col
-        button.btn.btn-outline-secondary(role="button") Add Date
+        input.form-control(type="text", id="start_date", name="start_date" placeholder="MM/DD/YYYY")
+      .col
+        input.form-control(type="text", id="end_date", name="end_date" placeholder="MM/DD/YYYY")
 
     .form-group.row
       label.col-sm-4.col-form-label
