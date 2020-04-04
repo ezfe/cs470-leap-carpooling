@@ -89,3 +89,65 @@ document.getElementById('discard_button').addEventListener('click', () => {
     location.href = "/trips"
   }
 })
+
+$(document).ready(function(){
+  var date = new Date();
+  date.setDate(date.getDate());
+
+  var first_date_input=$('input[name="first_date"]');
+  var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
+  var options={
+    format: 'mm/dd/yyyy',
+    container: container,
+    todayHighlight: true,
+    autoclose: true,
+    startDate: date
+  };
+  first_date_input.datepicker(options);
+
+  var last_date_input=$('input[name="last_date"]');
+  last_date_input.datepicker(options);
+})
+
+$('#first_date').datepicker().on('changeDate', function(e) {
+  //check if the first date is after the last date, if it exists
+  var first_date_array = document.getElementById('first_date').value.split("/");
+  var last_date_array = document.getElementById('last_date').value.split("/");
+
+  if(last_date_val == ""){
+    return;
+  }
+
+  var first_date_val = new Date();
+  first_date_val.setFullYear(first_date_array[2],first_date_array[0], first_date_array[1]);
+  var last_date_val = new Date();
+  last_date_val.setFullYear(last_date_array[2], last_date_array[0], last_date_array[1]);
+
+  if(first_date_val > last_date_val){
+    alert("Please choose a valid first travel date.")
+    document.getElementById('first_date').value = "";
+  }
+  return;
+});
+
+$('#last_date').datepicker().on('changeDate', function(e) {
+  //check if the first date is after the last date, if it exists
+  var first_date_array = document.getElementById('first_date').value.split("/");
+  var last_date_array = document.getElementById('last_date').value.split("/");;
+
+  if(first_date_val == ""){
+    return;
+  }
+
+  var first_date_val = new Date();
+  first_date_val.setFullYear(first_date_array[2],first_date_array[0], first_date_array[1]);
+  var last_date_val = new Date();
+  last_date_val.setFullYear(last_date_array[2], last_date_array[0], last_date_array[1]);
+
+  if(first_date_val > last_date_val){
+    alert("Please choose a valid last travel date.")
+    document.getElementById('last_date').value = "";
+  }
+  return;
+
+});
