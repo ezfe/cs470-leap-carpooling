@@ -1,30 +1,30 @@
 doctype html
 html(lang="en")
-  head
-    meta(charset="utf-8")
-    meta(
-      name="viewport",
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    )
-    
-    // Bootstrap CSS
-    link(
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css"
-      integrity="sha256-L/W5Wfqfa0sdBNIKN9cG6QA5F2qx4qICmU2VgLruv9Y="
-      crossorigin="anonymous"
-    )
+  block head
+    head
+      meta(charset="utf-8")
+      meta(
+        name="viewport",
+        content="width=device-width, initial-scale=1, shrink-to-fit=no"
+      )
+      
+      // Bootstrap CSS
+      link(
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha256-L/W5Wfqfa0sdBNIKN9cG6QA5F2qx4qICmU2VgLruv9Y="
+        crossorigin="anonymous"
+      )
 
-    link(
-      rel="stylesheet"
-      href="/static/sitewide-styles.css"
-    )
+      link(
+        rel="stylesheet"
+        href="/static/sitewide-styles.css"
+      )
 
-    title
-      block title
-      | LEAP Carpooling
+      title
+        block title
+        | LEAP Carpooling
 
-    block header_extension
   body
 
     block navbar_settings
@@ -97,28 +97,27 @@ html(lang="en")
         block content
           p This page has no content right now!
     
-    <!-- Bootstrap v4.4.1 JS -->
-    <!-- Also includes jQuery and Popper.js -->
-    script(
-      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-      crossorigin="anonymous"
-    )
-    script(
-      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"
-      integrity="sha256-/ijcOLwFf26xEYAjW75FizKVo5tnTYiQddPZoLUHHZ8="
-      crossorigin="anonymous"
-    )
-    script(
-      src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js"
-      integrity="sha256-WqU1JavFxSAMcLP2WIOI+GB2zWmShMI82mTpLDcqFUg="
-      crossorigin="anonymous"
-    )
+    block scripts
+      <!-- Bootstrap v4.4.1 JS -->
+      <!-- Also includes jQuery and Popper.js -->
+      script(
+        src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"
+      )
+      script(
+        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"
+        integrity="sha256-/ijcOLwFf26xEYAjW75FizKVo5tnTYiQddPZoLUHHZ8="
+        crossorigin="anonymous"
+      )
+      script(
+        src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha256-WqU1JavFxSAMcLP2WIOI+GB2zWmShMI82mTpLDcqFUg="
+        crossorigin="anonymous"
+      )
 
-    script(
-      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js"
-      integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0="
-      crossorigin="anonymous"
-    )
-  
-    block scripts_extension
+      script(
+        src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js"
+        integrity="sha256-MAgcygDRahs+F/Nk5Vz387whB4kSK9NXlDN3w58LLq0="
+        crossorigin="anonymous"
+      )
