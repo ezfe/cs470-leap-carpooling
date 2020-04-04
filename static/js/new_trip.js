@@ -65,23 +65,6 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     event.preventDefault()
     return
   }
-
-  const firstDate = document.getElementById('first_date').value
-
-  if(firstDate == 'a'){
-    alert('Please use a valid start date.')
-    return
-  }
-  /* if(!(moment(startDate, 'MM-DD-YYYY', true))){
-    alert('Please use a valid start date.')
-    return
-  } */
-
-  const lastDate = document.getElementById('last_date').value
-  if(!(moment(lastDate, 'MM-DD-YYYY', true))){
-    alert('Please use a valid final date.')
-    return
-  }
 })
 
 document.getElementById('discard_button').addEventListener('click', () => {
@@ -89,3 +72,56 @@ document.getElementById('discard_button').addEventListener('click', () => {
     location.href = "/trips"
   }
 })
+
+$(document).ready(function(){
+  const options = {
+    format: 'mm/dd/yyyy',
+    autoclose: true,
+    startDate: new Date()
+  }
+
+  $('input[name="first_date"]').datepicker(options)
+  $('input[name="last_date"]').datepicker(options)
+})
+
+$('#first_date').on('changeDate', function(e) {
+  //check if the first date is after the last date, if it exists
+  var first_date_array = document.getElementById('first_date').value.split("/");
+  var last_date_array = document.getElementById('last_date').value.split("/");
+
+  if(last_date_val == ""){
+    return;
+  }
+
+  var first_date_val = new Date();
+  first_date_val.setFullYear(first_date_array[2],first_date_array[0], first_date_array[1]);
+  var last_date_val = new Date();
+  last_date_val.setFullYear(last_date_array[2], last_date_array[0], last_date_array[1]);
+
+  if(first_date_val > last_date_val){
+    alert("Please choose a valid first travel date.")
+    $('#first_date').datepicker('clearDates');
+  }
+  $('#last_date').datepicker('setStartDate', $('#first_date').val())
+});
+
+$('#last_date').on('changeDate', function(e) {
+  //check if the first date is after the last date, if it exists
+  var first_date_array = document.getElementById('first_date').value.split("/");
+  var last_date_array = document.getElementById('last_date').value.split("/");;
+
+  if(first_date_val == ""){
+    return;
+  }
+
+  var first_date_val = new Date();
+  first_date_val.setFullYear(first_date_array[2],first_date_array[0], first_date_array[1]);
+  var last_date_val = new Date();
+  last_date_val.setFullYear(last_date_array[2], last_date_array[0], last_date_array[1]);
+
+  if(first_date_val > last_date_val){
+    alert("Please choose a valid last travel date.")
+    $('#last_date').datepicker('clearDates');
+  }
+  $('#first_date').datepicker('setEndDate', $('#last_date').val())
+});
