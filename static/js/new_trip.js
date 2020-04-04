@@ -100,9 +100,9 @@ $('#first_date').on('changeDate', function(e) {
 
   if(first_date_val > last_date_val){
     alert("Please choose a valid first travel date.")
-    //document.getElementById('first_date').value = "";
     $('#first_date').datepicker('clearDates');
   }
+  $('#last_date').datepicker('setStartDate', $('#first_date').val())
 });
 
 $('#last_date').on('changeDate', function(e) {
@@ -123,4 +123,5 @@ $('#last_date').on('changeDate', function(e) {
     alert("Please choose a valid last travel date.")
     $('#last_date').datepicker('clearDates');
   }
+  $('#first_date').datepicker('setEndDate', $('#last_date').val())
 });
