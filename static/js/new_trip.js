@@ -65,23 +65,6 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     event.preventDefault()
     return
   }
-
-  const firstDate = document.getElementById('first_date').value
-
-  if(firstDate == 'a'){
-    alert('Please use a valid start date.')
-    return
-  }
-  /* if(!(moment(startDate, 'MM-DD-YYYY', true))){
-    alert('Please use a valid start date.')
-    return
-  } */
-
-  const lastDate = document.getElementById('last_date').value
-  if(!(moment(lastDate, 'MM-DD-YYYY', true))){
-    alert('Please use a valid final date.')
-    return
-  }
 })
 
 document.getElementById('discard_button').addEventListener('click', () => {
@@ -91,9 +74,6 @@ document.getElementById('discard_button').addEventListener('click', () => {
 })
 
 $(document).ready(function(){
-  var date = new Date();
-  date.setDate(date.getDate());
-
   var first_date_input=$('input[name="first_date"]');
   var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
   var options={
@@ -101,15 +81,15 @@ $(document).ready(function(){
     container: container,
     todayHighlight: true,
     autoclose: true,
-    startDate: date
+    startDate: new Date()
   };
   first_date_input.datepicker(options);
 
   var last_date_input=$('input[name="last_date"]');
-  last_date_input.datepicker(options);
+  last_date_input.datepicker(options); 
 })
 
-$('#first_date').datepicker().on('changeDate', function(e) {
+$('#first_date').on('changeDate', function(e) {
   //check if the first date is after the last date, if it exists
   var first_date_array = document.getElementById('first_date').value.split("/");
   var last_date_array = document.getElementById('last_date').value.split("/");
@@ -125,12 +105,13 @@ $('#first_date').datepicker().on('changeDate', function(e) {
 
   if(first_date_val > last_date_val){
     alert("Please choose a valid first travel date.")
-    document.getElementById('first_date').value = "";
+    //document.getElementById('first_date').value = "";
+    $('#first_date').datepicker('clearDates');
   }
   return;
 });
 
-$('#last_date').datepicker().on('changeDate', function(e) {
+$('#last_date').on('changeDate', function(e) {
   //check if the first date is after the last date, if it exists
   var first_date_array = document.getElementById('first_date').value.split("/");
   var last_date_array = document.getElementById('last_date').value.split("/");;
@@ -146,7 +127,7 @@ $('#last_date').datepicker().on('changeDate', function(e) {
 
   if(first_date_val > last_date_val){
     alert("Please choose a valid last travel date.")
-    document.getElementById('last_date').value = "";
+    $('#last_date').datepicker('clearDates');
   }
   return;
 
