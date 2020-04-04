@@ -74,19 +74,14 @@ document.getElementById('discard_button').addEventListener('click', () => {
 })
 
 $(document).ready(function(){
-  var first_date_input=$('input[name="first_date"]');
-  var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
-  var options={
+  const options = {
     format: 'mm/dd/yyyy',
-    container: container,
-    todayHighlight: true,
     autoclose: true,
     startDate: new Date()
-  };
-  first_date_input.datepicker(options);
+  }
 
-  var last_date_input=$('input[name="last_date"]');
-  last_date_input.datepicker(options); 
+  $('input[name="first_date"]').datepicker(options)
+  $('input[name="last_date"]').datepicker(options)
 })
 
 $('#first_date').on('changeDate', function(e) {
@@ -108,7 +103,6 @@ $('#first_date').on('changeDate', function(e) {
     //document.getElementById('first_date').value = "";
     $('#first_date').datepicker('clearDates');
   }
-  return;
 });
 
 $('#last_date').on('changeDate', function(e) {
@@ -129,6 +123,4 @@ $('#last_date').on('changeDate', function(e) {
     alert("Please choose a valid last travel date.")
     $('#last_date').datepicker('clearDates');
   }
-  return;
-
 });
