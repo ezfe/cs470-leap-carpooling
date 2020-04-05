@@ -14,8 +14,10 @@ routes.use('/:tripId/', tripDetail)
 
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   try {
-    console.log(req.query.delete === 'success')
-    const alerts = { delete: req.query.delete === 'success'  }
+    const alerts = {
+      delete: req.query.delete === 'success',
+      reject: req.query.reject === 'success'
+    }
 
     const matchedRequests = await getTripMatches(req.user)
     console.log('Found matched requests')

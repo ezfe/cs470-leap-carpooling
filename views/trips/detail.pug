@@ -152,16 +152,16 @@ block content
               span(aria-hidden="true") &times;
           .modal-body
             .form-check
-              input.form-check-input#radio-block-person(type="radio" name="block-reason" value="block-person")
+              input.form-check-input#radio-block-person(type="radio" name="blockReason" value="block-person")
               label.form-check-label(for="radio-block-person")
                 = 'Do not want to ride with '
                 = otherUser.preferred_name || otherUser.first_name
             .form-check
-              input.form-check-input#radio-incompatible-times(type="radio" name="block-reason" value="incompatible-times")
+              input.form-check-input#radio-incompatible-times(type="radio" name="blockReason" value="incompatible-times")
               label.form-check-label(for="radio-incompatible-times") Cannot agree on when to travel
             if driverRequest.member_id == currentUser.id && tripMatch.first_portion == 'driver'
               .form-check
-                input.form-check-input#radio-incompatible-location(type="radio" name="block-reason" value="incompatible-location")
+                input.form-check-input#radio-incompatible-location(type="radio" name="blockReason" value="incompatible-location")
                 label.form-check-label(for="radio-incompatible-location")
                   = 'Prefer picking someone up at another location'
 

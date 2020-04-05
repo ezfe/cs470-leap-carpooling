@@ -4,6 +4,7 @@ import { TripMatch } from '../../models/trip_matches'
 import { TripRequest } from '../../models/trip_requests'
 import { getUserByID, User } from '../../models/users'
 import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
+import { PairRejection } from '../../models/pair_rejections'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -80,31 +81,45 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
   }
 })
 
-routes.get('/reject', async (req: ReqAuthedReq, res: Response) => {
+routes.post('/reject', async (req: ReqAuthedReq, res: Response) => {
   const processed = await preprocess(req)
   if (!processed) {
     res.sendStatus(404)
     return
   }
-  const { driverRequest, riderRequest } = processed
+  const { tripMatch, driverRequest, riderRequest } = processed
 
-  if (driverRequest.member_id === req.user.id || riderRequest.member_id === req.user.id) {
-    const otherMemberID = (driverRequest.member_id === req.user.id) ? riderRequest.member_id : driverRequest.member_id
+  let myRequest: TripRequest | null = null
+  let otherRequest: TripRequest | null = null
 
-    const otherUser = await getUserByID(otherMemberID)
-    if (!otherUser) {
-      console.error(`Unable to find user ${otherMemberID}`)
-      res.sendStatus(500)
-      return
-    }
-
-    res.render('trips/reject', { otherUser })
-    return
+  if (driverRequest.member_id === req.user.id) {
+    myRequest = driverRequest
+    otherRequest = riderRequest
+  } else if (riderRequest.member_id === req.user.id) {
+    myRequest = riderRequest
+    otherRequest = driverRequest
   } else {
     console.error('Forbidden to reject trip when not a member of the trip')
     res.sendStatus(403)
     return
   }
+
+  const reasons = ['incompatible-location', 'incompatible-times', 'block-person']
+  const requestedReason = req.body.blockReason
+  if (reasons.indexOf(requestedReason) < 0) {
+    console.error(`Forbidden block reason: ${requestedReason}`)
+    res.sendStatus(403)
+    return
+  }
+
+  await db<PairRejection>('pair_rejections').insert({
+    blocker_id: myRequest.member_id,
+    blockee_id: otherRequest.member_id
+  })
+  await db<TripMatch>('trip_matches').where({ id: tripMatch.id }).del()
+
+  res.redirect('/trips?reject=success')
+  return
 })
 
 export default routes

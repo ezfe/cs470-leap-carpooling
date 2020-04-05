@@ -13,6 +13,11 @@ block content
       .col
         .alert.alert-success(role="alert")
           | Successfully removed your trip request
+  else if alerts.reject
+    .row.mb-3
+      .col
+        .alert.alert-success(role="alert")
+          | Successfully requested a new match
 
   .row.mb-3
     .col.text-center
