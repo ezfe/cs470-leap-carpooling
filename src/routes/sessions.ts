@@ -12,6 +12,10 @@ const routes = Router()
 const service = 'https://carpool.cs.lafayette.edu/sessions/handle-ticket'
 
 routes.get('/login', async (req: AuthedReq, res: Response) => {
+  if (req.session?.loginRedirect && !req.query.forwarding) {
+    delete req.session.loginRedirect
+  }
+
   if (process.env.CAS_ENABLED === "true") {
     const casURL = format({
       pathname: 'https://cas.lafayette.edu/cas/login',
@@ -42,9 +46,9 @@ routes.post('/login', async (req: AuthedReq, res: Response) => {
   if (user) {
     setLoggedInAs(req, user)
 
-    const key = parseInt(req.query.next, 10)
-    if (req.session?.loginRedirect?.key === key && req.session?.loginRedirect.value) {
-      res.redirect(req.session.loginRedirect.value)
+    if (req.session?.loginRedirect) {
+      res.redirect(req.session.loginRedirect)
+      delete req.session.loginRedirect
       return
     }
 
@@ -90,9 +94,9 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
       if (user) {
         setLoggedInAs(req, user)
 
-        const key = parseInt(req.query.next, 10)
-        if (req.session?.loginRedirect?.key === key && req.session?.loginRedirect.value) {
-          res.redirect(req.session.loginRedirect.value)
+        if (req.session?.loginRedirect) {
+          delete req.session.loginRedirect
+          res.redirect(req.session.loginRedirect)
           return
         }
 
