@@ -78,3 +78,9 @@ block content
             //- ul
             //-   each time in trip.times
             //-     li= prettyDate(time.date)
+
+            .row
+              .col
+                form(action=`/trip-requests/${trip.trip_request_id}/cancel` method="POST")
+                  button.btn.btn-danger(type="submit") Cancel Trip
+

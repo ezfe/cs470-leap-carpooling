@@ -1,13 +1,13 @@
 import { Response, Router } from 'express'
 import db from '../../db'
-import { AuthedReq } from '../../utils/authed_req'
 import { TripMatch } from '../../models/trip_matches'
 import { TripRequest } from '../../models/trip_requests'
 import { User } from '../../models/users'
+import { ReqAuthedReq } from '../../utils/authed_req'
 
 const routes = Router({ mergeParams: true })
 
-async function preprocess(req: AuthedReq): Promise<{ tripMatch?: TripMatch, driverRequest?: TripRequest, riderRequest?: TripRequest }> {
+async function preprocess(req: ReqAuthedReq): Promise<{ tripMatch?: TripMatch, driverRequest?: TripRequest, riderRequest?: TripRequest }> {
   const id = parseInt(req.params.tripId, 10)
 
   const tripMatch = await db('trip_matches').where({ id }).first<TripMatch>()
@@ -24,7 +24,7 @@ async function preprocess(req: AuthedReq): Promise<{ tripMatch?: TripMatch, driv
   return { tripMatch, driverRequest, riderRequest }
 }
 
-routes.get('/', async (req: AuthedReq, res: Response) => {
+routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const { tripMatch, driverRequest, riderRequest } = await preprocess(req)
 
@@ -54,7 +54,7 @@ routes.get('/', async (req: AuthedReq, res: Response) => {
   }
 })
 
-routes.post('/confirm', async (req: AuthedReq, res: Response) => {
+routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
   try {
     const { tripMatch, driverRequest, riderRequest } = await preprocess(req)
 
@@ -85,43 +85,6 @@ routes.post('/confirm', async (req: AuthedReq, res: Response) => {
 
     res.redirect(`/trips/${tripMatch.id}`)
     return
-  } catch (err) {
-    console.error(err)
-    res.render('database-error')
-  }
-})
-
-routes.post('/cancel', async (req: AuthedReq, res: Response) => {
-  try {
-    const { tripMatch, driverRequest, riderRequest } = await preprocess(req)
-
-    if (!tripMatch) {
-      res.sendStatus(404)
-      return
-    }
-
-    if (!driverRequest || !riderRequest) {
-      console.error(`The trip match ${JSON.stringify(tripMatch)} has invalid requests?`)
-      res.sendStatus(510)
-      return
-    }
-
-    let myRequest: TripRequest | null = null
-    if (req.user?.id === driverRequest.member_id) {
-      myRequest = driverRequest
-    } else if (req.user?.id === riderRequest.member_id) {
-      myRequest = riderRequest
-    }
-
-    if (!myRequest) {
-      console.error('Forbidden to confirm trip when not a member of the trip')
-      res.sendStatus(403)
-      return
-    }
-
-    await db('trip_requests').where('id', myRequest.id).del()
-
-    res.redirect(`/trips?delete=success`)
   } catch (err) {
     console.error(err)
     res.render('database-error')
