@@ -6,7 +6,6 @@ import bodyParser = require('body-parser')
 import session from 'express-session'
 import { authenticateUser } from './middleware/auth'
 import registerJobs from './jobs'
-import CASAuthentication from './middleware/cas'
 
 /* Load environment variables from .env file */
 dotenv.config()
@@ -27,16 +26,6 @@ app.use(session({
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-
-// app.get('/*', (req, res) => {
-//   if (req.session) {
-//     res.json({
-//       cas_user: req.session[ cas.session_name ]
-//     })
-//   } else {
-//     res.send('Session error')
-//   }
-// })
 
 app.use(authenticateUser)
 
