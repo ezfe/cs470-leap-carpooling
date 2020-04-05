@@ -10,16 +10,25 @@ import axios from 'axios'
 
 const routes = Router()
 
-routes.get('/login', (req: AuthedReq, res: Response) => {
-  const redirectURL = format({
-    pathname: 'https://cas.lafayette.edu/cas/login',
-    query: {
-        service: 'https://artful.cs.lafayette.edu/sessions/handle-ticket',
-        ticket: req.query.ticket
-    }
-  })
+routes.get('/login', async (req: AuthedReq, res: Response) => {
+  if (process.env.CAS_ENABLED === "true") {
+    const casURL = format({
+      pathname: 'https://cas.lafayette.edu/cas/login',
+      query: {
+          service: 'https://artful.cs.lafayette.edu/sessions/handle-ticket',
+      }
+    })
 
-  res.redirect(redirectURL)
+    res.redirect(casURL)
+  } else {
+    try {
+      const users = await db<User>('users')
+      const currentUser = req.user
+      res.render('sessions/choose_user', { users, currentUser })
+    } catch (err) {
+      res.render('database-error')
+    }
+  }
 })
 
 routes.get('/logout', (req, res) => {
@@ -28,7 +37,6 @@ routes.get('/logout', (req, res) => {
 })
 
 routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
-
   const requestURL = format({
     pathname: 'https://cas.lafayette.edu/cas/p3/serviceValidate',
     query: {
@@ -99,12 +107,6 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
   }
 
   return
-
-  // const user = await getUserByID(req.body.chosen_user)
-  // if (user) {
-  // } else {
-  //   res.send('User not found')
-  // }
 })
 
 // POST /sessions/create-user
