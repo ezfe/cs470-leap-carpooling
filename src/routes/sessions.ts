@@ -9,13 +9,14 @@ import { AuthedReq } from '../utils/authed_req'
 import axios from 'axios'
 
 const routes = Router()
+const service = 'https://carpool.cs.lafayette.edu/sessions/handle-ticket'
 
 routes.get('/login', async (req: AuthedReq, res: Response) => {
   if (process.env.CAS_ENABLED === "true") {
     const casURL = format({
       pathname: 'https://cas.lafayette.edu/cas/login',
       query: {
-          service: 'https://artful.cs.lafayette.edu/sessions/handle-ticket',
+          service
       }
     })
 
@@ -57,7 +58,7 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
   const requestURL = format({
     pathname: 'https://cas.lafayette.edu/cas/p3/serviceValidate',
     query: {
-        service: 'https://artful.cs.lafayette.edu/sessions/handle-ticket',
+        service,
         ticket: req.query.ticket
     }
   })
