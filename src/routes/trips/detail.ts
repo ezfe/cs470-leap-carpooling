@@ -2,7 +2,7 @@ import { Response, Router } from 'express'
 import db from '../../db'
 import { TripMatch } from '../../models/trip_matches'
 import { TripRequest } from '../../models/trip_requests'
-import { User, getUserByID } from '../../models/users'
+import { getUserByID, User } from '../../models/users'
 import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
@@ -74,37 +74,6 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
 
     res.redirect(`/trips/${tripMatch.id}`)
     return
-  } catch (err) {
-    console.error(err)
-    res.render('database-error')
-  }
-})
-
-routes.post('/cancel', async (req: ReqAuthedReq, res: Response) => {
-  try {
-    const processed = await preprocess(req)
-    if (!processed) {
-      res.sendStatus(404)
-      return
-    }
-    const { driverRequest, riderRequest } = processed
-
-    let myRequest: TripRequest | null = null
-    if (req.user.id === driverRequest.member_id) {
-      myRequest = driverRequest
-    } else if (req.user.id === riderRequest.member_id) {
-      myRequest = riderRequest
-    }
-
-    if (!myRequest) {
-      console.error('Forbidden to confirm trip when not a member of the trip')
-      res.sendStatus(403)
-      return
-    }
-
-    await db('trip_requests').where('id', myRequest.id).del()
-
-    res.redirect(`/trips?delete=success`)
   } catch (err) {
     console.error(err)
     res.render('database-error')

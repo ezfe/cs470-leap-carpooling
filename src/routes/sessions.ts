@@ -77,12 +77,13 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
     if (failure) {
       console.error('CAS authentication failed (' + failure.$.code + ').')
       res.sendStatus(401)
+      return
     }
 
     const success = parsedXML.serviceresponse.authenticationsuccess
     if (success) {
       const netid = success.user
-      const firstName = success.attributes.givenName
+      const firstName = success.attributes.givenname
       const lastName = success.attributes.surname
 
       let user = await getUserByNetID(netid)
@@ -98,12 +99,20 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
         res.redirect('/')
         return
       } else {
-        user = await db<User>('users').insert({
+        const inserted = await db<User>('users').insert({
           netid,
           first_name: firstName,
           last_name: lastName,
           created_at: db.fn.now()
-        }).returning<User>('*')
+        }).returning<User[]>('*')
+
+        if (inserted.length === 0) {
+          console.error('Failed to find or insert new record')
+          res.render('database-error')
+          return
+        } else {
+          user = inserted[0]
+        }
 
         if (user) {
           setLoggedInAs(req, user)
