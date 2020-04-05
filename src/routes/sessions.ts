@@ -140,6 +140,10 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
 routes.post('/create-user', async (req: AuthedReq, res: Response) => {
   try {
     await db<User>('users').insert({
+      netid: req.body.netid,
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      created_at: db.fn.now()
       })
     const user = await getUserByNetID(req.body.netid)
     setLoggedInAs(req, user)

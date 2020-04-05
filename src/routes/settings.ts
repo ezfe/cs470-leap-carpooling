@@ -25,6 +25,15 @@ routes.get('/onboard', requireAuthenticated, (req: AuthedReq, res: Response) => 
   res.render('settings/onboard')
 })
 
+const nodemailer = require('nodemailer')
+const transporter = nodemailer.createTransport({
+  service: 'SendInBlue',
+  auth: {
+    user: 'leaplifts@gmail.com',
+    pass: 'qW4NAZ6TKaSdBsMJ'
+  }
+});
+
 routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), async (req: AuthedReq, res: Response) => {
   const fileName = (req.file) ? req.file.path : undefined;
 
@@ -51,6 +60,14 @@ routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), as
         phone_number: phoneNumber,
         profile_image_name: fileName
       })
+
+      let info = await transporter.sendMail({
+        from: '"LEAP Lifts" <leaplifts@gmail.com>', // sender address
+        to: "sampseln@lafayette.edu", // list of receivers
+        subject: "Confirmation Email", // Subject line
+        text: "Hi this is an email!", // plain text body
+        html: "<b>Hello it worked!</b>" // html body
+      });
 
     res.redirect('/')
   } catch (err) {
