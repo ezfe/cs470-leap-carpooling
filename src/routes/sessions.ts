@@ -36,6 +36,23 @@ routes.get('/logout', (req, res) => {
   res.redirect('/')
 })
 
+routes.post('/login', async (req: AuthedReq, res: Response) => {
+  const user = await getUserByID(req.body.chosen_user)
+  if (user) {
+    setLoggedInAs(req, user)
+
+    const key = parseInt(req.query.next, 10)
+    if (req.session?.loginRedirect?.key === key && req.session?.loginRedirect.value) {
+      res.redirect(req.session.loginRedirect.value)
+      return
+    }
+
+    res.redirect('/')
+  } else {
+    res.send('User not found')
+  }
+})
+
 routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
   const requestURL = format({
     pathname: 'https://cas.lafayette.edu/cas/p3/serviceValidate',
