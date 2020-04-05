@@ -6,18 +6,13 @@ import bodyParser = require('body-parser')
 import session from 'express-session'
 import { authenticateUser } from './middleware/auth'
 import registerJobs from './jobs'
-import CASAuthentication from 'express-cas-authentication'
+import CASAuthentication from './middleware/cas'
 
 /* Load environment variables from .env file */
 dotenv.config()
 
 /* Express Setup */
 const app = express()
-
-const cas = new CASAuthentication({
-  cas_url: 'https://cas.lafayette.edu/cas',
-  service_url: 'https://artful.cs.lafayette.edu'
-})
 
 if (!process.env.SESSION_SECRET) {
   console.log('Set SESSION_SECRET=(SOME RANDOM SECRET VALUE) in .env!')
@@ -33,7 +28,16 @@ app.use(session({
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-app.use(cas.bounce)
+// app.get('/*', (req, res) => {
+//   if (req.session) {
+//     res.json({
+//       cas_user: req.session[ cas.session_name ]
+//     })
+//   } else {
+//     res.send('Session error')
+//   }
+// })
+
 app.use(authenticateUser)
 
 app.use('/public/uploads', express.static('public/uploads'));
@@ -43,6 +47,6 @@ registerJobs()
 app.set('view engine', 'pug')
 app.use('/', routes)
 
-app.listen(80, () => {
+app.listen(8000, () => {
   console.log('Example app listening on port 8000!')
 })
