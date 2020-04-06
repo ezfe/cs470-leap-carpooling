@@ -87,12 +87,36 @@ block content
             fa.fas.fa-location-arrow
             = ' Google Maps'
 
+  -
+    function prettyDate(dateString){
+      //if it's already a date object and not a string you don't need this line:
+      var date = new Date(dateString);
+      var d = date.getDate();
+      var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+      var m = monthNames[date.getMonth()];
+      var y = date.getFullYear();
+      return `${m} ${d}, ${y}`;
+    }
+      function prettyDateNoYear(dateString){
+      //if it's already a date object and not a string you don't need this line:
+      var date = new Date(dateString);
+      var d = date.getDate();
+      var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+      var m = monthNames[date.getMonth()];
+      return `${m} ${d}`;
+    }
 
   hr.my-4
   .row.mb-2
     .col
-      h5 Trip Date Range:  3/20/2020-3/30/2020
-      h5 
+      if (prettyDate(tripMatch.first_date) === prettyDate(tripMatch.last_date))
+       h5= `Trip date range: ${prettyDate(tripMatch.first_date)}`
+      else
+        if(tripMatch.first_date.getFullYear()===tripMatch.last_date.getFullYear())
+         h5= `Trip date range: ${prettyDateNoYear(tripMatch.first_date)} - ${prettyDate(tripMatch.last_date)}`
+        else 
+         h5= `Trip date range: ${prettyDate(tripMatch.first_date)} - ${prettyDate(tripMatch.last_date)}`
+
   hr.my-4
   .row.mb-2
     .col-2
