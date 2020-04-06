@@ -83,9 +83,9 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
         this.select('*').from('trip_requests_times').where('role', '=', 'driver').as('driver_t')
       }).innerJoin(function() {
           this.select('*').from('trip_requests_times').where('role', '=', 'rider').as('rider_t')
-      }, db.raw('GREATEST(driver_t.first_date, rider_t.first_date) <= LEAST(driver_t.last_date, rider_t.last_date)')
-      )
-
+        },
+        db.raw('GREATEST(driver_t.first_date, rider_t.first_date) <= LEAST(driver_t.last_date, rider_t.last_date)')
+      ).where('driver_t.member_id','<>', db.ref('rider_t.member_id'))
       // console.log(`Identified potential pairs for direction ${direction}`)
       // console.log('Used:')
       // console.log(query)
