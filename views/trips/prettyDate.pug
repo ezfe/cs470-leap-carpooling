@@ -1,7 +1,5 @@
 -
-  function prettyDate(dateString){
-    //if it's already a date object and not a string you don't need this line:
-    var date = new Date(dateString);
+  function prettyDate(date){
     var d = date.getDate();
     var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
     var m = monthNames[date.getMonth()];
@@ -9,11 +7,19 @@
     return `${m} ${d}, ${y}`;
   }
 
-  function prettyDateNoYear(dateString){
-    //if it's already a date object and not a string you don't need this line:
-    var date = new Date(dateString);
+  function prettyDateNoYear(date){
     var d = date.getDate();
     var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
     var m = monthNames[date.getMonth()];
     return `${m} ${d}`;
+  }
+
+  function prettyDates(d1, d2) {
+    if (prettyDate(d1) === prettyDate(d2)) {
+      return prettyDate(d1)
+    } else if (d1.getFullYear() === d2.getFullYear()) {
+      return `${prettyDateNoYear(d1)} - ${prettyDate(d2)}`
+    } else {
+      return `${prettyDate(d1)} - ${prettyDate(d2)}`
+    }
   }

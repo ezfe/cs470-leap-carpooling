@@ -92,13 +92,7 @@ block content
   hr.my-4
   .row.mb-2
     .col
-      if (prettyDate(tripMatch.first_date) === prettyDate(tripMatch.last_date))
-       h5= `Trip date range: ${prettyDate(tripMatch.first_date)}`
-      else
-        if(tripMatch.first_date.getFullYear()===tripMatch.last_date.getFullYear())
-         h5= `Trip date range: ${prettyDateNoYear(tripMatch.first_date)} - ${prettyDate(tripMatch.last_date)}`
-        else 
-         h5= `Trip date range: ${prettyDate(tripMatch.first_date)} - ${prettyDate(tripMatch.last_date)}`
+      h5= `Trip date range: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
 
   hr.my-4
   .row.mb-2
