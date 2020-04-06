@@ -25,16 +25,7 @@ block content
         i.fas.fa-plus.mr-2
         | New Trip
 
-  -
-    function prettyDate(dateString){
-      //if it's already a date object and not a string you don't need this line:
-      var date = new Date(dateString);
-      var d = date.getDate();
-      var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
-      var m = monthNames[date.getMonth()];
-      var y = date.getFullYear();
-      return `${m} ${d}, ${y}`;
-    }
+  include prettyDate
 
   each trip in matchedRequests
     .row.mb-3
@@ -60,9 +51,7 @@ block content
                 = `Trip to Lafayette College from ${trip.driver_location_description}`
               else
                 = `Trip from Lafayette College to ${currentUserLocationDescription}`
-            //- ul
-            //-   each time in trip.times
-            //-     li= prettyDate(time.date)
+            h6= `Trip date range: ${prettyDates(trip.first_date, trip.last_date)}`
             
             .row
               .col
@@ -80,9 +69,7 @@ block content
                 = `Trip to Lafayette College from ${trip.location_description}`
               else
                 = `Trip from Lafayette College to ${trip.location_description}`
-            //- ul
-            //-   each time in trip.times
-            //-     li= prettyDate(time.date)
+            h6= `Trip date range: ${prettyDates(trip.first_date, trip.last_date)}`
 
             .row
               .col

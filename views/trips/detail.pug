@@ -47,6 +47,7 @@ block content
                   = 'Location: '
                   = riderRequest.location_description
 
+  
   .row
     .col-1.order-4
       span.fas.fa-arrow-right
@@ -86,8 +87,14 @@ block content
             fa.fas.fa-location-arrow
             = ' Google Maps'
 
-  hr.my-4
+  include prettyDate
 
+  hr.my-4
+  .row.mb-2
+    .col
+      h5= `Trip date range: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
+
+  hr.my-4
   .row.mb-2
     .col-2
       if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
