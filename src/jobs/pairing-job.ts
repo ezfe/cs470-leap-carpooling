@@ -87,11 +87,7 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
             })
         })
         .whereNull('pair_rejections.id')
-
-      // console.log(`Identified potential pairs for direction ${direction}`)
-      // console.log('Used:')
-      // console.log(query)
-      // console.log(potentialPairs)
+        .andWhere('driver_t.member_id', '<>', db.ref('rider_t.member_id'))
 
       return potentialPairs
     })
