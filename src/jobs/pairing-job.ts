@@ -75,6 +75,18 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
           function() { createSubquery(this, 'rider') },
           db.raw('GREATEST(driver_t.first_date, rider_t.first_date) <= LEAST(driver_t.last_date, rider_t.last_date)')
         )
+        .leftJoin(
+          'pair_rejections',
+          function() {
+            this.on(function() {
+              this.on('pair_rejections.blocker_id', 'rider_t.member_id')
+                .andOn('pair_rejections.blockee_id', 'driver_t.member_id')
+            }).orOn(function() {
+              this.on('pair_rejections.blocker_id', 'driver_t.member_id')
+                .andOn('pair_rejections.blockee_id', 'rider_t.member_id')
+            })
+        })
+        .whereNull('pair_rejections.id')
 
       // console.log(`Identified potential pairs for direction ${direction}`)
       // console.log('Used:')
