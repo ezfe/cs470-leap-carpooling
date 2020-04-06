@@ -126,7 +126,7 @@ async function calculatePairsWithCost(direction: TripDirection): Promise<PricedP
       last_date: potential.driver_last_date < potential.rider_last_date ? potential.driver_last_date : potential.rider_last_date
     }
 
-    if (mtrx.driverCost <= potential.driver_deviation_limit) {
+    if (mtrx.driverCost <= potential.driver_deviation_limit&& potential.driver_id!= potential.rider_id) {
       // driver could pay
       // rider unknown
       if (mtrx.riderCost <= potential.rider_deviation_limit) {
@@ -144,7 +144,7 @@ async function calculatePairsWithCost(direction: TripDirection): Promise<PricedP
           firstPortion: 'driver'
         })
       }
-    } else if (mtrx.riderCost <= potential.rider_deviation_limit) {
+    } else if (mtrx.riderCost <= potential.rider_deviation_limit&& potential.driver_id!= potential.rider_id) {
       // only rider could pay
       pricedPairs.push({
         ...res,
