@@ -6,6 +6,7 @@ import path from 'path'
 import db from '../db'
 import { User } from '../models/users'
 import { ReqAuthedReq } from '../utils/authed_req'
+import { PairRejection } from '../models/pair_rejections'
 
 const routes = Router()
 
@@ -62,7 +63,7 @@ routes.post('/onboard', upload.single('profile_photo'), async (req: ReqAuthedReq
   }
 })
 
-routes.get('/', (req: ReqAuthedReq, res: Response) => {
+routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
   if (!googleMapsAPIKey) {
     res.send('GOOGLE_MAPS_PLACES_KEY is unset')
@@ -70,8 +71,12 @@ routes.get('/', (req: ReqAuthedReq, res: Response) => {
   }
 
   const profileImageURL = req.user.profile_image_name || '/static/blank-profile.png'
+  const blockedUsers: User[] = await db('pair_rejections')
+    .select('users.*')
+    .where('blocker_id', req.user.id)
+    .innerJoin('users', 'users.id', 'pair_rejections.blockee_id')
 
-  res.render('settings/index', { googleMapsAPIKey, profileImageURL })
+  res.render('settings/index', { googleMapsAPIKey, profileImageURL, blockedUsers })
 })
 
 routes.get('/remove-profile-image', async (req: ReqAuthedReq, res: Response) => {
