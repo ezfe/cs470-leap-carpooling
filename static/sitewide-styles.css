@@ -44,3 +44,15 @@
 .signup-box:hover {
   text-decoration: none;
 }
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #343a40;
+  }
+
+  .card-body {
+    background-color: #444649;
+    color: white;
+    border-radius: 3px;
+  }
+}
