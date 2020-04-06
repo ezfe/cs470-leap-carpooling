@@ -85,8 +85,7 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
           this.select('*').from('trip_requests_times').where('role', '=', 'rider').as('rider_t')
         },
         db.raw('GREATEST(driver_t.first_date, rider_t.first_date) <= LEAST(driver_t.last_date, rider_t.last_date)')
-      )
-
+      ).where('driver_t.member_id','<>', db.ref('rider_t.member_id'))
       // console.log(`Identified potential pairs for direction ${direction}`)
       // console.log('Used:')
       // console.log(query)
@@ -127,7 +126,7 @@ async function calculatePairsWithCost(direction: TripDirection): Promise<PricedP
       last_date: potential.driver_last_date < potential.rider_last_date ? potential.driver_last_date : potential.rider_last_date
     }
 
-    if (mtrx.driverCost <= potential.driver_deviation_limit&& potential.driver_id!= potential.rider_id) {
+    if (mtrx.driverCost <= potential.driver_deviation_limit) {
       // driver could pay
       // rider unknown
       if (mtrx.riderCost <= potential.rider_deviation_limit) {
@@ -145,7 +144,7 @@ async function calculatePairsWithCost(direction: TripDirection): Promise<PricedP
           firstPortion: 'driver'
         })
       }
-    } else if (mtrx.riderCost <= potential.rider_deviation_limit&& potential.driver_id!= potential.rider_id) {
+    } else if (mtrx.riderCost <= potential.rider_deviation_limit) {
       // only rider could pay
       pricedPairs.push({
         ...res,
