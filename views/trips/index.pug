@@ -30,6 +30,14 @@ block content
       var y = date.getFullYear();
       return `${m} ${d}, ${y}`;
     }
+    function prettyDateNoYear(dateString){
+      //if it's already a date object and not a string you don't need this line:
+      var date = new Date(dateString);
+      var d = date.getDate();
+      var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+      var m = monthNames[date.getMonth()];
+      return `${m} ${d}`;
+    }
 
   each trip in matchedRequests
     .row.mb-3
@@ -55,7 +63,13 @@ block content
                 = `Trip to Lafayette College from ${trip.driver_location_description}`
               else
                 = `Trip from Lafayette College to ${currentUserLocationDescription}`
-            h6 Trip Date Range:  3/20/2020-3/30/2020
+            if (prettyDate(trip.first_date) === prettyDate(trip.last_date))
+              h6= `Trip date range: ${prettyDate(trip.first_date)}`
+            else
+              if(trip.first_date.getFullYear()===trip.last_date.getFullYear())
+                h6= `Trip date range: ${prettyDateNoYear(trip.first_date)} - ${prettyDate(trip.last_date)}`
+              else 
+                h6= `Trip date range: ${prettyDate(trip.first_date)} - ${prettyDate(trip.last_date)}`
             //- ul
             //-   each time in trip.times
             //-     li= prettyDate(time.date)
