@@ -5,16 +5,10 @@ import { ReqAuthedReq } from '../../utils/authed_req'
 
 const routes = Router({ mergeParams: true })
 
-async function preprocess(req: ReqAuthedReq): Promise<TripRequest> {
-  const id = parseInt(req.params.requestID, 10)
-
-  const request = await db('trip_requests').where({ id }).first<TripRequest>()
-  return request
-}
-
 routes.post('/cancel', async (req: ReqAuthedReq, res: Response) => {
   try {
-    const tripRequest = await preprocess(req)
+    const id = parseInt(req.params.requestID, 10)
+    const tripRequest = await db('trip_requests').where({ id }).first<TripRequest>()
 
     if (!tripRequest) {
       res.sendStatus(404)

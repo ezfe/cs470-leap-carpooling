@@ -3,7 +3,7 @@ extends ../base.pug
 block content
   .card.mb-lg-3
     .card-header 
-      h4 Preferences
+      h4.mb-0 Preferences
     .card-body
       .row
         .col-12.col-lg-4
@@ -53,6 +53,22 @@ block content
             .row.mb-2
               .col.text-center
                 button.btn.btn-primary(type="submit") Update
+
+  .card.mb-lg-3
+    .card-header 
+      h4.mb-0 Blocked Users
+    .card-body
+      table.table
+        each user in blockedUsers
+          tr
+            td= user.first_name
+            td= user.last_name
+            - const email = user.email || `${user.netid}@lafayette.edu`
+            td
+              a(href=`mailto:${email}`)= email
+            td
+              a.btn.btn-link(href='#') Unblock
+        
 
   script(
     type="text/javascript",

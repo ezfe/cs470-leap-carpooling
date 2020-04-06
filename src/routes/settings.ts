@@ -4,9 +4,9 @@ import fs from 'fs'
 import multer from 'multer'
 import path from 'path'
 import db from '../db'
-import { requireAuthenticated } from '../middleware/auth'
 import { User } from '../models/users'
-import { AuthedReq } from '../utils/authed_req'
+import { ReqAuthedReq } from '../utils/authed_req'
+import { PairRejection } from '../models/pair_rejections'
 
 const routes = Router()
 
@@ -21,11 +21,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-routes.get('/onboard', requireAuthenticated, (req: AuthedReq, res: Response) => {
+routes.get('/onboard', (req: ReqAuthedReq, res: Response) => {
   res.render('settings/onboard')
 })
 
-routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), async (req: AuthedReq, res: Response) => {
+routes.post('/onboard', upload.single('profile_photo'), async (req: ReqAuthedReq, res: Response) => {
   const fileName = (req.file) ? req.file.path : undefined;
 
   function validate(bodyField: string, length: number): string {
@@ -44,7 +44,7 @@ routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), as
     const phoneNumber = validate('phone_number', 30)
     console.log(phoneNumber)
 
-    await db<User>('users').where({ id: req.user?.id })
+    await db<User>('users').where({ id: req.user.id })
       .update({
         preferred_name: preferredName,
         email: preferredEmail,
@@ -63,28 +63,32 @@ routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), as
   }
 })
 
-routes.get('/', requireAuthenticated, (req: AuthedReq, res: Response) => {
+routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
   if (!googleMapsAPIKey) {
     res.send('GOOGLE_MAPS_PLACES_KEY is unset')
     return
   }
 
-  const profileImageURL = req.user?.profile_image_name || '/static/blank-profile.png'
+  const profileImageURL = req.user.profile_image_name || '/static/blank-profile.png'
+  const blockedUsers: User[] = await db('pair_rejections')
+    .select('users.*')
+    .where('blocker_id', req.user.id)
+    .innerJoin('users', 'users.id', 'pair_rejections.blockee_id')
 
-  res.render('settings/index', { googleMapsAPIKey, profileImageURL })
+  res.render('settings/index', { googleMapsAPIKey, profileImageURL, blockedUsers })
 })
 
-routes.get('/remove-profile-image', requireAuthenticated, async (req: AuthedReq, res: Response) => {
+routes.get('/remove-profile-image', async (req: ReqAuthedReq, res: Response) => {
   try {
-    await db<User>('users').where({ id: req.user?.id })
+    await db<User>('users').where({ id: req.user.id })
       .update({
         profile_image_name: null
       })
 
-    if (req.user?.profile_image_name) {
+    if (req.user.profile_image_name) {
       try {
-        fs.unlinkSync(req.user?.profile_image_name)
+        fs.unlinkSync(req.user.profile_image_name)
       } catch (err) {
         // An error deleting the file shouldn't be a failure,
         // since it probably means the file doesn't exist
@@ -98,9 +102,9 @@ routes.get('/remove-profile-image', requireAuthenticated, async (req: AuthedReq,
   }
 })
 
-routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => {
+routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
-    await db<User>('users').where({ id: req.user?.id })
+    await db<User>('users').where({ id: req.user.id })
       .update({
         preferred_name: req.body.preferred_name,
         email: req.body.preferred_email,
@@ -116,10 +120,10 @@ routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => 
   }
 })
 
-routes.post('/upload-photo', upload.single('profile_photo'), requireAuthenticated, async (req: AuthedReq, res: Response) => {
+routes.post('/upload-photo', upload.single('profile_photo'), async (req: ReqAuthedReq, res: Response) => {
   try {
     // Prepend a / so that public/uploads/file.jpg becomes /public/uploads/file.jpg
-    await db<User>('users').where({ id: req.user?.id })
+    await db<User>('users').where({ id: req.user.id })
     .update({
       profile_image_name: req.file.path
     })
