@@ -145,8 +145,8 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     event.preventDefault()
     return
   }
-  if(deviation_limit > 120){
-    alert('Please choose a max deviation limit below 120 minutes')
+  if(deviation_limit > 1440){
+    alert('Please choose a max deviation limit below 1440 minutes')
     event.preventDefault()
     return
   }
