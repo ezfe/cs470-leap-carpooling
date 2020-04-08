@@ -10,7 +10,7 @@ block content
         .card-header 
           h4.mb-0 Welcome!
         .card-body
-          form#onboard-form(method="POST", enctype="multipart/form-data")
+          form#onboard_form(method="POST", enctype="multipart/form-data")
             .row.mb-4
               .col.text-center
                 img.rounded.img-fluid.mr-3(id="uploadedPhoto", src="/static/blank-profile.png",style="height:200px;width:200px")   
@@ -26,6 +26,7 @@ block content
                 input.form-control(
                   name="preferred_name"
                   autocomplete="given-name"
+                  id="preferred_name"
                   value=(currentUser.preferred_name || currentUser.first_name)
                   required
                   maxlength=100
@@ -38,6 +39,7 @@ block content
                 input.form-control(
                   name="preferred_email"
                   autocomplete="email"
+                  id="preferred_email"
                   value=(currentUser.email || `${currentUser.netid}@lafayette.edu`)
                   required
                   maxlength=100
@@ -50,6 +52,7 @@ block content
                 input.form-control(
                   name= "phone_number"
                   autocomplete="tel"
+                  id="phone_number"
                   value=currentUser.phone_number
                   required
                   maxlength=30
