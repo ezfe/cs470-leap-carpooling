@@ -141,12 +141,17 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
   }
   const deviation_limit = document.getElementById('deviation_limit').value
   if(deviation_limit == ""){
-    alert('Please enter a deviation_ imit between 0 minutes and 120 minutes')
+    alert('Please enter a deviation limit between 0 minutes and 120 minutes')
     event.preventDefault()
     return
   }
   if(deviation_limit > 120){
     alert('Please choose a max deviation limit below 120 minutes')
+    event.preventDefault()
+    return
+  }
+  if(isNaN(deviation_limit)){
+    alert('Please enter a valid deviation limit between 0 minutes and 120 minutes')
     event.preventDefault()
     return
   }
