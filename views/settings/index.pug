@@ -36,7 +36,7 @@ block content
                 b Phone number
             .row.mb-4
               .col
-                input.form-control(name= "_phone", value=currentUser.phone_number)
+                input.form-control(name= "_phone",id="_phone", value=currentUser.phone_number)
             .row.mb-2
               .col
                 b Default location
@@ -49,7 +49,7 @@ block content
                 b Deviation limit
             .row.mb-4
               .col
-                input.form-control(name= "deviation_limit", value=currentUser.deviation_limit)
+                input.form-control(name= "deviation_limit", id ="deviation_limit", value=currentUser.deviation_limit)
             .row.mb-2
               .col.text-center
                 button.btn.btn-primary(type="submit") Update
