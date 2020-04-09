@@ -5,6 +5,7 @@ import { TripRequest } from '../../models/trip_requests'
 import { getUserByID, User } from '../../models/users'
 import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
 import { PairRejection } from '../../models/pair_rejections'
+import { lafayettePlaceID } from '../../utils/places'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -26,6 +27,12 @@ async function preprocess(req: AuthedReq): Promise<{ tripMatch: TripMatch, drive
 
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   try {
+    const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
+    if (!googleMapsAPIKey) {
+      res.send('GOOGLE_MAPS_PLACES_KEY is unset')
+      return
+    }
+
     const processed = await preprocess(req)
     if (!processed) {
       res.sendStatus(404)
@@ -43,7 +50,11 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
 
     const otherUser = driver.id === req.user.id ? rider : driver
 
-    res.render('trips/detail', { tripMatch, driverRequest, riderRequest, driver, rider, otherUser })
+    const firstPlaceID = (driverRequest.direction === 'from_lafayette') ? lafayettePlaceID : (tripMatch.first_portion === 'driver' ? driverRequest.location : riderRequest.location)
+    const midPlaceID = (tripMatch.first_portion === 'driver' ? riderRequest.location : driverRequest.location)
+    const lastPlaceID = (driverRequest.direction === 'towards_lafayette') ? lafayettePlaceID : (tripMatch.first_portion === 'driver' ? riderRequest.location : driverRequest.location)
+
+    res.render('trips/detail', { tripMatch, driverRequest, riderRequest, driver, rider, otherUser, firstPlaceID, lastPlaceID, midPlaceID, googleMapsAPIKey })
   } catch (err) {
     console.error(err)
     res.render('database-error')

@@ -6,6 +6,10 @@ block navbar_settings
 append head
   link(rel="stylesheet", href="/static/dashboard.css")
 
+  meta(name="firstPlaceID" content=firstPlaceID)
+  meta(name="midPlaceID" content=midPlaceID)
+  meta(name="lastPlaceID" content=lastPlaceID)
+
 block content
 
   if driver.id != currentUser.id
@@ -47,15 +51,27 @@ block content
                   = 'Location: '
                   = riderRequest.location_description
 
+  .row
+    .col
+      #map
+      //- iframe(
+      //-   width="600"
+      //-   height="450"
+      //-   frameborder="0"
+      //-   style="border:0"
+      //-   src=`https://www.google.com/maps/embed/v1/directions?origin=place_id:${firstPlace}&destination=place_id:${lastPlace}&key=${googleMapsAPIKey}`
+      //-   allowfullscreen
+      //- )
+
   
   .row
     .col-1.order-4
       span.fas.fa-arrow-right
-    .col-1(class=(tripMatch.direction == 'from_lafayette' ? 'order-2' : 'order-6'))
+    .col-1(class=(driverRequest.direction == 'from_lafayette' ? 'order-2' : 'order-6'))
       span.fas.fa-arrow-right
 
     .col(
-      class=(tripMatch.direction == 'from_lafayette' ? 'order-1' : 'order-7')
+      class=(driverRequest.direction == 'from_lafayette' ? 'order-1' : 'order-7')
     )
       .row
         .col
@@ -176,7 +192,11 @@ block content
             button.btn.btn-secondary(type="button" data-dismiss="modal") Cancel
             button.btn.btn-primary(type="submit") Confirm
 
-
+append scripts
+  script(
+    type="text/javascript",
+    src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`
+  )
   script(
     type="text/javascript",
     src="/static/js/trip_detail.js"
