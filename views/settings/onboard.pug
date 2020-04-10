@@ -28,7 +28,7 @@ block content
                   id="preferred_name"
                   value=(currentUser.preferred_name || currentUser.first_name)
                   type="text"
-                  pattern="^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$"
+                  pattern="[^0-9_!¡?÷?¿/\\\\+=@#$%ˆ&*(){}|~<>;:[\\]]{2,}"
                   autocomplete="given-name"
                   required
                   maxlength=100
@@ -60,7 +60,7 @@ block content
                   value=currentUser.phone_number
                   required
                   type="text"
-                  pattern="^\d{10}$"
+                  pattern="\\d{10}"
                   autocomplete="tel"
                   maxlength=30
                 )
