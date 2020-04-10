@@ -61,12 +61,15 @@ routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), as
         profile_image_name: fileName
       })
 
-      let info = await transporter.sendMail({
-        from: '"LEAP Lifts" <leaplifts@gmail.com>', // sender address
-        to: "sampseln@lafayette.edu", // list of receivers
-        subject: "Confirmation Email", // Subject line
-        text: "Hi this is an email!", // plain text body
-        html: "<b>Hello it worked!</b>" // html body
+      // Send welcome email
+      await transporter.sendMail({
+        from: '"LEAP Lifts" <leaplifts@gmail.com>',
+        to: preferredEmail,
+        subject: "Welcome to LEAP Lifts",
+        html: `Hello ${preferredName}, <br>
+              Thanks for signing up for LEAP Lifts! To get started, visit your dashboard and create a trip request.
+              First, we'll match you with another student along your route, then we'll ask for confirmation from both
+              of you before confirming your ride. <br> Hope to see you soon! <br> The LEAP Lifts Team`
       });
 
     res.redirect('/')

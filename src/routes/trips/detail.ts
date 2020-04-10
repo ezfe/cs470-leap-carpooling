@@ -7,6 +7,15 @@ import { ReqAuthedReq } from '../../utils/authed_req'
 
 const routes = Router({ mergeParams: true })
 
+const nodemailer = require('nodemailer')
+const transporter = nodemailer.createTransport({
+  service: 'SendInBlue',
+  auth: {
+    user: 'leaplifts@gmail.com',
+    pass: 'qW4NAZ6TKaSdBsMJ'
+  }
+});
+
 async function preprocess(req: ReqAuthedReq): Promise<{ tripMatch?: TripMatch, driverRequest?: TripRequest, riderRequest?: TripRequest }> {
   const id = parseInt(req.params.tripId, 10)
 
@@ -73,10 +82,22 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
       await db<TripMatch>('trip_matches').update({
         driver_confirmed: true
       }).where('id', tripMatch.id)
+
+      if (tripMatch.rider_confirmed) {
+        const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
+        sendConfirmationEmail(req.user, rider)
+        sendConfirmationEmail(rider, req.user)
+      }
     } else if (req.user?.id === riderRequest.member_id) {
       await db<TripMatch>('trip_matches').update({
         rider_confirmed: true
       }).where('id', tripMatch.id)
+
+      if (tripMatch.driver_confirmed) {
+        const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
+        sendConfirmationEmail(req.user, driver)
+        sendConfirmationEmail(driver, req.user)
+      }
     } else {
       console.error('Forbidden to confirm trip when not a member of the trip')
       res.sendStatus(403)
@@ -90,5 +111,15 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
     res.render('database-error')
   }
 })
+
+async function sendConfirmationEmail(user, passenger) {
+  await transporter.sendMail({
+    from: '"LEAP Lifts" <leaplifts@gmail.com>',
+    to: user.email,
+    subject: "Trip Confirmation",
+    html: `Hello ${user.preferredName}, <br> Both you and ${passenger.preferredName} have confirmed your trip.
+          At this point, please contact your match and decide on a departure time and location! <br> The LEAP Lifts Team`
+  });
+}
 
 export default routes
