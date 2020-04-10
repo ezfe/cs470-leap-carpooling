@@ -26,10 +26,11 @@ export async function sendWelcomeEmail(name : string, email : string) {
  * Send a given user a trip processing email in response to making a trip request.
  */
 export async function sendTripProcessingEmail(
-  name : string, email : string, trip_direction : string, location : string, firstDate : string, lastDate : string) {
+  name : string, email : string, trip_direction : string, location : string, firstDate, lastDate) {
+  firstDate = prettyDate(new Date(firstDate))
+  lastDate = prettyDate(new Date(lastDate))
   let message = `Hello ${name}, <br><br> Thanks for submitting a trip request! We have you travelling`
-      message += (trip_direction == 'to_lafayette') ? ' to Lafayette College from ' : ' from Lafayette College to '
-      message += `${location}`
+      message += (trip_direction == 'to_lafayette') ? ` to Lafayette College from ${location}` : ` from Lafayette College to ${location}`
       message += (firstDate == lastDate) ? ` on ${firstDate}. ` : ` sometime between ${firstDate} and ${lastDate}. `
       message += `We'll let you know once we've found you someone to ride with! <br><br> The LEAP Lifts Team`
 
@@ -43,21 +44,23 @@ export async function sendTripProcessingEmail(
 
 export async function sendTripMatchEmail(
   name : string, email : string, driver : boolean, passengerFirstName : string, passengerLastName : string, trip_direction : string,
-  driverLocation : string, riderLocation : string, firstDate : string, lastDate : string) {
+  driverLocation : string, riderLocation : string, firstDate, lastDate) {
+  firstDate = prettyDate(new Date(firstDate))
+  lastDate = prettyDate(new Date(lastDate))
   let message = `Hello ${name}, <br><br> We found you a `
       message += (driver) ? `rider! You will be driving ${passengerFirstName} ${passengerLastName}` : 
       `driver! ${passengerFirstName} ${passengerLastName} will be driving you`
       message += (trip_direction == 'to_lafayette') ? 
-      ` to Lafayette College from ${riderLocation} on the way from ${driverLocation}. `  : 
-      ` from Lafayette College to ${riderLocation} on the way to ${driverLocation}. `
+      ` to Lafayette College from ${riderLocation} on the way from ${driverLocation}`  : 
+      ` from Lafayette College to ${riderLocation} on the way to ${driverLocation}`
+      message += (firstDate == lastDate) ? ` on ${firstDate}. ` : ` sometime between ${firstDate} and ${lastDate}. `
       message += 'Please login to LEAP Lifts to confirm or reject your trip. <br><br> The LEAP Lifts Team'
 
   await transporter.sendMail({
     from: '"LEAP Lifts" <leaplifts@gmail.com>',
     to: email,
     subject: "Trip Match Found",
-    html: `Hello ${name}, <br><br> 
-          We found you a passenger! Please login to LEAP Lifts to confirm or reject your trip. <br><br> The LEAP Lifts Team`
+    html: message
   });
 }
 
@@ -65,13 +68,15 @@ export async function sendTripMatchEmail(
  * Send a given user an email once both members of a match have confirmed a trip.
  */
 export async function sendTripConfirmationEmail(
-  name : string, email : string, location : string, passengerName : string, passengerLocation : string, firstDate : string, lastDate : string) {  
+  name : string, email : string, location : string, passengerName : string, passengerLocation : string, firstDate, lastDate) { 
+  firstDate = prettyDate(new Date(firstDate)) 
+  lastDate = prettyDate(new Date(lastDate))
   let message = `Hello ${name}, <br><br> Both you and ${passengerName} have confirmed your trip.
                 Here are your trip details: <br>
                 Your location: ${location} <br>
                 ${passengerName}'s location: ${passengerLocation} <br>`
       message += (firstDate == lastDate) ? `Date: ${firstDate} <br>` : `Date Range: ${firstDate} to ${lastDate} <br>`
-      message += '<br><br> The LEAP Lift Team'
+      message += '<br><br> The LEAP Lifts Team'
   
   await transporter.sendMail({
     from: '"LEAP Lifts" <leaplifts@gmail.com>',
@@ -79,4 +84,12 @@ export async function sendTripConfirmationEmail(
     subject: "Trip Confirmation",
     html: message
   });
+}
+
+function prettyDate(date : Date){
+  var d = date.getDate();
+  var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+  var m = monthNames[date.getMonth()];
+  var y = date.getFullYear();
+  return `${m} ${d}, ${y}`;
 }

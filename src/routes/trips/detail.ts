@@ -60,8 +60,6 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
     }
     const { tripMatch, driverRequest, riderRequest } = processed
 
-  //  name : string, email : string, location : string, passengerName : string, passengerLocation : string, first_date : string, last_date : string) {  
-
     if (req.user.id === driverRequest.member_id) {
       await db<TripMatch>('trip_matches').update({
         driver_confirmed: true
@@ -71,9 +69,9 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
         const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
 
         sendTripConfirmationEmail(req.user.preferred_name || req.user.first_name, req.user.email!, driverRequest.location_description,
-          rider.preferred_name || rider.first_name, riderRequest.location_description, `${tripMatch.first_date}`, `${tripMatch.last_date}`)
+          rider.preferred_name || rider.first_name, riderRequest.location_description, tripMatch.first_date, tripMatch.last_date)
         sendTripConfirmationEmail(rider.preferred_name || rider.first_name, rider.email!, riderRequest.location_description,
-          req.user.preferred_name || req.user.first_name, driverRequest.location_description, `${tripMatch.first_date}`, `${tripMatch.first_date}`)
+          req.user.preferred_name || req.user.first_name, driverRequest.location_description, tripMatch.first_date, tripMatch.last_date)
       }
     } else if (req.user.id === riderRequest.member_id) {
       await db<TripMatch>('trip_matches').update({
@@ -82,11 +80,11 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
 
       if (tripMatch.driver_confirmed) {
         const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
-        
+
         sendTripConfirmationEmail(req.user.preferred_name || req.user.first_name, req.user.email!, riderRequest.location_description, 
-          driver.preferred_name || driver.first_name, driverRequest.location_description, `${tripMatch.first_date}`, `${tripMatch.last_date}`)
+          driver.preferred_name || driver.first_name, driverRequest.location_description, tripMatch.first_date, tripMatch.last_date)
         sendTripConfirmationEmail(driver.preferred_name || driver.first_name, driver.email!, driverRequest.location_description,
-          req.user.preferred_name || req.user.first_name, riderRequest.location_description, `${tripMatch.first_date}`, `${tripMatch.last_date}`)
+          req.user.preferred_name || req.user.first_name, riderRequest.location_description, tripMatch.first_date, tripMatch.last_date)
       }
     } else {
       console.error('Forbidden to confirm trip when not a member of the trip')
