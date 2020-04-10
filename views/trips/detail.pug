@@ -47,6 +47,7 @@ block content
                   = 'Location: '
                   = riderRequest.location_description
 
+  
   .row
     .col-1.order-4
       span.fas.fa-arrow-right
@@ -86,8 +87,14 @@ block content
             fa.fas.fa-location-arrow
             = ' Google Maps'
 
-  hr.my-4
+  include prettyDate
 
+  hr.my-4
+  .row.mb-2
+    .col
+      h5= `Trip date range: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
+
+  hr.my-4
   .row.mb-2
     .col-2
       if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
@@ -103,10 +110,9 @@ block content
           = ' Trip Confirmed'
 
     .col-2
-      form(method="POST" action=`/trips/${tripMatch.id}/reject`)
-        button.btn.btn-block.btn-warning(role="submit")
-          i.fas.fa-sync-alt
-          = ' Reject Match'
+      button.btn.btn-block.btn-warning(type="button" data-toggle="modal" data-target="#rejectModal")
+        i.fas.fa-sync-alt
+        = ' Reject Match'
 
     -
       let currentUserRequestID = null
@@ -122,6 +128,54 @@ block content
           button.btn.btn-block.btn-danger(role="submit")
             i.fas.fa-times
             = ' Cancel Trip'
+
+    .col.col-sm-5
+      p
+        = 'You\'ve been matched! Contact '
+        = otherUser.preferred_name || otherUser.first_name
+        = ' and make sure that both of you can agree on '
+        | when you will leave (and any other details that concern you).
+      p If everything checks out, click "Confirm Trip" to finalize the match.
+      p
+        | If you're unable to agree on something, or don't want to ride with this person,
+        | click "Reject Match" and indicate a reason (so that we can most efficiently find
+        | you another match).
+      p
+        | If you need to change details like when you are travelling or where you are travelling
+        | to, click "Cancel Trip" and request another trip with the corrected details.
+
+  .modal.fade#rejectModal(
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="rejectModalLabel"
+    aria-hidden="true"
+  )
+    .modal-dialog(role="document")
+      .modal-content
+        form(method="POST" action=`/trips/${tripMatch.id}/reject`)
+          .modal-header
+            h5.modal-title#rejectModalLabel Reject Match
+            button.close(type="button" data-dismiss="modal" aria-label="Close")
+              span(aria-hidden="true") &times;
+          .modal-body
+            .form-check
+              input.form-check-input#radio-block-person(type="radio" name="blockReason" value="block-person")
+              label.form-check-label(for="radio-block-person")
+                = 'Do not want to ride with '
+                = otherUser.preferred_name || otherUser.first_name
+            .form-check
+              input.form-check-input#radio-incompatible-times(type="radio" name="blockReason" value="incompatible-times")
+              label.form-check-label(for="radio-incompatible-times") Cannot agree on when to travel
+            if driverRequest.member_id == currentUser.id && tripMatch.first_portion == 'driver'
+              .form-check
+                input.form-check-input#radio-incompatible-location(type="radio" name="blockReason" value="incompatible-location")
+                label.form-check-label(for="radio-incompatible-location")
+                  = 'Prefer picking someone up at another location'
+
+          .modal-footer
+            button.btn.btn-secondary(type="button" data-dismiss="modal") Cancel
+            button.btn.btn-primary(type="submit") Confirm
+
 
   script(
     type="text/javascript",
