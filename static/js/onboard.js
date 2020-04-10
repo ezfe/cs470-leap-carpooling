@@ -9,7 +9,7 @@ function validatePhone(phone) {
 }
 
 function validateName(name) {
-  const na = /^[A-Za-z]+$/
+  const na = /^[A-Za-z']+$/
   return na.test(name)
 }
 
