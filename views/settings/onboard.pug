@@ -38,10 +38,11 @@ block content
               .col
                 input.form-control(
                   name="preferred_email"
-                  autocomplete="email"
                   id="preferred_email"
                   value=(currentUser.email || `${currentUser.netid}@lafayette.edu`)
                   required
+                  type="email"
+                  autocomplete="email"
                   maxlength=100
                 )
             .row.mb-2.ml-1
@@ -51,10 +52,11 @@ block content
               .col
                 input.form-control(
                   name= "phone_number"
-                  autocomplete="tel"
                   id="phone_number"
                   value=currentUser.phone_number
                   required
+                  type="text"
+                  autocomplete="tel"
                   maxlength=30
                 )
             .row
