@@ -40,4 +40,12 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     alert("Please enter a valid 10 digit phone number")
     return
   }
+  const name = document.getElementById("preferred_name").value
+  const n = /^[A-Za-z']+$/;
+  if(!n.test(name))
+  {
+    event.preventDefault()
+    alert("Please enter a valid name")
+    return
+  }
 })

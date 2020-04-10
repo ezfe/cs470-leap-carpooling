@@ -24,13 +24,13 @@ block content
                 b Preferred first name
             .row.mb-4
               .col
-                input.form-control(name="preferred_name", value=currentUser.preferred_name)
+                input.form-control(name="preferred_name",id="preferred_name", value=(currentUser.preferred_name || currentUser.first_name))
             .row.mb-2
               .col
                 b Preferred email
             .row.mb-4
               .col
-                input.form-control(name = "preferred_email", value=currentUser.email)
+                input.form-control(name = "preferred_email",  value=(currentUser.email || `${currentUser.netid}@lafayette.edu`), type= "email", autocomplete="email")
             .row.mb-2
               .col
                 b Phone number
