@@ -205,7 +205,7 @@ async function sendMatchFoundEmail(user) {
     from: '"LEAP Lifts" <leaplifts@gmail.com>',
     to: user.email,
     subject: "Trip Match Found",
-    html: `Hello ${user.preferredName}, <br> 
+    html: `Hello ${user.firstName}, <br> 
           We found you a passenger! Please login to LEAP Lifts to confirm or reject your trip. <br> The LEAP Lifts Team`
   });
 }

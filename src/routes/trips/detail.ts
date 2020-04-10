@@ -107,8 +107,8 @@ async function sendConfirmationEmail(user, passenger) {
     from: '"LEAP Lifts" <leaplifts@gmail.com>',
     to: user.email,
     subject: "Trip Confirmation",
-    html: `Hello ${user.preferredName}, <br> Both you and ${passenger.preferredName} have confirmed your trip.
-          At this point, please contact your match and decide on a departure time and location! <br> The LEAP Lifts Team`
+    html: `Hello ${user.firstName}, <br> Both you and ${passenger.firstName} have confirmed your trip.
+          here are your trip details: <br> The LEAP Lift Team`
   });
 }
 
