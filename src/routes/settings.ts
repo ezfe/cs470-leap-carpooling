@@ -7,6 +7,7 @@ import db from '../db'
 import { User } from '../models/users'
 import { ReqAuthedReq } from '../utils/authed_req'
 import { PairRejection } from '../models/pair_rejections'
+import { sendWelcomeEmail } from '../utils/emails'
 
 const routes = Router()
 
@@ -24,15 +25,6 @@ const upload = multer({ storage });
 routes.get('/onboard', (req: ReqAuthedReq, res: Response) => {
   res.render('settings/onboard')
 })
-
-const nodemailer = require('nodemailer')
-const transporter = nodemailer.createTransport({
-  service: 'SendInBlue',
-  auth: {
-    user: 'leaplifts@gmail.com',
-    pass: 'qW4NAZ6TKaSdBsMJ'
-  }
-});
 
 routes.post('/onboard', upload.single('profile_photo'), async (req: ReqAuthedReq, res: Response) => {
   const fileName = (req.file) ? req.file.path : undefined;
@@ -61,16 +53,7 @@ routes.post('/onboard', upload.single('profile_photo'), async (req: ReqAuthedReq
         profile_image_name: fileName
       })
 
-      // Send welcome email
-      await transporter.sendMail({
-        from: '"LEAP Lifts" <leaplifts@gmail.com>',
-        to: preferredEmail,
-        subject: "Welcome to LEAP Lifts",
-        html: `Hello ${preferredName}, <br>
-              Thanks for signing up for LEAP Lifts! To get started, visit your dashboard and create a trip request.
-              First, we'll match you with another student along your route, then we'll ask for confirmation from both
-              of you before confirming your ride. <br> Hope to see you soon! <br> The LEAP Lifts Team`
-      });
+      sendWelcomeEmail(preferredName || req.user.first_name!, preferredEmail || req.user.email!)
 
     res.redirect('/')
   } catch (err) {

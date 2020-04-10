@@ -5,19 +5,11 @@ import { TripRequest } from '../../models/trip_requests'
 import { getUserByID, User } from '../../models/users'
 import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
 import { PairRejection } from '../../models/pair_rejections'
+import { sendTripConfirmationEmail } from '../../utils/emails'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
 const routes = Router({ mergeParams: true })
-
-const nodemailer = require('nodemailer')
-const transporter = nodemailer.createTransport({
-  service: 'SendInBlue',
-  auth: {
-    user: 'leaplifts@gmail.com',
-    pass: 'qW4NAZ6TKaSdBsMJ'
-  }
-});
 
 async function preprocess(req: AuthedReq): Promise<{ tripMatch: TripMatch, driverRequest: TripRequest, riderRequest: TripRequest } | null> {
   const id = parseInt(req.params.tripId, 10)
@@ -68,6 +60,8 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
     }
     const { tripMatch, driverRequest, riderRequest } = processed
 
+  //  name : string, email : string, location : string, passengerName : string, passengerLocation : string, first_date : string, last_date : string) {  
+
     if (req.user.id === driverRequest.member_id) {
       await db<TripMatch>('trip_matches').update({
         driver_confirmed: true
@@ -75,8 +69,11 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
 
       if (tripMatch.rider_confirmed) {
         const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
-        sendConfirmationEmail(req.user, rider)
-        sendConfirmationEmail(rider, req.user)
+
+        sendTripConfirmationEmail(req.user.preferred_name || req.user.first_name, req.user.email!, driverRequest.location_description,
+          rider.preferred_name || rider.first_name, riderRequest.location_description, `${tripMatch.first_date}`, `${tripMatch.last_date}`)
+        sendTripConfirmationEmail(rider.preferred_name || rider.first_name, rider.email!, riderRequest.location_description,
+          req.user.preferred_name || req.user.first_name, driverRequest.location_description, `${tripMatch.first_date}`, `${tripMatch.first_date}`)
       }
     } else if (req.user.id === riderRequest.member_id) {
       await db<TripMatch>('trip_matches').update({
@@ -85,8 +82,11 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
 
       if (tripMatch.driver_confirmed) {
         const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
-        sendConfirmationEmail(req.user, driver)
-        sendConfirmationEmail(driver, req.user)
+        
+        sendTripConfirmationEmail(req.user.preferred_name || req.user.first_name, req.user.email!, riderRequest.location_description, 
+          driver.preferred_name || driver.first_name, driverRequest.location_description, `${tripMatch.first_date}`, `${tripMatch.last_date}`)
+        sendTripConfirmationEmail(driver.preferred_name || driver.first_name, driver.email!, driverRequest.location_description,
+          req.user.preferred_name || req.user.first_name, riderRequest.location_description, `${tripMatch.first_date}`, `${tripMatch.last_date}`)
       }
     } else {
       console.error('Forbidden to confirm trip when not a member of the trip')
@@ -101,16 +101,6 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
     res.render('database-error')
   }
 })
-
-async function sendConfirmationEmail(user, passenger) {
-  await transporter.sendMail({
-    from: '"LEAP Lifts" <leaplifts@gmail.com>',
-    to: user.email,
-    subject: "Trip Confirmation",
-    html: `Hello ${user.firstName}, <br> Both you and ${passenger.firstName} have confirmed your trip.
-          here are your trip details: <br> The LEAP Lift Team`
-  });
-}
 
 routes.post('/reject', async (req: ReqAuthedReq, res: Response) => {
   const processed = await preprocess(req)

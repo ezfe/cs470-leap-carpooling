@@ -5,15 +5,7 @@ import { TripRequest } from '../models/trip_requests'
 import { User } from '../models/users'
 import { distanceMatrix } from '../utils/distances'
 import { Raw } from 'knex'
-
-const nodemailer = require('nodemailer')
-const transporter = nodemailer.createTransport({
-  service: 'SendInBlue',
-  auth: {
-    user: 'leaplifts@gmail.com',
-    pass: 'qW4NAZ6TKaSdBsMJ'
-  }
-});
+import { sendTripMatchEmail } from '../utils/emails'
 
 export default async function job() {
   // console.log("Starting Pairing Process")
@@ -190,22 +182,14 @@ async function matchFirstPair(pairs: PricedPair[]) {
     const riderRequest = await db('trip_requests').where({ id: rider_request_id }).first<TripRequest>()
     const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
     const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
-    sendMatchFoundEmail(rider)
-    sendMatchFoundEmail(driver)
+    sendTripMatchEmail(driver.preferred_name || driver.first_name, driver.email!, true, rider.preferred_name || rider.first_name, rider.last_name,
+      driverRequest.direction, driverRequest.location_description, riderRequest.location_description, `${first_date}`, `${last_date}`)
+    sendTripMatchEmail(rider.preferred_name || rider.first_name, rider.email!, false, driver.preferred_name || driver.first_name, driver.last_name,
+      driverRequest.direction, driverRequest.location_description, riderRequest.location_description, `${first_date}`, `${last_date}`)
 
     return
   } catch (err) {
     console.error('There was a database issue')
     console.error(err)
   }
-}
-
-async function sendMatchFoundEmail(user) {
-  await transporter.sendMail({
-    from: '"LEAP Lifts" <leaplifts@gmail.com>',
-    to: user.email,
-    subject: "Trip Match Found",
-    html: `Hello ${user.firstName}, <br> 
-          We found you a passenger! Please login to LEAP Lifts to confirm or reject your trip. <br> The LEAP Lifts Team`
-  });
 }
