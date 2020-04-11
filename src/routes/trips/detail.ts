@@ -49,12 +49,27 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     }
 
     const otherUser = driver.id === req.user.id ? rider : driver
+    const driverProfileImageURL = driver.profile_image_name || 'static/blank-profile.png'
+    const riderProfileImageURL = rider.profile_image_name || 'static/blank-profile.png'
 
     const firstPlaceID = (driverRequest.direction === 'from_lafayette') ? lafayettePlaceID : (tripMatch.first_portion === 'driver' ? driverRequest.location : riderRequest.location)
     const midPlaceID = (tripMatch.first_portion === 'driver' ? riderRequest.location : driverRequest.location)
     const lastPlaceID = (driverRequest.direction === 'towards_lafayette') ? lafayettePlaceID : (tripMatch.first_portion === 'driver' ? riderRequest.location : driverRequest.location)
 
-    res.render('trips/detail', { tripMatch, driverRequest, riderRequest, driver, rider, otherUser, firstPlaceID, lastPlaceID, midPlaceID, googleMapsAPIKey })
+    res.render('trips/detail', {
+      tripMatch,
+      driverRequest,
+      riderRequest,
+      driver,
+      rider,
+      otherUser,
+      firstPlaceID,
+      lastPlaceID,
+      midPlaceID,
+      driverProfileImageURL,
+      riderProfileImageURL,
+      googleMapsAPIKey
+    })
   } catch (err) {
     console.error(err)
     res.render('database-error')

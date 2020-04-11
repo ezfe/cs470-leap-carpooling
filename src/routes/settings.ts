@@ -22,11 +22,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 routes.get('/onboard', (req: ReqAuthedReq, res: Response) => {
-  res.render('settings/onboard')
+  const profileImageURL = req.user.profile_image_name || 'static/blank-profile.png'
+
+  res.render('settings/onboard', { profileImageURL })
 })
 
-routes.post('/onboard', upload.single('profile_photo'), async (req: ReqAuthedReq, res: Response) => {
-  const fileName = (req.file) ? req.file.path : undefined;
+routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
 
   function validate(bodyField: string, length: number): string {
     const foundValue = req.body[bodyField]
@@ -49,7 +50,6 @@ routes.post('/onboard', upload.single('profile_photo'), async (req: ReqAuthedReq
         preferred_name: preferredName,
         email: preferredEmail,
         phone_number: phoneNumber,
-        profile_image_name: fileName
       })
 
     res.redirect('/')
@@ -60,6 +60,41 @@ routes.post('/onboard', upload.single('profile_photo'), async (req: ReqAuthedReq
     } else {
       res.render('database-error')
     }
+  }
+})
+
+routes.post('/onboard/upload-onboard-image', upload.single('profile_photo'), async (req: ReqAuthedReq, res: Response) => {
+  try {
+    await db<User>('users').where({ id: req.user.id })
+    .update({
+      profile_image_name: req.file.path
+    })
+    res.redirect('/settings/onboard')
+  } catch (err) {
+    res.render('database-error')
+  }
+})
+
+routes.get('/onboard/remove-profile-image', async (req: ReqAuthedReq, res: Response) => {
+  try {
+    await db<User>('users').where({ id: req.user.id })
+      .update({
+        profile_image_name: null
+      })
+
+    if (req.user.profile_image_name) {
+      try {
+        fs.unlinkSync(req.user.profile_image_name)
+      } catch (err) {
+        // An error deleting the file shouldn't be a failure,
+        // since it probably means the file doesn't exist
+        console.error(err)
+      }
+    }
+    res.redirect('/settings/onboard')
+  } catch (err) {
+    console.error(err)
+    res.render('database-error')
   }
 })
 
@@ -120,7 +155,7 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   }
 })
 
-routes.post('/upload-photo', upload.single('profile_photo'), async (req: ReqAuthedReq, res: Response) => {
+routes.post('/upload-image', upload.single('profile_photo'), async (req: ReqAuthedReq, res: Response) => {
   try {
     // Prepend a / so that public/uploads/file.jpg becomes /public/uploads/file.jpg
     await db<User>('users').where({ id: req.user.id })

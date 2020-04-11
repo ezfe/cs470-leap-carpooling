@@ -24,7 +24,7 @@ block content
           .card-body
             .row
               .col-2
-                img.rounded.img-fluid(src='/'+driver.profile_image_name, style="width: 300px;")   
+                img.rounded.img-fluid(src='/'+driverProfileImageURL, style="width: 300px;")   
               .col
                 h5.card-title
                   = driver.preferred_name || driver.first_name
@@ -43,7 +43,7 @@ block content
           .card-body
             .row
               .col-2
-                img.rounded.img-fluid(src='/'+rider.profile_image_name, style="width: 300px;")   
+                img.rounded.img-fluid(src='/'+riderProfileImageURL, style="width: 300px;")   
               .col
                 h5.card-title
                   = rider.preferred_name || rider.first_name
