@@ -10,14 +10,17 @@ block content
         .card-header 
           h4.mb-0 Welcome!
         .card-body
-          form#onboard_form(method="POST", enctype="multipart/form-data")
+          form#photo_form(method="POST" action="/settings/onboard/upload-onboard-image" enctype="multipart/form-data" novalidate)
             .row.mb-4
               .col.text-center
-                img.rounded.img-fluid.mr-3(id="uploadedPhoto", src="/static/blank-profile.png",style="height:200px;width:200px")   
+                a.btn.btn-dark.ml-2.mt-2(id="exitButton", href="/settings/onboard/remove-profile-image", style="position:absolute; opacity:0.8; visibility:hidden")
+                  img(src="/static/exit.svg")
+                img.rounded.img-fluid.mr-3(id="uploadedPhoto", src='/'+profileImageURL,style="height:200px;width:200px")   
             .row.mb-4
               .col.text-center
                   label.btn.btn-primary Upload Photo
-                    input.form-control(style="display: none;", type="file", name="profile_photo", accept="image/*", onchange="displayPhoto(event)")
+                    input.form-control(style="display: none;", type="file", name="profile_photo", accept="image/*", onchange="submitForm(event)")
+          form#onboard_form(method="POST" novalidate)
             .row.mb-2.ml-1
               .col
                 h4 Enter your preferred first name
@@ -25,12 +28,15 @@ block content
               .col
                 input.form-control(
                   name="preferred_name"
-                  autocomplete="given-name"
                   id="preferred_name"
                   value=(currentUser.preferred_name || currentUser.first_name)
+                  type="text"
+                  pattern="[^0-9_!¡?÷?¿/\\\\+=@#$%ˆ&*(){}|~<>;:[\\]]{2,}"
+                  autocomplete="given-name"
                   required
                   maxlength=100
                 )
+                .invalid-feedback Please enter your preferred first name
             .row.mb-2.ml-1
               .col
                 h4 Enter your preferred email
@@ -45,6 +51,7 @@ block content
                   autocomplete="email"
                   maxlength=100
                 )
+                .invalid-feedback Please enter a valid email address
             .row.mb-2.ml-1
               .col
                 h4 Enter your phone number
@@ -56,9 +63,11 @@ block content
                   value=currentUser.phone_number
                   required
                   type="text"
+                  pattern="\\d{10}"
                   autocomplete="tel"
                   maxlength=30
                 )
+                .invalid-feedback Please enter a valid phone number
             .row
               .col.text-center
                 button.btn.btn-primary(type="submit") Submit

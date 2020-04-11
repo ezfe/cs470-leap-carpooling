@@ -43,8 +43,10 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     }
 
     const otherUser = driver.id === req.user.id ? rider : driver
+    const driverProfileImageURL = driver.profile_image_name || 'static/blank-profile.png'
+    const riderProfileImageURL = rider.profile_image_name || 'static/blank-profile.png'
 
-    res.render('trips/detail', { tripMatch, driverRequest, riderRequest, driver, rider, otherUser })
+    res.render('trips/detail', { tripMatch, driverRequest, riderRequest, driver, rider, otherUser, driverProfileImageURL, riderProfileImageURL })
   } catch (err) {
     console.error(err)
     res.render('database-error')
