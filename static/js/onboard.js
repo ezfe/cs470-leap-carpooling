@@ -1,6 +1,11 @@
-function displayPhoto(event) {
-  var image = document.getElementById('uploadedPhoto')
-  image.src = URL.createObjectURL(event.target.files[0])
+var submitForm = function(event) {
+  document.getElementById("photo_form").submit()
+}
+
+window.onload = function () {
+  if (!document.getElementById("uploadedPhoto").src.includes('/static/blank-profile.png')) {
+    document.getElementById("exitButton").style.visibility = "visible";
+  }
 }
 
 document.getElementById('onboard_form').addEventListener('submit', (event) => {
