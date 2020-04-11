@@ -3,11 +3,12 @@ var submitForm = function(event) {
 }
 
 var setCheckboxValue = function(event) {
-  let checkbox = document.getElementById("notificationsCheckbox")
+  let checkbox = document.getElementById("notifications_checkbox")
+  let notificationsField = document.getElementById("allow_notifications_field")
   if (checkbox.checked) {
-    checkbox.value=true
+    notificationsField.value=true
   } else {
-    checkbox.value=false
+    notificationsField.value=false
   }
 }
 
