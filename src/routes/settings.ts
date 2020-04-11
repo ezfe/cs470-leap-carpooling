@@ -56,7 +56,7 @@ routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
         allow_notifications : allowNotifications
       })
 
-      if (req.body.allow_notifications) {
+      if (allowNotifications) {
         sendWelcomeEmail(preferredName || req.user.first_name!, preferredEmail || req.user.email!)
       }
 
