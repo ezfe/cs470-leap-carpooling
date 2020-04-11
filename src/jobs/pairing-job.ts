@@ -175,7 +175,8 @@ async function matchFirstPair(pairs: PricedPair[]) {
         rider_confirmed: false,
         driver_confirmed: false,
         first_portion: firstPortion,
-        created_at: db.fn.now()
+        created_at: db.fn.now(),
+        notification_sent: false
       })
 
     const driverRequest = await db('trip_requests').where({ id: driver_request_id }).first<TripRequest>()
