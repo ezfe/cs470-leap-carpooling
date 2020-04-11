@@ -58,4 +58,9 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     alert("Please enter a valid name")
     return
   }
+  const notifications = document.getElementById("allow_notifications_field").value
+  if(!(notifications == 'true' || notifications == 'false' || notifications == '')) {
+    document.getElementById("allow_notifications_field").value=''
+  }
 })
+

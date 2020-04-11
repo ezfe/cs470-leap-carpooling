@@ -41,8 +41,10 @@ routes.post('/', async (req: AuthedReq, res: Response) => {
         created_at: db.fn.now()
       })
 
-    sendTripProcessingEmail(req.user?.preferred_name || req.user?.first_name!, req.user?.email!, 
-      req.body.trip_direction, req.body.location_description, req.body.first_date, req.body.last_date)
+    if (req.user?.allow_notifications) {
+      sendTripProcessingEmail(req.user?.preferred_name || req.user?.first_name!, req.user?.email!, 
+        req.body.trip_direction, req.body.location_description, req.body.first_date, req.body.last_date)
+    }
 
     res.redirect('/trips')
   } catch (err) {

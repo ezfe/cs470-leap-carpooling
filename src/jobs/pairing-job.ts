@@ -183,10 +183,14 @@ async function matchFirstPair(pairs: PricedPair[]) {
     const riderRequest = await db('trip_requests').where({ id: rider_request_id }).first<TripRequest>()
     const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
     const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
-    sendTripMatchEmail(driver.preferred_name || driver.first_name, driver.email!, true, rider.preferred_name || rider.first_name, rider.last_name,
-      driverRequest.direction, driverRequest.location_description, riderRequest.location_description, first_date, last_date)
-    sendTripMatchEmail(rider.preferred_name || rider.first_name, rider.email!, false, driver.preferred_name || driver.first_name, driver.last_name,
-      driverRequest.direction, driverRequest.location_description, riderRequest.location_description, first_date, last_date)
+    if (driver.allow_notifications) {
+      sendTripMatchEmail(driver.preferred_name || driver.first_name, driver.email!, true, rider.preferred_name || rider.first_name, rider.last_name,
+        driverRequest.direction, driverRequest.location_description, riderRequest.location_description, first_date, last_date)
+    }
+    if (rider.allow_notifications) {
+      sendTripMatchEmail(rider.preferred_name || rider.first_name, rider.email!, false, driver.preferred_name || driver.first_name, driver.last_name,
+        driverRequest.direction, driverRequest.location_description, riderRequest.location_description, first_date, last_date)
+    }
 
     return
   } catch (err) {
