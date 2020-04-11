@@ -114,7 +114,8 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
         phone_number: req.body._phone,
         default_location: req.body.place_id,
         default_location_description: req.body.place_name,
-        deviation_limit: req.body.deviation_limit
+        deviation_limit: req.body.deviation_limit,
+        allow_notifications: req.body.allow_notifications
       })
 
     res.redirect('/settings')

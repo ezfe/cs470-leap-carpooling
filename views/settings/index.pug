@@ -50,6 +50,12 @@ block content
             .row.mb-4
               .col
                 input.form-control(name= "deviation_limit", value=currentUser.deviation_limit)
+            .row.mb-4
+              .col
+                .custom-control.custom-checkbox
+                  input(type="checkbox", name="allow_notifications", class="custom-control-input", id="notificationsCheckbox", 
+                    value=currentUser.allow_notifications, onchange="setCheckboxValue(event)")
+                  label.custom-control-label(for="notificationsCheckbox") Allow LEAP Lifts to send email notifications
             .row.mb-2
               .col.text-center
                 button.btn.btn-primary(type="submit") Update
