@@ -5,6 +5,6 @@ import emailJob from './email-job'
 export default function registerJobs() {
   // every 5 seconds
   schedule.scheduleJob('*/5 * * * * *', sampleJob)
-  // schedule.scheduleJob('*/5 * * * * *', emailJob)
+  schedule.scheduleJob('*/5 * * * * *', emailJob)
 }
 

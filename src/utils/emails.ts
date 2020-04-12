@@ -75,13 +75,37 @@ export async function sendTripConfirmationEmail(
                 Here are your trip details: <br>
                 Your location: ${location} <br>
                 ${passengerName}'s location: ${passengerLocation} <br>`
-      message += (firstDate == lastDate) ? `Date: ${firstDate} <br>` : `Date Range: ${firstDate} to ${lastDate} <br>`
+      message += (firstDate == lastDate) ? `Date: ${firstDate}` : `Date Range: ${firstDate} to ${lastDate}`
       message += '<br><br> The LEAP Lifts Team'
   
   await transporter.sendMail({
     from: '"LEAP Lifts" <leaplifts@gmail.com>',
     to: email,
     subject: "Trip Confirmation",
+    html: message
+  });
+}
+
+/**
+ * Send a given user an email reminding them of an upcoming trip.
+ */
+export async function sendTripReminderEmail(
+  name : string, email : string, firstDate, lastDate, driver: boolean, passengerName : string, trip_direction : string, 
+  driverLocation : string, riderLocation : string) {
+  firstDate = prettyDate(new Date(firstDate))
+  lastDate = prettyDate(new Date(lastDate))
+  let message = `Hello ${name}, <br><br> Your trip with ${passengerName} is coming up `
+      message += (firstDate == lastDate) ? `on ${firstDate}! ` : `between ${firstDate} and ${lastDate}! `
+      message += (driver) ? `You will be driving ${passengerName} ` : `${passengerName} will be driving you `
+      message += (trip_direction == 'to_lafayette') ? 
+      ` to Lafayette College from ${riderLocation} on the way from ${driverLocation}.`  : 
+      ` from Lafayette College to ${riderLocation} on the way to ${driverLocation}.`
+      message += `<br><br>Thanks for using LEAP Lifts! <br><br> The LEAP Lifts Team`
+
+  await transporter.sendMail({
+    from: '"LEAP Lifts" <leaplifts@gmail.com>',
+    to: email,
+    subject: "Trip Reminder",
     html: message
   });
 }
