@@ -115,6 +115,12 @@ $('#last_date').on('changeDate', function(e) {
 });
 
 document.getElementById('request_form').addEventListener('submit', (event) => {
+  if (!event.target.checkValidity()) {
+    event.preventDefault()
+    event.stopPropagation()
+    alert("Please correct the highlighted errors")
+  }
+
   const userRoleValue = document.getElementById('user_role').value
   if (['driver', 'rider'].indexOf(userRoleValue) < 0) {
     event.preventDefault()
@@ -127,32 +133,9 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     event.preventDefault()
     return
   }
-  const first_date = document.getElementById('first_date').value
-  if(first_date == ""){
-    alert('Please enter a valid date for the START of your desired travel range')
-    event.preventDefault()
-    return
-  }
-  const last_date = document.getElementById('last_date').value
-  if(last_date == ""){
-    alert('Please enter a valid date for the END of your desired travel range')
-    event.preventDefault()
-    return
-  }
-  const deviation_limit = document.getElementById('deviation_limit').value
-  if(deviation_limit == ""){
-    alert('Please enter a deviation limit between 0 minutes and 120 minutes')
-    event.preventDefault()
-    return
-  }
-  if(deviation_limit > 1440){
-    alert('Please choose a max deviation limit below 1440 minutes')
-    event.preventDefault()
-    return
-  }
-  if(isNaN(deviation_limit)){
-    alert('Please enter a valid deviation limit between 0 minutes and 120 minutes')
-    event.preventDefault()
-    return
-  }
+  // if(deviation_limit > 1440){
+  //   alert('Please choose a max deviation limit below 1440 minutes')
+  //   event.preventDefault()
+  //   return
+  // }
 })
