@@ -16,7 +16,7 @@ block content
             .row.mb-4 
               .col.text-center
                   label.btn.btn-primary Upload Photo
-                    input.form-control(style="display: none;", type="file", name="profile_photo", accept="image/*", onchange="submitForm(event)")
+                    input.form-control(style="display: none;", type="file", name="profile_photo", accept="image/*", onchange="document.getElementById('photo_form').submit()")
         .col-12.col-lg-8
           form#request_form(method="POST" novalidate)
             .row.mb-2
@@ -99,9 +99,13 @@ block content
             .row.mb-4
               .col
                 .custom-control.custom-checkbox
-                  input(type="checkbox", name="allow_notifications_box", class="custom-control-input", id="notifications_checkbox", 
-                    checked=currentUser.allow_notifications, onchange="setCheckboxValue(event)")
-                  input#allow_notifications_field(type="hidden", name="allow_notifications", value=currentUser.allow_notifications)
+                  input(
+                    type="checkbox",
+                    name="allow_notifications",
+                    class="custom-control-input",
+                    id="notifications_checkbox", 
+                    checked=currentUser.allow_notifications,
+                  )
                   label.custom-control-label(for="notifications_checkbox") Allow LEAP Lifts to send email notifications
             .row.mb-2
               .col.text-center
@@ -129,10 +133,6 @@ block content
     src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`
   )
   script(
-    type="text/javascript",
-    src="/static/js/location_autocomplete.js"
-  )
-  script(
-    type="text/javascript",
+    type="module",
     src="/static/js/settings.js"
   )

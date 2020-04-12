@@ -1,16 +1,7 @@
-'use strict'
+import { setClicked, setUnclicked } from './button_clicks.js'
+import registerAutocomplete from './location_autocomplete.js'
 
 const formSync = registerAutocomplete('location_field', 'place_id_field')
-
-function setClicked(button) {
-  button.classList.add('active')
-  button.setAttribute('aria-pressed', 'true')
-}
-
-function setUnclicked(button) {
-  button.classList.remove('active')
-  button.setAttribute('aria-pressed', 'false')
-}
 
 function clickRoleButton(event) {
   for (const button of document.getElementsByClassName('role_button')) {
