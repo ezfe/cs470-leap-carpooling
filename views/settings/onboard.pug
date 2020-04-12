@@ -68,6 +68,13 @@ block content
                   maxlength=30
                 )
                 .invalid-feedback Please enter a valid phone number
+            .row.mb-4.ml-1.mr-1
+              .col
+                .custom-control.custom-checkbox
+                  input(type="checkbox", name="allow_notifications_box", class="custom-control-input", id="notifications_checkbox", 
+                    checked=currentUser.allow_notifications, onchange="setCheckboxValue(event)")
+                  input#allow_notifications_field(type="hidden", name="allow_notifications", value=currentUser.allow_notifications)
+                  label.custom-control-label(for="notifications_checkbox") Allow LEAP Lifts to send email notifications
             .row
               .col.text-center
                 button.btn.btn-primary(type="submit") Submit

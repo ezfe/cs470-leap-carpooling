@@ -7,6 +7,7 @@ import db from '../db'
 import { User } from '../models/users'
 import { ReqAuthedReq } from '../utils/authed_req'
 import { PairRejection } from '../models/pair_rejections'
+import { sendWelcomeEmail } from '../utils/emails'
 
 const routes = Router()
 
@@ -43,6 +44,8 @@ routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
     const preferredName = validate('preferred_name', 100)
     const preferredEmail = validate('preferred_email', 100)
     const phoneNumber = validate('phone_number', 30)
+    const allowNotifications = (!(req.body.allow_notifications == 'true' || req.body.allow_notifications == 'false' || req.body.allow_notifications == null)) ?
+                               req.user.allow_notifications : req.body.allow_notifications
     console.log(phoneNumber)
 
     await db<User>('users').where({ id: req.user.id })
@@ -50,7 +53,12 @@ routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
         preferred_name: preferredName,
         email: preferredEmail,
         phone_number: phoneNumber,
+        allow_notifications : allowNotifications
       })
+
+      if (allowNotifications) {
+        sendWelcomeEmail(preferredName || req.user.first_name!, preferredEmail || req.user.email!)
+      }
 
     res.redirect('/')
   } catch (err) {
@@ -138,6 +146,8 @@ routes.get('/remove-profile-image', async (req: ReqAuthedReq, res: Response) => 
 })
 
 routes.post('/', async (req: ReqAuthedReq, res: Response) => {
+  const allowNotifications = (req.body.allow_notifications == '') ? req.user.allow_notifications : req.body.allow_notifications
+
   try {
     await db<User>('users').where({ id: req.user.id })
       .update({
@@ -146,7 +156,8 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
         phone_number: req.body._phone,
         default_location: req.body.place_id,
         default_location_description: req.body.place_name,
-        deviation_limit: req.body.deviation_limit
+        deviation_limit: req.body.deviation_limit,
+        allow_notifications: allowNotifications
       })
 
     res.redirect('/settings')
