@@ -25,30 +25,31 @@ block content
             .row.mb-4
               .col
                 input.form-control(
-                name="preferred_name"
-                id="preferred_name"
-                value=(currentUser.preferred_name || currentUser.first_name)
-                type="text"
-                pattern="[^0-9_!¡?÷?¿/\\\\+=@#$%ˆ&*(){}|~<>;:[\\]]{2,}"
-                autocomplete="given-name"
-                required
-                maxlength=100
-              )
-              .invalid-feedback Please enter your preferred first name
+                  name="preferred_name"
+                  id="preferred_name"
+                  value=(currentUser.preferred_name || currentUser.first_name)
+                  required
+                  type="text"
+                  pattern="[^0-9_!¡?÷?¿/\\\\+=@#$%ˆ&*(){}|~<>;:[\\]]{2,}"
+                  autocomplete="given-name"
+                  maxlength=100
+                )
+                .invalid-feedback Please enter a valid preferred name
             .row.mb-2
               .col
                 b Preferred email
             .row.mb-4
               .col
                 input.form-control(
-                name = "preferred_email"
-                value=(currentUser.email || `${currentUser.netid}@lafayette.edu`)
-                autocomplete="email"
-                required
-                type="email"
-                maxlength=100
-              )
-              .invalid-feedback Please enter a valid email address
+                  name="preferred_email"
+                  id="preferred_email"
+                  value=(currentUser.email || `${currentUser.netid}@lafayette.edu`)
+                  required
+                  type="email"
+                  autocomplete="email"
+                  maxlength=100
+                )
+                .invalid-feedback Please enter a valid email address
                 
             .row.mb-2
               .col
@@ -91,7 +92,7 @@ block content
                   required
                   type="text"
                   pattern="[0-9]{1,}"
-                  autocomplete="tel"
+                  autocomplete="deviation"
                   maxlength=30
                 )
                 .invalid-feedback Please enter a valid deviation limit

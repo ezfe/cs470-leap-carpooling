@@ -60,29 +60,29 @@ block content
     .form-group.row
       .col
         input.form-control(
-        type="text"
-        id="first_date"
-        name="first_date" 
-        placeholder="MM/DD/YYYY"
-        onkeydown="return false"
-        pattern="\\d{2}\\/\\d{2}\\/\\d{4}"
-        autocomplete="given-name"
-        maxlength=100
-        required
-        )
-      .invalid-feedback Please enter a valid start date
-      .col
-        input.form-control(
+          name="first_date" 
+          id="first_date"
+          required
           type="text"
-          id="last_date"
-          name="last_date" 
           placeholder="MM/DD/YYYY"
           onkeydown="return false"
           pattern="\\d{2}\\/\\d{2}\\/\\d{4}"
           autocomplete="given-name"
           maxlength=100
+        )
+        .invalid-feedback Please enter a valid start date
+      .col
+        input.form-control(
+          name="last_date" 
+          id="last_date"
           required
-          )
+          type="text"
+          placeholder="MM/DD/YYYY"
+          onkeydown="return false"
+          pattern="\\d{2}\\/\\d{2}\\/\\d{4}"
+          autocomplete="given-name"
+          maxlength=100
+        )
         .invalid-feedback Please enter a valid end date
         
 
@@ -100,7 +100,7 @@ block content
             pattern="[0-9]{1,}"
             autocomplete="devaition"
             maxlength=30
-            )
+          )
           .invalid-feedback Please enter a valid deviation limit
           .input-group-append
             span.input-group-text minutes
