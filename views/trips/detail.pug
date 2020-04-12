@@ -52,56 +52,44 @@ block content
                   = riderRequest.location_description
 
   .row
-    .col
-      #map
-      //- iframe(
-      //-   width="600"
-      //-   height="450"
-      //-   frameborder="0"
-      //-   style="border:0"
-      //-   src=`https://www.google.com/maps/embed/v1/directions?origin=place_id:${firstPlace}&destination=place_id:${lastPlace}&key=${googleMapsAPIKey}`
-      //-   allowfullscreen
-      //- )
+    .col-12.col-lg-6
+      .row.order-4
+        .col
+          span.fas.fa-arrow-right
+      .row(class=(driverRequest.direction == 'from_lafayette' ? 'order-2' : 'order-6'))
+        .col
+          span.fas.fa-arrow-right
 
-  
-  .row
-    .col-1.order-4
-      span.fas.fa-arrow-right
-    .col-1(class=(driverRequest.direction == 'from_lafayette' ? 'order-2' : 'order-6'))
-      span.fas.fa-arrow-right
-
-    .col(
-      class=(driverRequest.direction == 'from_lafayette' ? 'order-1' : 'order-7')
-    )
-      .row
+      .row(class=(driverRequest.direction == 'from_lafayette' ? 'order-1' : 'order-7'))
         .col
           p Lafayette College
-    .col(
-      class=(tripMatch.first_portion == 'driver' ? 'order-3' : 'order-5')
-    )
-      .row
+
+      .row(class=(tripMatch.first_portion == 'driver' ? 'order-3' : 'order-5'))
         .col
           p= driverRequest.location_description
-      .row
-        .col
-          a.btn.btn-outline-info(
-            href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(driverRequest.location_description)}&query_place_id=${driverRequest.location}`
-          )
-            fa.fas.fa-location-arrow
-            = ' Google Maps'
-    .col(
-      class=(tripMatch.first_portion == 'rider' ? 'order-3' : 'order-5')
-    )
-      .row
-        .col
-          p= riderRequest.location_description
-      .row
-        .col
-          a.btn.btn-outline-info(
-            href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(riderRequest.location_description)}&query_place_id=${riderRequest.location}`
-          )
-            fa.fas.fa-location-arrow
-            = ' Google Maps'
+        //- .row
+        //-   .col
+        //-     a.btn.btn-outline-info(
+        //-       href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(driverRequest.location_description)}&query_place_id=${driverRequest.location}`
+        //-     )
+        //-       fa.fas.fa-location-arrow
+        //-       = ' Google Maps'
+      .col(
+        class=(tripMatch.first_portion == 'rider' ? 'order-3' : 'order-5')
+      )
+        .row
+          .col
+            p= riderRequest.location_description
+        .row
+          .col
+            a.btn.btn-outline-info(
+              href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(riderRequest.location_description)}&query_place_id=${riderRequest.location}`
+            )
+              fa.fas.fa-location-arrow
+              = ' Google Maps'
+
+    .col-12.col-lg-6
+      #map(style="height: 300px")
 
   include prettyDate
 
