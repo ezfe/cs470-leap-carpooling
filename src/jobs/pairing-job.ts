@@ -1,8 +1,11 @@
 import db from '../db'
 import { TripDirection, UserRole } from '../models/misc_types'
 import { TripMatch } from '../models/trip_matches'
+import { TripRequest } from '../models/trip_requests'
+import { User } from '../models/users'
 import { distanceMatrix } from '../utils/distances'
 import { Raw } from 'knex'
+import { sendTripMatchEmail } from '../utils/emails'
 
 export default async function job() {
   // console.log("Starting Pairing Process")
@@ -172,8 +175,22 @@ async function matchFirstPair(pairs: PricedPair[]) {
         rider_confirmed: false,
         driver_confirmed: false,
         first_portion: firstPortion,
-        created_at: db.fn.now()
+        created_at: db.fn.now(),
+        notification_sent: false
       })
+
+    const driverRequest = await db('trip_requests').where({ id: driver_request_id }).first<TripRequest>()
+    const riderRequest = await db('trip_requests').where({ id: rider_request_id }).first<TripRequest>()
+    const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
+    const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
+    if (driver.allow_notifications) {
+      sendTripMatchEmail(driver.preferred_name || driver.first_name, driver.email!, true, rider.preferred_name || rider.first_name, rider.last_name,
+        driverRequest.direction, driverRequest.location_description, riderRequest.location_description, first_date, last_date)
+    }
+    if (rider.allow_notifications) {
+      sendTripMatchEmail(rider.preferred_name || rider.first_name, rider.email!, false, driver.preferred_name || driver.first_name, driver.last_name,
+        driverRequest.direction, driverRequest.location_description, riderRequest.location_description, first_date, last_date)
+    }
 
     return
   } catch (err) {
