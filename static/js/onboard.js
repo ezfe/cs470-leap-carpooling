@@ -8,6 +8,16 @@ window.onload = function () {
   }
 }
 
+var setCheckboxValue = function(event) {
+  let checkbox = document.getElementById("notifications_checkbox")
+  let notificationsField = document.getElementById("allow_notifications_field")
+  if (checkbox.checked) {
+    notificationsField.value=true
+  } else {
+    notificationsField.value=false
+  }
+}
+
 document.getElementById('onboard_form').addEventListener('submit', (event) => {
   if (!event.target.checkValidity()) {
     event.preventDefault()

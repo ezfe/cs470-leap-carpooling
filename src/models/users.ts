@@ -45,4 +45,5 @@ export interface User {
   phone_number?: string
   profile_image_name?: string | null
   created_at: Date | Raw<any>
+  allow_notifications: boolean
 }

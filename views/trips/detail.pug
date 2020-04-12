@@ -99,8 +99,8 @@ block content
       h5= `Trip date range: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
 
   hr.my-4
-  .row.mb-2
-    .col-2
+  .row
+    .col-12.col-sm-4.col-lg-3.col-xl-2.mb-2
       if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
         form(method="POST" action=`/trips/${tripMatch.id}/confirm`)
           button.btn.btn-block.btn-success(role="submit")
@@ -113,7 +113,7 @@ block content
           i.fas.fa-check
           = ' Trip Confirmed'
 
-    .col-2
+    .col-12.col-sm-4.col-lg-3.col-xl-2.mb-2
       button.btn.btn-block.btn-warning(type="button" data-toggle="modal" data-target="#rejectModal")
         i.fas.fa-sync-alt
         = ' Reject Match'
@@ -127,13 +127,13 @@ block content
       }
 
     if currentUserRequestID
-      .col-2
+      .col-12.col-sm-4.col-lg-3.col-xl-2.mb-2
         form#cancel-trip-form(method="POST" action=`/trip-requests/${currentUserRequestID}/cancel`)
           button.btn.btn-block.btn-danger(role="submit")
             i.fas.fa-times
             = ' Cancel Trip'
 
-    .col.col-sm-5
+    .col-12.col-md-6
       p
         = 'You\'ve been matched! Contact '
         = otherUser.preferred_name || otherUser.first_name

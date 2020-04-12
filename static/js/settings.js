@@ -2,6 +2,16 @@ var submitForm = function(event) {
   document.getElementById("photo_form").submit()
 }
 
+var setCheckboxValue = function(event) {
+  let checkbox = document.getElementById("notifications_checkbox")
+  let notificationsField = document.getElementById("allow_notifications_field")
+  if (checkbox.checked) {
+    notificationsField.value=true
+  } else {
+    notificationsField.value=false
+  }
+}
+
 window.onload = function () {
   if (document.getElementById("uploadedPhoto").src.includes('/static/blank-profile.png')) {
     document.getElementById("exitButton").style.visibility = "hidden";
@@ -48,4 +58,9 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     alert("Please enter a valid name")
     return
   }
+  const notifications = document.getElementById("allow_notifications_field").value
+  if(!(notifications == 'true' || notifications == 'false' || notifications == '')) {
+    document.getElementById("allow_notifications_field").value=''
+  }
 })
+
