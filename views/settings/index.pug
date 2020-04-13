@@ -72,12 +72,16 @@ block content
                 b Default location
             .row.mb-4
               .col
-                input.form-control#location_field(type="text", name="place_name" value=currentUser.default_location_description)
+                input.form-control#location_field(
+                  type="text"
+                  name="place_name" 
+                  required
+                  value=currentUser.default_location_description
+                )
                 input#place_id_field(
                   type="hidden"
                   name="place_id" 
                   value=currentUser.default_location
-                  required
                 )
                 .invalid-feedback Please enter a valid location
             .row.mb-2
