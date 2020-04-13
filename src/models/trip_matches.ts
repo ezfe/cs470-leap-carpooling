@@ -13,6 +13,7 @@ export interface TripMatch {
   driver_confirmed: boolean
   first_portion: UserRole
   created_at: Date | Raw<any>
+  notification_sent: boolean
 }
 
 export interface AnnotatedTripMatch {

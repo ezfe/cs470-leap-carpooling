@@ -5,6 +5,7 @@ import { TripRequest } from '../../models/trip_requests'
 import { getUserByID, User } from '../../models/users'
 import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
 import { PairRejection } from '../../models/pair_rejections'
+import { sendTripConfirmationEmail } from '../../utils/emails'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -42,8 +43,10 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     }
 
     const otherUser = driver.id === req.user.id ? rider : driver
+    const driverProfileImageURL = driver.profile_image_name || 'static/blank-profile.png'
+    const riderProfileImageURL = rider.profile_image_name || 'static/blank-profile.png'
 
-    res.render('trips/detail', { tripMatch, driverRequest, riderRequest, driver, rider, otherUser })
+    res.render('trips/detail', { tripMatch, driverRequest, riderRequest, driver, rider, otherUser, driverProfileImageURL, riderProfileImageURL })
   } catch (err) {
     console.error(err)
     res.render('database-error')
@@ -63,10 +66,36 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
       await db<TripMatch>('trip_matches').update({
         driver_confirmed: true
       }).where('id', tripMatch.id)
+
+      if (tripMatch.rider_confirmed) {
+        const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
+
+        if (req.user.allow_notifications) {
+          sendTripConfirmationEmail(req.user.preferred_name || req.user.first_name, req.user.email!, driverRequest.location_description,
+            rider.preferred_name || rider.first_name, riderRequest.location_description, tripMatch.first_date, tripMatch.last_date)
+        }
+        if (rider.allow_notifications) {
+          sendTripConfirmationEmail(rider.preferred_name || rider.first_name, rider.email!, riderRequest.location_description,
+            req.user.preferred_name || req.user.first_name, driverRequest.location_description, tripMatch.first_date, tripMatch.last_date)
+        }
+      }
     } else if (req.user.id === riderRequest.member_id) {
       await db<TripMatch>('trip_matches').update({
         rider_confirmed: true
       }).where('id', tripMatch.id)
+
+      if (tripMatch.driver_confirmed) {
+        const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
+
+        if (req.user.allow_notifications) {
+          sendTripConfirmationEmail(req.user.preferred_name || req.user.first_name, req.user.email!, riderRequest.location_description, 
+            driver.preferred_name || driver.first_name, driverRequest.location_description, tripMatch.first_date, tripMatch.last_date)
+        }
+        if (driver.allow_notifications) {
+          sendTripConfirmationEmail(driver.preferred_name || driver.first_name, driver.email!, driverRequest.location_description,
+            req.user.preferred_name || req.user.first_name, riderRequest.location_description, tripMatch.first_date, tripMatch.last_date)
+        }
+      }
     } else {
       console.error('Forbidden to confirm trip when not a member of the trip')
       res.sendStatus(403)
