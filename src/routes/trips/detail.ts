@@ -1,10 +1,10 @@
 import { Response, Router } from 'express'
 import db from '../../db'
+import { PairRejection } from '../../models/pair_rejections'
 import { TripMatch } from '../../models/trip_matches'
 import { TripRequest } from '../../models/trip_requests'
-import { getUserByID, User } from '../../models/users'
+import { User } from '../../models/users'
 import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
-import { PairRejection } from '../../models/pair_rejections'
 import { sendTripConfirmationEmail } from '../../utils/emails'
 import { lafayettePlaceID } from '../../utils/places'
 

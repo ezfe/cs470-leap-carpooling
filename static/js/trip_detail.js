@@ -1,14 +1,6 @@
 'use strict'
 
-function getMeta(metaName) {
-  for (const meta of document.getElementsByTagName('meta')) {
-    if (meta.getAttribute('name') === metaName) {
-      return meta.getAttribute('content');
-    }
-  }
-
-  return '';
-}
+import getMeta from './getMeta.js'
 
 document.getElementById('cancel-trip-form').addEventListener('submit', (evt) => {
   if (!confirm('This will completely remove your trip request and matching.\n\nIf you want to be paired with someone else, stop and click Reject Match instead.')) {
