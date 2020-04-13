@@ -106,14 +106,9 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
 
   // Check Location Field
   if (!formSync()) {
-    otherOverride = true
-    document.getElementById('location_field').classList.remove('is-valid')
-    document.getElementById('location_field').classList.add('is-invalid')
     // This regex always fails
     document.getElementById('location_field').setAttribute('pattern', '\\b')
   } else {
-    document.getElementById('location_field').classList.add('is-valid')
-    document.getElementById('location_field').classList.remove('is-invalid')
     document.getElementById('location_field').removeAttribute('pattern')
   }
 
