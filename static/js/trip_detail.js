@@ -36,7 +36,7 @@ let options = {
 }
 
 if (midPlaceID != lastPlaceID && midPlaceID != firstPlaceID) {
-  options.waypoints = { location: { placeId: getMeta('midPlaceID') }}
+  options.waypoints = [{ location: { placeId: getMeta('midPlaceID') }}]
 }
 
 console.log(options)
