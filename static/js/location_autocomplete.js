@@ -1,6 +1,6 @@
 'use strict'
 
-function registerAutocomplete(locationFieldID, placeFieldID) {
+export default function registerAutocomplete(locationFieldID, placeFieldID) {
   const locationField = document.getElementById(locationFieldID)
   const placeField = document.getElementById(placeFieldID)
 

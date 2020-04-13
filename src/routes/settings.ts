@@ -146,8 +146,6 @@ routes.get('/remove-profile-image', async (req: ReqAuthedReq, res: Response) => 
 })
 
 routes.post('/', async (req: ReqAuthedReq, res: Response) => {
-  const allowNotifications = (req.body.allow_notifications == '') ? req.user.allow_notifications : req.body.allow_notifications
-
   try {
     await db<User>('users').where({ id: req.user.id })
       .update({
@@ -157,7 +155,7 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
         default_location: req.body.place_id,
         default_location_description: req.body.place_name,
         deviation_limit: req.body.deviation_limit,
-        allow_notifications: allowNotifications
+        allow_notifications: (req.body.allow_notifications === 'on')
       })
 
     res.redirect('/settings')
