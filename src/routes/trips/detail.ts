@@ -57,6 +57,10 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     const midPlaceID = (tripMatch.first_portion === 'driver' ? riderRequest.location : driverRequest.location)
     const lastPlaceID = (driverRequest.direction === 'towards_lafayette') ? lafayettePlaceID : (tripMatch.first_portion === 'driver' ? riderRequest.location : driverRequest.location)
 
+    const firstPlaceDescription = (driverRequest.direction === 'from_lafayette') ? 'Lafayette College' : (tripMatch.first_portion === 'driver' ? driverRequest.location_description : riderRequest.location_description)
+    const midPlaceDescription = (tripMatch.first_portion === 'driver' ? riderRequest.location_description : driverRequest.location_description)
+    const lastPlaceDescription = (driverRequest.direction === 'towards_lafayette') ? 'Lafayette College' : (tripMatch.first_portion === 'driver' ? riderRequest.location_description : driverRequest.location_description)
+
     res.render('trips/detail', {
       tripMatch,
       driverRequest,
@@ -67,6 +71,9 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       firstPlaceID,
       lastPlaceID,
       midPlaceID,
+      firstPlaceDescription,
+      midPlaceDescription,
+      lastPlaceDescription,
       driverProfileImageURL,
       riderProfileImageURL,
       googleMapsAPIKey

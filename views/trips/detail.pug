@@ -53,40 +53,31 @@ block content
 
   .row
     .col-12.col-lg-6
-      .row.order-4
+      .row
         .col
-          span.fas.fa-arrow-right
-      .row(class=(driverRequest.direction == 'from_lafayette' ? 'order-2' : 'order-6'))
+          h4 Your Trip
+      .row
         .col
-          span.fas.fa-arrow-right
-
-      .row(class=(driverRequest.direction == 'from_lafayette' ? 'order-1' : 'order-7'))
+          span= firstPlaceDescription
+      .row
         .col
-          p Lafayette College
-
-      .row(class=(tripMatch.first_portion == 'driver' ? 'order-3' : 'order-5'))
-        .col
-          p= driverRequest.location_description
-        //- .row
-        //-   .col
-        //-     a.btn.btn-outline-info(
-        //-       href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(driverRequest.location_description)}&query_place_id=${driverRequest.location}`
-        //-     )
-        //-       fa.fas.fa-location-arrow
-        //-       = ' Google Maps'
-      .col(
-        class=(tripMatch.first_portion == 'rider' ? 'order-3' : 'order-5')
-      )
+          i.fas.fa-arrow-down
+      if (midPlaceID !== lastPlaceID && midPlaceID !== firstPlaceID)
         .row
           .col
-            p= riderRequest.location_description
+            span= midPlaceDescription
         .row
           .col
-            a.btn.btn-outline-info(
-              href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(riderRequest.location_description)}&query_place_id=${riderRequest.location}`
-            )
-              fa.fas.fa-location-arrow
-              = ' Google Maps'
+            i.fas.fa-arrow-down
+      .row
+        .col
+          span= lastPlaceDescription
+
+    //- a.btn.btn-outline-info(
+    //-   href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(riderRequest.location_description)}&query_place_id=${riderRequest.location}`
+    //- )
+    //-   fa.fas.fa-location-arrow
+    //-   = ' Google Maps'
 
     .col-12.col-lg-6
       #map(style="height: 300px")
