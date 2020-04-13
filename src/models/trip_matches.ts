@@ -31,8 +31,10 @@ export interface AnnotatedTripMatch {
   rider_location_description: number
 }
 
-function tripMatchesBuilder(user: User | null) {
-  const query = db('trip_matches')
+function tripMatchesBuilder(user: User | null, filter: "past" | "future" | null) {
+  const orderByParam = (filter === 'past' ? 'desc' : 'asc')
+
+  let query = db('trip_matches')
     .select(
       'trip_matches.id',
       'trip_matches.first_date',
@@ -51,27 +53,31 @@ function tripMatchesBuilder(user: User | null) {
     ).join(
       'trip_requests as rider_t',
       'trip_matches.rider_request_id', 'rider_t.id'
-    )
+    ).orderBy('trip_matches.first_date', orderByParam)
 
   if (user) {
-    return query.where(
-        'driver_t.member_id', user.id,
-      ).orWhere(
-        'rider_t.member_id', user.id
-      )
-  } else {
-    return query
+    query = query.where(function() {
+      this.where('driver_t.member_id', user.id).orWhere('rider_t.member_id', user.id)
+    })
+
+    if (filter === "past") {
+      query = query.andWhere('trip_matches.last_date', '<', db.fn.now())
+    } else if (filter === "future") {
+      query = query.andWhere('trip_matches.last_date', '>=', db.fn.now())
+    }
   }
+
+  return query
 }
 
-export async function getTripMatches(user: User | null): Promise<AnnotatedTripMatch[]> {
-  const tripRequests = await tripMatchesBuilder(user) // .toSQL()
+export async function getTripMatches(user: User | null, filter: "past" | "future" | null): Promise<AnnotatedTripMatch[]> {
+  const tripRequests = await tripMatchesBuilder(user, filter) // .toSQL()
 
   return tripRequests
 }
 
 export async function getTripMatch(matchID: number): Promise<AnnotatedTripMatch> {
-  return await tripMatchesBuilder(null).andWhere('trip_matches.id', matchID).first<AnnotatedTripMatch>()
+  return await tripMatchesBuilder(null, null).andWhere('trip_matches.id', matchID).first<AnnotatedTripMatch>()
 }
 
 // export async function getTripMatchByID(id: number): Promise<TripMatch | undefined> {

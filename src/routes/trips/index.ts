@@ -1,10 +1,10 @@
 import { Response, Router } from 'express'
 import db from '../../db'
 import { getTripMatches } from '../../models/trip_matches'
+import { TripRequest } from '../../models/trip_requests'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import tripDetail from './detail'
 import tripCreation from './new'
-import { TripRequest } from '../../models/trip_requests'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -20,9 +20,12 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       reject: req.query.reject === 'success'
     }
 
-    const matchedRequests = await getTripMatches(req.user)
-    console.log('Found matched requests')
-    console.log(matchedRequests)
+    const pastMatchedRequests = await getTripMatches(req.user, "past")
+    const futureMatchedRequests = await getTripMatches(req.user, "future")
+    console.log('Found past matched requests')
+    console.log(pastMatchedRequests)
+    console.log('Found future matched requests')
+    console.log(futureMatchedRequests)
 
     const unmatchedRequests: TripRequest[] = await db('trip_requests')
       .select(
@@ -33,7 +36,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       }).whereNull('trip_matches.id')
       .andWhere('trip_requests.member_id', req.user.id)
 
-    const context = { matchedRequests, unmatchedRequests, alerts }
+    const context = { pastMatchedRequests, futureMatchedRequests, unmatchedRequests, alerts }
     console.log(context)
 
     res.render('trips/index', context)
