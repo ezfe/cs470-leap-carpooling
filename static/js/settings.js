@@ -11,19 +11,11 @@ if (document.getElementById("uploadedPhoto").src.includes('/static/blank-profile
 
 
 document.getElementById('request_form').addEventListener('submit', (event) => {
-  // Check Location Field
-if (!formSync()) {
-  // This regex always fails
-  document.getElementById('location_field').setAttribute('pattern', '\\b')
-} else {
-  document.getElementById('location_field').removeAttribute('pattern')
-}
-  if (!event.target.checkValidity()) {
+  if (!event.target.checkValidity() || !formSync()) {
     event.preventDefault()
     event.stopPropagation()
     alert("Please correct the highlighted errors")
   }
+
   event.target.classList.add('was-validated')
-
-
 })
