@@ -1,11 +1,12 @@
-const nodemailer = require('nodemailer')
+import nodemailer from 'nodemailer'
+
 const transporter = nodemailer.createTransport({
   service: 'SendInBlue',
   auth: {
     user: 'leaplifts@gmail.com',
     pass: 'qW4NAZ6TKaSdBsMJ'
   }
-});
+})
 
 /**
  * Send a given user a welcome email.
