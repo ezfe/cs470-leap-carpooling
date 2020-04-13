@@ -55,7 +55,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
 
     const firstPlaceID = (driverRequest.direction === 'from_lafayette') ? lafayettePlaceID : (tripMatch.first_portion === 'driver' ? driverRequest.location : riderRequest.location)
     const midPlaceID = (tripMatch.first_portion === 'driver' ? riderRequest.location : driverRequest.location)
-    const lastPlaceID = (driverRequest.direction === 'towards_lafayette') ? lafayettePlaceID : (tripMatch.first_portion === 'rider' ? riderRequest.location : driverRequest.location)
+    const lastPlaceID = (driverRequest.direction === 'towards_lafayette') ? lafayettePlaceID : (tripMatch.first_portion === 'driver' ? riderRequest.location : driverRequest.location)
 
     function descriptionFor(placeID) {
       return (driverRequest.location === placeID) ? driverRequest.location_description : ((riderRequest.location === placeID) ? riderRequest.location_description : 'Lafayette College')
