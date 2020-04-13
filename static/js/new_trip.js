@@ -43,24 +43,20 @@ document.getElementById('reverse_locations').addEventListener('click', (event) =
   }
 })
 
-
-
 document.getElementById('discard_button').addEventListener('click', () => {
   if (confirm('Discard entered information?')) {
     location.href = "/trips"
   }
 })
 
-$(document).ready(function(){
-  const options = {
-    format: 'mm/dd/yyyy',
-    autoclose: true,
-    startDate: new Date()
-  }
+const options = {
+  format: 'mm/dd/yyyy',
+  autoclose: true,
+  startDate: new Date()
+}
 
-  $('input[name="first_date"]').datepicker(options)
-  $('input[name="last_date"]').datepicker(options)
-})
+$('input[name="first_date"]').datepicker(options)
+$('input[name="last_date"]').datepicker(options)
 
 $('#first_date').on('changeDate', function(e) {
   //check if the first date is after the last date, if it exists
@@ -106,27 +102,32 @@ $('#last_date').on('changeDate', function(e) {
 });
 
 document.getElementById('request_form').addEventListener('submit', (event) => {
-  if (!event.target.checkValidity()) {
+  let otherOverride = false
+
+  // Check Location Field
+  if (!formSync()) {
+    otherOverride = true
+    document.getElementById('location_field').classList.remove('is-valid')
+    document.getElementById('location_field').classList.add('is-invalid')
+    // This regex always fails
+    document.getElementById('location_field').setAttribute('pattern', '\\b')
+  } else {
+    document.getElementById('location_field').classList.add('is-valid')
+    document.getElementById('location_field').classList.remove('is-invalid')
+    document.getElementById('location_field').removeAttribute('pattern')
+  }
+
+  // Check User Role
+  const userRoleValue = document.getElementById('user_role').value
+  if (['driver', 'rider'].indexOf(userRoleValue) < 0) {
+    alert('Must select whether you\'re driving or riding')
+    otherOverride = true
+  }
+
+  if (!event.target.checkValidity() || otherOverride) {
     event.preventDefault()
     event.stopPropagation()
     alert("Please correct the highlighted errors")
   }
-
-  const userRoleValue = document.getElementById('user_role').value
-  if (['driver', 'rider'].indexOf(userRoleValue) < 0) {
-    event.preventDefault()
-    alert('Must select whether you\'re driving or riding')
-    return
-  }
-
-  if (!formSync()) {
-    alert('Please enter a valid location')
-    event.preventDefault()
-    return
-  }
-  // if(deviation_limit > 1440){
-  //   alert('Please choose a max deviation limit below 1440 minutes')
-  //   event.preventDefault()
-  //   return
-  // }
+  event.target.classList.add('was-validated')
 })

@@ -34,6 +34,7 @@ block content
         input.form-control#location_field(
           type="text"
           name="location_description"
+          required
           value=currentUser.default_location_description
         )
         input#place_id_field(
@@ -41,6 +42,7 @@ block content
           name="place_id"
           value=currentUser.default_location
         )
+        .invalid-feedback Please choose a location from the list
       input#trip_direction(type="hidden" name="trip_direction" value="from_lafayette")
     .row
       .col
