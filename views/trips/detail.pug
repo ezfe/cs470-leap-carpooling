@@ -62,13 +62,13 @@ block content
       .row
         .col
           i.fas.fa-arrow-down
-      //- if (midPlaceID !== lastPlaceID && midPlaceID !== firstPlaceID)
-      .row
-        .col
-          span= midPlaceDescription
-      .row
-        .col
-          i.fas.fa-arrow-down
+      if (midPlaceID !== lastPlaceID && midPlaceID !== firstPlaceID)
+        .row
+          .col
+            span= midPlaceDescription
+        .row
+          .col
+            i.fas.fa-arrow-down
       .row
         .col
           span= lastPlaceDescription
