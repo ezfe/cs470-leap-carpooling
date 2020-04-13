@@ -112,8 +112,15 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
         const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
 
         if (req.user.allow_notifications) {
-          sendTripConfirmationEmail(req.user.preferred_name || req.user.first_name, req.user.email!, riderRequest.location_description, 
-            driver.preferred_name || driver.first_name, driverRequest.location_description, tripMatch.first_date, tripMatch.last_date)
+          sendTripConfirmationEmail(
+            req.user.preferred_name || req.user.first_name,
+            req.user.email!,
+            riderRequest.location_description,
+            driver.preferred_name || driver.first_name,
+            driverRequest.location_description,
+            tripMatch.first_date,
+            tripMatch.last_date
+          )
         }
         if (driver.allow_notifications) {
           sendTripConfirmationEmail(driver.preferred_name || driver.first_name, driver.email!, driverRequest.location_description,

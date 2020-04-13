@@ -104,12 +104,8 @@ $('#last_date').on('changeDate', function(e) {
 document.getElementById('request_form').addEventListener('submit', (event) => {
   let otherOverride = false
 
-  // Check Location Field
   if (!formSync()) {
-    // This regex always fails
-    document.getElementById('location_field').setAttribute('pattern', '\\b')
-  } else {
-    document.getElementById('location_field').removeAttribute('pattern')
+    otherOverride = true
   }
 
   // Check User Role

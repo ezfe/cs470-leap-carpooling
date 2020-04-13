@@ -1,5 +1,14 @@
 'use strict'
 
+function verifyValidity(autocomplete, field) {
+  if (autocomplete.getPlace()) {
+    console.log('Still finding a place')
+    field.removeAttribute('pattern')
+  } else {
+    field.setAttribute('pattern', '\\b')
+  }
+}
+
 export default function registerAutocomplete(locationFieldID, placeFieldID) {
   const locationField = document.getElementById(locationFieldID)
   const placeField = document.getElementById(placeFieldID)
@@ -12,8 +21,15 @@ export default function registerAutocomplete(locationFieldID, placeFieldID) {
     }
   )
 
+  autocomplete.addListener('place_changed', () => {
+    verifyValidity(autocomplete, document.getElementById('location_field'))
+  })
+
+
   locationField.addEventListener('keyup', () => {
     placeField.value = '';
+
+    verifyValidity(autocomplete, document.getElementById('location_field'))
   })
 
   const formSync = () => {
