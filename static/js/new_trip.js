@@ -1,16 +1,7 @@
-'use strict'
+import { setClicked, setUnclicked } from './button_clicks.js'
+import registerAutocomplete from './location_autocomplete.js'
 
 const formSync = registerAutocomplete('location_field', 'place_id_field')
-
-function setClicked(button) {
-  button.classList.add('active')
-  button.setAttribute('aria-pressed', 'true')
-}
-
-function setUnclicked(button) {
-  button.classList.remove('active')
-  button.setAttribute('aria-pressed', 'false')
-}
 
 function clickRoleButton(event) {
   for (const button of document.getElementsByClassName('role_button')) {
@@ -52,24 +43,20 @@ document.getElementById('reverse_locations').addEventListener('click', (event) =
   }
 })
 
-
-
 document.getElementById('discard_button').addEventListener('click', () => {
   if (confirm('Discard entered information?')) {
     location.href = "/trips"
   }
 })
 
-$(document).ready(function(){
-  const options = {
-    format: 'mm/dd/yyyy',
-    autoclose: true,
-    startDate: new Date()
-  }
+const options = {
+  format: 'mm/dd/yyyy',
+  autoclose: true,
+  startDate: new Date()
+}
 
-  $('input[name="first_date"]').datepicker(options)
-  $('input[name="last_date"]').datepicker(options)
-})
+$('input[name="first_date"]').datepicker(options)
+$('input[name="last_date"]').datepicker(options)
 
 $('#first_date').on('changeDate', function(e) {
   //check if the first date is after the last date, if it exists
@@ -115,44 +102,27 @@ $('#last_date').on('changeDate', function(e) {
 });
 
 document.getElementById('request_form').addEventListener('submit', (event) => {
-  const userRoleValue = document.getElementById('user_role').value
-  if (['driver', 'rider'].indexOf(userRoleValue) < 0) {
-    event.preventDefault()
-    alert('Must select whether you\'re driving or riding')
-    return
+  let otherOverride = false
+
+  // Check Location Field
+  if (!formSync()) {
+    // This regex always fails
+    document.getElementById('location_field').setAttribute('pattern', '\\b')
+  } else {
+    document.getElementById('location_field').removeAttribute('pattern')
   }
 
-  if (!formSync()) {
-    alert('Please enter a valid location')
-    event.preventDefault()
-    return
+  // Check User Role
+  const userRoleValue = document.getElementById('user_role').value
+  if (['driver', 'rider'].indexOf(userRoleValue) < 0) {
+    alert('Must select whether you\'re driving or riding')
+    otherOverride = true
   }
-  const first_date = document.getElementById('first_date').value
-  if(first_date == ""){
-    alert('Please enter a valid date for the START of your desired travel range')
+
+  if (!event.target.checkValidity() || otherOverride) {
     event.preventDefault()
-    return
+    event.stopPropagation()
+    alert("Please correct the highlighted errors")
   }
-  const last_date = document.getElementById('last_date').value
-  if(last_date == ""){
-    alert('Please enter a valid date for the END of your desired travel range')
-    event.preventDefault()
-    return
-  }
-  const deviation_limit = document.getElementById('deviation_limit').value
-  if(deviation_limit == ""){
-    alert('Please enter a deviation limit between 0 minutes and 120 minutes')
-    event.preventDefault()
-    return
-  }
-  if(deviation_limit > 1440){
-    alert('Please choose a max deviation limit below 1440 minutes')
-    event.preventDefault()
-    return
-  }
-  if(isNaN(deviation_limit)){
-    alert('Please enter a valid deviation limit between 0 minutes and 120 minutes')
-    event.preventDefault()
-    return
-  }
+  event.target.classList.add('was-validated')
 })
