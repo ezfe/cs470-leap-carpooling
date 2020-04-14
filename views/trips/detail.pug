@@ -59,13 +59,13 @@ block content
     )
       .row
         .col
-          p Lafayette College
+          p#laf_location Lafayette College
     .col(
       class=(tripMatch.first_portion == 'driver' ? 'order-3' : 'order-5')
     )
       .row
         .col
-          p= driverRequest.location_description
+          p#driver_location= driverRequest.location_description
       .row
         .col
           a.btn.btn-outline-info(
@@ -78,7 +78,7 @@ block content
     )
       .row
         .col
-          p= riderRequest.location_description
+          p#rider_location= riderRequest.location_description
       .row
         .col
           a.btn.btn-outline-info(
@@ -86,6 +86,11 @@ block content
           )
             fa.fas.fa-location-arrow
             = ' Google Maps'
+  .row
+    .col
+      .div( id="googleMap" style="width:100%;height:400px;")
+
+      
 
   include prettyDate
 
@@ -181,3 +186,8 @@ block content
     type="text/javascript",
     src="/static/js/trip_detail.js"
   )
+  script(
+        src="/static/js/maps.js"
+  )
+
+  script( src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCpa-av-UZCTwxyF9CY8YvO6ce4VmY87OI&callback=myMap")
