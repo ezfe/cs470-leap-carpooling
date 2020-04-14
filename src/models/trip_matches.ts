@@ -39,7 +39,6 @@ function tripMatchesBuilder(user: User | null) {
       'trip_matches.last_date',
       'trip_matches.rider_confirmed',
       'trip_matches.driver_confirmed',
-      db.ref('driver_t.direction').as('direction'),
       db.ref('driver_t.id').as('driver_request_id'),
       db.ref('rider_t.id').as('rider_request_id'),
       db.ref('driver_t.member_id').as('driver_id'),
