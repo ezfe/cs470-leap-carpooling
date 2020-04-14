@@ -10,7 +10,7 @@ export default async function job() {
     .where('rider_confirmed', 'true')
     .where('notification_sent', 'false')
     .whereBetween('first_date', [db.raw('now()'), db.raw(`now() + ('1 DAY'::INTERVAL)`)])
-  console.log(matchesToNotify)
+  // console.log(matchesToNotify)
   for (const match of matchesToNotify) {
     notifyMatch(match)
   }

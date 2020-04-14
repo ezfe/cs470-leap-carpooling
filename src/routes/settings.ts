@@ -6,8 +6,8 @@ import path from 'path'
 import db from '../db'
 import { User } from '../models/users'
 import { ReqAuthedReq } from '../utils/authed_req'
-import { PairRejection } from '../models/pair_rejections'
 import { sendWelcomeEmail } from '../utils/emails'
+import { settingsSchema, preferredName, preferredEmail, phoneNumber } from '../validation/settings'
 
 const routes = Router()
 
@@ -113,13 +113,19 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     return
   }
 
+  const constraints = {
+    preferredName,
+    preferredEmail,
+    phoneNumber
+  }
+
   const profileImageURL = req.user.profile_image_name || '/static/blank-profile.png'
   const blockedUsers: User[] = await db('pair_rejections')
     .select('users.*')
     .where('blocker_id', req.user.id)
     .innerJoin('users', 'users.id', 'pair_rejections.blockee_id')
 
-  res.render('settings/index', { googleMapsAPIKey, profileImageURL, blockedUsers })
+  res.render('settings/index', { constraints, googleMapsAPIKey, profileImageURL, blockedUsers })
 })
 
 routes.get('/remove-profile-image', async (req: ReqAuthedReq, res: Response) => {
@@ -147,19 +153,22 @@ routes.get('/remove-profile-image', async (req: ReqAuthedReq, res: Response) => 
 
 routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
+    const validated = await settingsSchema.validateAsync(req.body)
+
     await db<User>('users').where({ id: req.user.id })
       .update({
-        preferred_name: req.body.preferred_name,
-        email: req.body.preferred_email,
-        phone_number: req.body._phone,
-        default_location: req.body.place_id,
-        default_location_description: req.body.place_name,
-        deviation_limit: req.body.deviation_limit,
-        allow_notifications: (req.body.allow_notifications === 'on')
+        preferred_name: validated.preferred_name,
+        email: validated.preferred_email,
+        phone_number: validated.phone_number,
+        default_location: validated.place_id,
+        default_location_description: validated.place_name,
+        deviation_limit: validated.deviation_limit,
+        allow_notifications: validated.allow_notifications || false
       })
 
     res.redirect('/settings')
   } catch (err) {
+    console.error(err)
     res.render('database-error')
   }
 })
