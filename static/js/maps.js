@@ -31,3 +31,5 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay){
     }
   });
 }
+
+myMap()
