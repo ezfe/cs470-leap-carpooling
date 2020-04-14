@@ -1,6 +1,7 @@
 import { Client } from "@googlemaps/google-maps-services-js"
 import redisClient from "../db/redis"
 import { TripDirection } from "../models/misc_types"
+import { lafayettePlaceID } from "./places"
 
 /**
  * Compute the distance matrix concerning a driver, rider, and direction
@@ -15,12 +16,10 @@ export async function distanceMatrix(
     driverCost: number
   }> {
 
-  const lafayettePlace = 'ChIJAZll2E5sxIkRmWtHcAi0le4'
-
   if (direction === 'towards_lafayette') {
-    const driverBaseCost = await timeBetween(driverPlace, lafayettePlace)
+    const driverBaseCost = await timeBetween(driverPlace, lafayettePlaceID)
     const driverToRider = await timeBetween(driverPlace, riderPlace)
-    const riderToLafayette = await timeBetween(riderPlace, lafayettePlace)
+    const riderToLafayette = await timeBetween(riderPlace, lafayettePlaceID)
 
     const driverCost = (driverToRider + riderToLafayette) - (driverBaseCost)
     const riderCost = await timeBetween(riderPlace, driverPlace)
@@ -30,9 +29,9 @@ export async function distanceMatrix(
       riderCost
     }
   } else {
-    const driverBaseCost = await timeBetween(lafayettePlace, driverPlace)
+    const driverBaseCost = await timeBetween(lafayettePlaceID, driverPlace)
     const riderToDriver = await timeBetween(riderPlace, driverPlace)
-    const lafayetteToRider = await timeBetween(lafayettePlace, riderPlace)
+    const lafayetteToRider = await timeBetween(lafayettePlaceID, riderPlace)
 
     const driverCost = (lafayetteToRider + riderToDriver) - (driverBaseCost)
     const riderCost = await timeBetween(driverPlace, riderPlace)
