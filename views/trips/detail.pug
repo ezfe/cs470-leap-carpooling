@@ -177,11 +177,10 @@ append scripts
     src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`
   )
   script(
-    type="text/javascript",
+    type="module"
     src="/static/js/trip_detail.js"
   )
   script(
-        src="/static/js/maps.js"
+    type="module"
+    src="/static/js/maps.js"
   )
-
-  script( src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCpa-av-UZCTwxyF9CY8YvO6ce4VmY87OI&callback=myMap")

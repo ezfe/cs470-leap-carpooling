@@ -1,3 +1,7 @@
+'use strict'
+
+import getMeta from './getMeta.js'
+
 function myMap() {
   var directionsService = new google.maps.DirectionsService;
   var directionsDisplay = new google.maps.DirectionsRenderer;
@@ -9,18 +13,15 @@ function myMap() {
 }
 
 function calculateAndDisplayRoute(directionsService, directionsDisplay){
-  var start_pt = document.getElementById('driver_location').textContent;
-  start_pt = start_pt.replace(/,/g, "");
-  var pickup_pt = document.getElementById('rider_location').textContent;
-  pickup_pt = pickup_pt.replace(/,/g, "");
-  console.log("start point:" + start_pt);
-  //var stop_pt = document.getElementById('first_date').value
-  var waypts = [];
-  waypts.push({location: ("" + pickup_pt)});
+  const firstPlaceID = getMeta('firstPlaceID')
+  const lastPlaceID = getMeta('lastPlaceID')
+  const midPlaceID = getMeta('midPlaceID')
+
   directionsService.route({
-    origin: (""+start_pt),
-    destination: (""+document.getElementById('laf_location').textContent),
-    waypoints: waypts,
+    origin: { placeId: firstPlaceID },
+    destination: { placeId: lastPlaceID },
+    waypoints: [{ location: { placeId: getMeta('midPlaceID') }}],
+    optimizeWaypoints: false,
     travelMode: 'DRIVING'
   }, function(response, status){
     if (status === 'OK'){
