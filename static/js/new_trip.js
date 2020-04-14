@@ -100,7 +100,7 @@ $('#last_date').on('changeDate', function(e) {
   $('#first_date').datepicker('setEndDate', $('#last_date').val())
   console.log(first_date_val)
 });
-
+document.getElementById('roleDes').style.display = 'none'
 document.getElementById('request_form').addEventListener('submit', (event) => {
   let otherOverride = false
 
@@ -111,8 +111,12 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
   // Check User Role
   const userRoleValue = document.getElementById('user_role').value
   if (['driver', 'rider'].indexOf(userRoleValue) < 0) {
-    alert('Must select whether you\'re driving or riding')
+    document.getElementById('roleDes').style.display = null
+    //alert('Must select whether you\'re driving or riding')
     otherOverride = true
+  }
+  else{
+    document.getElementById('roleDes').style.display = 'none'
   }
 
   if (!event.target.checkValidity() || otherOverride) {

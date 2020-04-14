@@ -21,6 +21,10 @@ block content
           button.btn.btn-light.role_button(type="button" value="driver") Drive
           button.btn.btn-light.role_button(type="button" value="rider") Ride
         input(type="hidden" id="user_role" name="user_role")
+        .form-group.row
+          .ml-3
+            span.small(id="roleDes" ).text-danger
+              |Select rider or driver
     .form-group.row
       .col-4.order-1#lafayette_column
         span.small#lafayette_loc_header From
@@ -42,7 +46,7 @@ block content
           name="place_id"
           value=currentUser.default_location
         )
-        .invalid-feedback Please choose a location from the list
+        .invalid-feedback Begin typing a location and then choose from the drop down menu
       input#trip_direction(type="hidden" name="trip_direction" value="from_lafayette")
     .row
       .col
@@ -72,7 +76,7 @@ block content
           autocomplete="given-name"
           maxlength=100
         )
-        .invalid-feedback Please enter a valid start date
+        .invalid-feedback Enter a start date that is in the future
       .col
         input.form-control(
           name="last_date" 
@@ -85,12 +89,12 @@ block content
           autocomplete="given-name"
           maxlength=100
         )
-        .invalid-feedback Please enter a valid end date
+        .invalid-feedback Enter a valid end date that is in the future
         
 
     .form-group.row
       label.col-sm-4.col-form-label
-        | How far can you travel to get picked up?
+        | How far can you travel to carpool?
       .col-sm-8
         .input-group
           input.form-control(
@@ -103,9 +107,9 @@ block content
             autocomplete="devaition"
             maxlength=30
           )
-          .invalid-feedback Please enter a valid deviation limit
+          .invalid-feedback Enter the number of minutes you are willing to travel off your route to carpool
           .input-group-append
-            span.input-group-text minutes
+            span.input-group-text Minutes
 
     .form-group.row.mt-5
       .col.text-right
