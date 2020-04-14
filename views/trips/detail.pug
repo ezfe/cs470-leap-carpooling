@@ -6,6 +6,10 @@ block navbar_settings
 append head
   link(rel="stylesheet", href="/static/dashboard.css")
 
+  meta(name="firstPlaceID" content=firstPlaceID)
+  meta(name="midPlaceID" content=midPlaceID)
+  meta(name="lastPlaceID" content=lastPlaceID)
+
 block content
 
   if driver.id != currentUser.id
@@ -47,50 +51,36 @@ block content
                   = 'Location: '
                   = riderRequest.location_description
 
-  
   .row
-    .col-1.order-4
-      span.fas.fa-arrow-right
-    .col-1(class=(tripMatch.direction == 'from_lafayette' ? 'order-2' : 'order-6'))
-      span.fas.fa-arrow-right
+    .col-12.col-lg-6
+      .row
+        .col
+          h4 Your Trip
+      .row
+        .col
+          span= firstPlaceDescription
+      .row
+        .col
+          i.fas.fa-arrow-down
+      if (midPlaceID !== lastPlaceID && midPlaceID !== firstPlaceID)
+        .row
+          .col
+            span= midPlaceDescription
+        .row
+          .col
+            i.fas.fa-arrow-down
+      .row
+        .col
+          span= lastPlaceDescription
 
-    .col(
-      class=(tripMatch.direction == 'from_lafayette' ? 'order-1' : 'order-7')
-    )
-      .row
-        .col
-          p#laf_location Lafayette College
-    .col(
-      class=(tripMatch.first_portion == 'driver' ? 'order-3' : 'order-5')
-    )
-      .row
-        .col
-          p#driver_location= driverRequest.location_description
-      .row
-        .col
-          a.btn.btn-outline-info(
-            href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(driverRequest.location_description)}&query_place_id=${driverRequest.location}`
-          )
-            fa.fas.fa-location-arrow
-            = ' Google Maps'
-    .col(
-      class=(tripMatch.first_portion == 'rider' ? 'order-3' : 'order-5')
-    )
-      .row
-        .col
-          p#rider_location= riderRequest.location_description
-      .row
-        .col
-          a.btn.btn-outline-info(
-            href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(riderRequest.location_description)}&query_place_id=${riderRequest.location}`
-          )
-            fa.fas.fa-location-arrow
-            = ' Google Maps'
-  .row
-    .col
-      .div( id="googleMap" style="width:100%;height:400px;")
+    //- a.btn.btn-outline-info(
+    //-   href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(riderRequest.location_description)}&query_place_id=${riderRequest.location}`
+    //- )
+    //-   fa.fas.fa-location-arrow
+    //-   = ' Google Maps'
 
-      
+    .col-12.col-lg-6
+      #googleMap(style="height: 300px")
 
   include prettyDate
 
@@ -181,13 +171,16 @@ block content
             button.btn.btn-secondary(type="button" data-dismiss="modal") Cancel
             button.btn.btn-primary(type="submit") Confirm
 
-
+append scripts
   script(
     type="text/javascript",
+    src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`
+  )
+  script(
+    type="module"
     src="/static/js/trip_detail.js"
   )
   script(
-        src="/static/js/maps.js"
+    type="module"
+    src="/static/js/maps.js"
   )
-
-  script( src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCpa-av-UZCTwxyF9CY8YvO6ce4VmY87OI&callback=myMap")
