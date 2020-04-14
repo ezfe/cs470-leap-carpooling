@@ -6,6 +6,7 @@ import { TripRequest } from '../../models/trip_requests'
 import { User } from '../../models/users'
 import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripConfirmationEmail } from '../../utils/emails'
+import { lafayettePlaceID } from '../../utils/places'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -27,6 +28,12 @@ async function preprocess(req: AuthedReq): Promise<{ tripMatch: TripMatch, drive
 
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   try {
+    const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
+    if (!googleMapsAPIKey) {
+      res.send('GOOGLE_MAPS_PLACES_KEY is unset')
+      return
+    }
+
     const processed = await preprocess(req)
     if (!processed) {
       res.sendStatus(404)
@@ -46,7 +53,61 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     const driverProfileImageURL = driver.profile_image_name || 'static/blank-profile.png'
     const riderProfileImageURL = rider.profile_image_name || 'static/blank-profile.png'
 
-    res.render('trips/detail', { tripMatch, driverRequest, riderRequest, driver, rider, otherUser, driverProfileImageURL, riderProfileImageURL })
+    let firstPlaceID: string | null = null
+    let midPlaceID: string | null = null
+    let lastPlaceID: string | null = null
+
+    if (driverRequest.direction === 'from_lafayette') {
+      firstPlaceID = lafayettePlaceID
+      if (tripMatch.first_portion === 'driver') {
+        midPlaceID = riderRequest.location
+        lastPlaceID = driverRequest.location
+      } else if (tripMatch.first_portion === 'rider') {
+        midPlaceID = driverRequest.location
+        lastPlaceID = riderRequest.location
+      }
+    } else if (driverRequest.direction === 'towards_lafayette') {
+      lastPlaceID = lafayettePlaceID
+      if (tripMatch.first_portion === 'driver') {
+        firstPlaceID = riderRequest.location
+        midPlaceID = driverRequest.location
+      } else if (tripMatch.first_portion === 'rider') {
+        firstPlaceID = driverRequest.location
+        midPlaceID = riderRequest.location
+      }
+    }
+
+    if (!firstPlaceID || !midPlaceID || !lastPlaceID) {
+      console.error('Unable to find all place IDs!')
+      res.send('An error occurred generating place IDs')
+      return
+    }
+
+    function descriptionFor(placeID) {
+      return (driverRequest.location === placeID) ? driverRequest.location_description : ((riderRequest.location === placeID) ? riderRequest.location_description : 'Lafayette College')
+    }
+
+    const firstPlaceDescription = descriptionFor(firstPlaceID)
+    const midPlaceDescription = descriptionFor(midPlaceID)
+    const lastPlaceDescription = descriptionFor(lastPlaceID)
+
+    res.render('trips/detail', {
+      tripMatch,
+      driverRequest,
+      riderRequest,
+      driver,
+      rider,
+      otherUser,
+      firstPlaceID,
+      lastPlaceID,
+      midPlaceID,
+      firstPlaceDescription,
+      midPlaceDescription,
+      lastPlaceDescription,
+      driverProfileImageURL,
+      riderProfileImageURL,
+      googleMapsAPIKey
+    })
   } catch (err) {
     console.error(err)
     res.render('database-error')
