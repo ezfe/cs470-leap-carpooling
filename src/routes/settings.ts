@@ -4,9 +4,10 @@ import fs from 'fs'
 import multer from 'multer'
 import path from 'path'
 import db from '../db'
-import { requireAuthenticated } from '../middleware/auth'
 import { User } from '../models/users'
-import { AuthedReq } from '../utils/authed_req'
+import { ReqAuthedReq } from '../utils/authed_req'
+import { PairRejection } from '../models/pair_rejections'
+import { sendWelcomeEmail } from '../utils/emails'
 
 const routes = Router()
 
@@ -21,12 +22,13 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-routes.get('/onboard', requireAuthenticated, (req: AuthedReq, res: Response) => {
-  res.render('settings/onboard')
+routes.get('/onboard', (req: ReqAuthedReq, res: Response) => {
+  const profileImageURL = req.user.profile_image_name || 'static/blank-profile.png'
+
+  res.render('settings/onboard', { profileImageURL })
 })
 
-routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), async (req: AuthedReq, res: Response) => {
-  const fileName = (req.file) ? req.file.path : undefined;
+routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
 
   function validate(bodyField: string, length: number): string {
     const foundValue = req.body[bodyField]
@@ -42,15 +44,21 @@ routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), as
     const preferredName = validate('preferred_name', 100)
     const preferredEmail = validate('preferred_email', 100)
     const phoneNumber = validate('phone_number', 30)
+    const allowNotifications = (!(req.body.allow_notifications == 'true' || req.body.allow_notifications == 'false' || req.body.allow_notifications == null)) ?
+                               req.user.allow_notifications : req.body.allow_notifications
     console.log(phoneNumber)
 
-    await db<User>('users').where({ id: req.user?.id })
+    await db<User>('users').where({ id: req.user.id })
       .update({
         preferred_name: preferredName,
         email: preferredEmail,
         phone_number: phoneNumber,
-        profile_image_name: fileName
+        allow_notifications : allowNotifications
       })
+
+      if (allowNotifications) {
+        sendWelcomeEmail(preferredName || req.user.first_name!, preferredEmail || req.user.email!)
+      }
 
     res.redirect('/')
   } catch (err) {
@@ -63,28 +71,67 @@ routes.post('/onboard', requireAuthenticated, upload.single('profile_photo'), as
   }
 })
 
-routes.get('/', requireAuthenticated, (req: AuthedReq, res: Response) => {
+routes.post('/onboard/upload-onboard-image', upload.single('profile_photo'), async (req: ReqAuthedReq, res: Response) => {
+  try {
+    await db<User>('users').where({ id: req.user.id })
+    .update({
+      profile_image_name: req.file.path
+    })
+    res.redirect('/settings/onboard')
+  } catch (err) {
+    res.render('database-error')
+  }
+})
+
+routes.get('/onboard/remove-profile-image', async (req: ReqAuthedReq, res: Response) => {
+  try {
+    await db<User>('users').where({ id: req.user.id })
+      .update({
+        profile_image_name: null
+      })
+
+    if (req.user.profile_image_name) {
+      try {
+        fs.unlinkSync(req.user.profile_image_name)
+      } catch (err) {
+        // An error deleting the file shouldn't be a failure,
+        // since it probably means the file doesn't exist
+        console.error(err)
+      }
+    }
+    res.redirect('/settings/onboard')
+  } catch (err) {
+    console.error(err)
+    res.render('database-error')
+  }
+})
+
+routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
   if (!googleMapsAPIKey) {
     res.send('GOOGLE_MAPS_PLACES_KEY is unset')
     return
   }
 
-  const profileImageURL = req.user?.profile_image_name || '/static/blank-profile.png'
+  const profileImageURL = req.user.profile_image_name || '/static/blank-profile.png'
+  const blockedUsers: User[] = await db('pair_rejections')
+    .select('users.*')
+    .where('blocker_id', req.user.id)
+    .innerJoin('users', 'users.id', 'pair_rejections.blockee_id')
 
-  res.render('settings/index', { googleMapsAPIKey, profileImageURL })
+  res.render('settings/index', { googleMapsAPIKey, profileImageURL, blockedUsers })
 })
 
-routes.get('/remove-profile-image', requireAuthenticated, async (req: AuthedReq, res: Response) => {
+routes.get('/remove-profile-image', async (req: ReqAuthedReq, res: Response) => {
   try {
-    await db<User>('users').where({ id: req.user?.id })
+    await db<User>('users').where({ id: req.user.id })
       .update({
         profile_image_name: null
       })
 
-    if (req.user?.profile_image_name) {
+    if (req.user.profile_image_name) {
       try {
-        fs.unlinkSync(req.user?.profile_image_name)
+        fs.unlinkSync(req.user.profile_image_name)
       } catch (err) {
         // An error deleting the file shouldn't be a failure,
         // since it probably means the file doesn't exist
@@ -98,16 +145,17 @@ routes.get('/remove-profile-image', requireAuthenticated, async (req: AuthedReq,
   }
 })
 
-routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => {
+routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
-    await db<User>('users').where({ id: req.user?.id })
+    await db<User>('users').where({ id: req.user.id })
       .update({
         preferred_name: req.body.preferred_name,
         email: req.body.preferred_email,
         phone_number: req.body._phone,
         default_location: req.body.place_id,
         default_location_description: req.body.place_name,
-        deviation_limit: req.body.deviation_limit
+        deviation_limit: req.body.deviation_limit,
+        allow_notifications: (req.body.allow_notifications === 'on')
       })
 
     res.redirect('/settings')
@@ -116,10 +164,10 @@ routes.post('/', requireAuthenticated, async (req: AuthedReq, res: Response) => 
   }
 })
 
-routes.post('/upload-photo', upload.single('profile_photo'), requireAuthenticated, async (req: AuthedReq, res: Response) => {
+routes.post('/upload-image', upload.single('profile_photo'), async (req: ReqAuthedReq, res: Response) => {
   try {
     // Prepend a / so that public/uploads/file.jpg becomes /public/uploads/file.jpg
-    await db<User>('users').where({ id: req.user?.id })
+    await db<User>('users').where({ id: req.user.id })
     .update({
       profile_image_name: req.file.path
     })

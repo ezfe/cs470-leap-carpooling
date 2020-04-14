@@ -5,55 +5,76 @@ block navbar_settings
 
 block content
   .row
-    .col-lg-6.offset-lg-3
+    .col-lg-6.offset-lg-3.mb-3
       .card
         .card-header 
           h4.mb-0 Welcome!
         .card-body
-          form#onboard-form(method="POST", enctype="multipart/form-data")
+          form#photo_form(method="POST" action="/settings/onboard/upload-onboard-image" enctype="multipart/form-data" novalidate)
             .row.mb-4
               .col.text-center
-                img.rounded.img-fluid.mr-3(id="uploadedPhoto", src="/static/blank-profile.png",style="height:200px;width:200px")   
+                a.btn.btn-dark.ml-2.mt-2(id="exitButton", href="/settings/onboard/remove-profile-image", style="position:absolute; opacity:0.8; visibility:hidden")
+                  img(src="/static/exit.svg")
+                img.rounded.img-fluid.mr-3(id="uploadedPhoto", src='/'+profileImageURL,style="height:200px;width:200px")   
             .row.mb-4
               .col.text-center
                   label.btn.btn-primary Upload Photo
-                    input.form-control(style="display: none;", type="file", name="profile_photo", accept="image/*", onchange="displayPhoto(event)")
-            .row.mb-2.ml-1
+                    input.form-control(style="display: none;", type="file", name="profile_photo", accept="image/*", onchange="submitForm(event)")
+          form#onboard_form(method="POST" novalidate)
+            .row.mb-2
               .col
                 h4 Enter your preferred first name
-            .row.mb-5.ml-1.mr-1
+            .row.mb-5
               .col
                 input.form-control(
                   name="preferred_name"
-                  autocomplete="given-name"
+                  id="preferred_name"
                   value=(currentUser.preferred_name || currentUser.first_name)
+                  type="text"
+                  pattern="[^0-9_!¡?÷?¿/\\\\+=@#$%ˆ&*(){}|~<>;:[\\]]{2,}"
+                  autocomplete="given-name"
                   required
                   maxlength=100
                 )
-            .row.mb-2.ml-1
+                .invalid-feedback Please enter your preferred first name
+            .row.mb-2
               .col
                 h4 Enter your preferred email
-            .row.mb-5.ml-1.mr-1
+            .row.mb-5
               .col
                 input.form-control(
                   name="preferred_email"
-                  autocomplete="email"
+                  id="preferred_email"
                   value=(currentUser.email || `${currentUser.netid}@lafayette.edu`)
                   required
+                  type="email"
+                  autocomplete="email"
                   maxlength=100
                 )
-            .row.mb-2.ml-1
+                .invalid-feedback Please enter a valid email address
+            .row.mb-2
               .col
                 h4 Enter your phone number
-            .row.mb-4.ml-1.mr-1
+            .row.mb-4
               .col
                 input.form-control(
                   name= "phone_number"
-                  autocomplete="tel"
+                  id="phone_number"
                   value=currentUser.phone_number
                   required
+                  type="text"
+                  pattern="\\d{10}"
+                  autocomplete="tel"
                   maxlength=30
                 )
+                .invalid-feedback Please enter a valid phone number
+            .row.mb-4
+              .col
+                .custom-control.custom-checkbox
+                  input(type="checkbox", name="allow_notifications_box", class="custom-control-input", id="notifications_checkbox", 
+                    checked=currentUser.allow_notifications, onchange="setCheckboxValue(event)")
+                  input#allow_notifications_field(type="hidden", name="allow_notifications", value=currentUser.allow_notifications)
+                  label.custom-control-label(for="notifications_checkbox") Allow LEAP Lifts to send email notifications
             .row
               .col.text-center
                 button.btn.btn-primary(type="submit") Submit

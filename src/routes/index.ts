@@ -14,7 +14,7 @@ routes.use('/static', expressStatic(path.join(__dirname, '../../static')))
 routes.use('/trips', requireAuthenticated, trips)
 routes.use('/trip-requests/:requestID', requireAuthenticated, tripRequestDetail)
 routes.use('/sessions', sessions)
-routes.use('/settings', settings)
+routes.use('/settings', requireAuthenticated, settings)
 
 // This would be the home page
 routes.get('/', async (req: AuthedReq, res: Response) => {

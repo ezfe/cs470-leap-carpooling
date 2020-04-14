@@ -1,8 +1,11 @@
 import db from '../db'
 import { TripDirection, UserRole } from '../models/misc_types'
 import { TripMatch } from '../models/trip_matches'
+import { TripRequest } from '../models/trip_requests'
+import { User } from '../models/users'
 import { distanceMatrix } from '../utils/distances'
 import { Raw } from 'knex'
+import { sendTripMatchEmail } from '../utils/emails'
 
 export default async function job() {
   // console.log("Starting Pairing Process")
@@ -40,56 +43,54 @@ interface PotentialPair {
 async function generatePotentialPairs(direction: TripDirection): Promise<PotentialPair[]> {
   try {
     return await db.transaction(async (trx) => {
-      // Create View
-      const rawViewQuery = trx.select([
-        db.ref('trip_requests_t.id').as('trip_request_id'),
-        db.ref('trip_requests_t.member_id').as('member_id'),
-        db.ref('trip_requests_t.role').as('role'),
-        db.ref('trip_requests_t.location').as('location'),
-        db.ref('trip_requests_t.deviation_limit').as('deviation_limit'),
-        db.ref('trip_requests_t.first_date').as('first_date'),
-        db.ref('trip_requests_t.last_date').as('last_date'),
-      ]).from(function() {
-        this.select('trip_requests.*')
+      function createSubquery(builder, role: UserRole) {
+        builder.select('trip_requests.*')
           .from('trip_requests')
           .leftJoin('trip_matches', function() {
             this.on('trip_requests.id', '=', 'trip_matches.driver_request_id')
             .orOn('trip_requests.id', '=', 'trip_matches.rider_request_id')
           })
           .whereNull('trip_matches.id')
-          .as('trip_requests_t')
-      }).where('trip_requests_t.direction', '=', direction)
-
-      await trx.raw(`CREATE OR REPLACE TEMPORARY VIEW trip_requests_times AS (${rawViewQuery})`)
-
-      // console.log('All merged date/times')
-      // console.log(await trx.select('*').from('trip_requests_times'))
+          .andWhere('trip_requests.direction', '=', direction)
+          .andWhere('role', '=', role)
+          .as(`${role}_t`)
+      }
 
       // Query Pairs
       const potentialPairs = await trx.select([
-        db.ref('driver_t.trip_request_id').as('driver_request_id'),
-        db.ref('driver_t.member_id').as('driver_id'),
-        db.ref('driver_t.location').as('driver_location'),
-        db.ref('driver_t.deviation_limit').as('driver_deviation_limit'),
-        db.ref('driver_t.first_date').as('driver_first_date'),
-        db.ref('driver_t.last_date').as('driver_last_date'),
-        db.ref('rider_t.trip_request_id').as('rider_request_id'),
-        db.ref('rider_t.member_id').as('rider_id'),
-        db.ref('rider_t.location').as('rider_location'),
-        db.ref('rider_t.deviation_limit').as('rider_deviation_limit'),
-        db.ref('rider_t.first_date').as('rider_first_date'),
-        db.ref('rider_t.last_date').as('rider_last_date'),
-      ]).from(function() {
-        this.select('*').from('trip_requests_times').where('role', '=', 'driver').as('driver_t')
-      }).innerJoin(function() {
-          this.select('*').from('trip_requests_times').where('role', '=', 'rider').as('rider_t')
-      }, db.raw('GREATEST(driver_t.first_date, rider_t.first_date) <= LEAST(driver_t.last_date, rider_t.last_date)')
-      )
-
-      // console.log(`Identified potential pairs for direction ${direction}`)
-      // console.log('Used:')
-      // console.log(query)
-      // console.log(potentialPairs)
+          db.ref('driver_t.id').as('driver_request_id'),
+          db.ref('driver_t.member_id').as('driver_id'),
+          db.ref('driver_t.location').as('driver_location'),
+          db.ref('driver_t.deviation_limit').as('driver_deviation_limit'),
+          db.ref('driver_t.first_date').as('driver_first_date'),
+          db.ref('driver_t.last_date').as('driver_last_date'),
+          db.ref('rider_t.id').as('rider_request_id'),
+          db.ref('rider_t.member_id').as('rider_id'),
+          db.ref('rider_t.location').as('rider_location'),
+          db.ref('rider_t.deviation_limit').as('rider_deviation_limit'),
+          db.ref('rider_t.first_date').as('rider_first_date'),
+          db.ref('rider_t.last_date').as('rider_last_date'),
+        ])
+        .from(function() {
+          createSubquery(this, 'driver')
+        })
+        .innerJoin(
+          function() { createSubquery(this, 'rider') },
+          db.raw('GREATEST(driver_t.first_date, rider_t.first_date) <= LEAST(driver_t.last_date, rider_t.last_date)')
+        )
+        .leftJoin(
+          'pair_rejections',
+          function() {
+            this.on(function() {
+              this.on('pair_rejections.blocker_id', 'rider_t.member_id')
+                .andOn('pair_rejections.blockee_id', 'driver_t.member_id')
+            }).orOn(function() {
+              this.on('pair_rejections.blocker_id', 'driver_t.member_id')
+                .andOn('pair_rejections.blockee_id', 'rider_t.member_id')
+            })
+        })
+        .whereNull('pair_rejections.id')
+        .andWhere('driver_t.member_id', '<>', db.ref('rider_t.member_id'))
 
       return potentialPairs
     })
@@ -174,8 +175,22 @@ async function matchFirstPair(pairs: PricedPair[]) {
         rider_confirmed: false,
         driver_confirmed: false,
         first_portion: firstPortion,
-        created_at: db.fn.now()
+        created_at: db.fn.now(),
+        notification_sent: false
       })
+
+    const driverRequest = await db('trip_requests').where({ id: driver_request_id }).first<TripRequest>()
+    const riderRequest = await db('trip_requests').where({ id: rider_request_id }).first<TripRequest>()
+    const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
+    const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
+    if (driver.allow_notifications) {
+      sendTripMatchEmail(driver.preferred_name || driver.first_name, driver.email!, true, rider.preferred_name || rider.first_name, rider.last_name,
+        driverRequest.direction, driverRequest.location_description, riderRequest.location_description, first_date, last_date)
+    }
+    if (rider.allow_notifications) {
+      sendTripMatchEmail(rider.preferred_name || rider.first_name, rider.email!, false, driver.preferred_name || driver.first_name, driver.last_name,
+        driverRequest.direction, driverRequest.location_description, riderRequest.location_description, first_date, last_date)
+    }
 
     return
   } catch (err) {

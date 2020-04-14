@@ -1,16 +1,7 @@
-'use strict'
+import { setClicked, setUnclicked } from './button_clicks.js'
+import registerAutocomplete from './location_autocomplete.js'
 
 const formSync = registerAutocomplete('location_field', 'place_id_field')
-
-function setClicked(button) {
-  button.classList.add('active')
-  button.setAttribute('aria-pressed', 'true')
-}
-
-function setUnclicked(button) {
-  button.classList.remove('active')
-  button.setAttribute('aria-pressed', 'false')
-}
 
 function clickRoleButton(event) {
   for (const button of document.getElementsByClassName('role_button')) {
@@ -52,37 +43,20 @@ document.getElementById('reverse_locations').addEventListener('click', (event) =
   }
 })
 
-document.getElementById('request_form').addEventListener('submit', (event) => {
-  const userRoleValue = document.getElementById('user_role').value
-  if (['driver', 'rider'].indexOf(userRoleValue) < 0) {
-    event.preventDefault()
-    alert('Must select whether you\'re driving or riding')
-    return
-  }
-
-  if (!formSync()) {
-    alert("No Place ID!")
-    event.preventDefault()
-    return
-  }
-})
-
 document.getElementById('discard_button').addEventListener('click', () => {
   if (confirm('Discard entered information?')) {
     location.href = "/trips"
   }
 })
 
-$(document).ready(function(){
-  const options = {
-    format: 'mm/dd/yyyy',
-    autoclose: true,
-    startDate: new Date()
-  }
+const options = {
+  format: 'mm/dd/yyyy',
+  autoclose: true,
+  startDate: new Date()
+}
 
-  $('input[name="first_date"]').datepicker(options)
-  $('input[name="last_date"]').datepicker(options)
-})
+$('input[name="first_date"]').datepicker(options)
+$('input[name="last_date"]').datepicker(options)
 
 $('#first_date').on('changeDate', function(e) {
   //check if the first date is after the last date, if it exists
@@ -124,4 +98,27 @@ $('#last_date').on('changeDate', function(e) {
     $('#last_date').datepicker('clearDates');
   }
   $('#first_date').datepicker('setEndDate', $('#last_date').val())
+  console.log(first_date_val)
 });
+
+document.getElementById('request_form').addEventListener('submit', (event) => {
+  let otherOverride = false
+
+  if (!formSync()) {
+    otherOverride = true
+  }
+
+  // Check User Role
+  const userRoleValue = document.getElementById('user_role').value
+  if (['driver', 'rider'].indexOf(userRoleValue) < 0) {
+    alert('Must select whether you\'re driving or riding')
+    otherOverride = true
+  }
+
+  if (!event.target.checkValidity() || otherOverride) {
+    event.preventDefault()
+    event.stopPropagation()
+    alert("Please correct the highlighted errors")
+  }
+  event.target.classList.add('was-validated')
+})

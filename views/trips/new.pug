@@ -13,7 +13,7 @@ append head
   )
 
 block content
-  form#request_form(method="POST")
+  form#request_form(method="POST" novalidate)
     .form-group.row
       label.col-sm-2.col-form-label I want to...
       .col-sm-10
@@ -34,6 +34,7 @@ block content
         input.form-control#location_field(
           type="text"
           name="location_description"
+          required
           value=currentUser.default_location_description
         )
         input#place_id_field(
@@ -41,6 +42,7 @@ block content
           name="place_id"
           value=currentUser.default_location
         )
+        .invalid-feedback Please choose a location from the list
       input#trip_direction(type="hidden" name="trip_direction" value="from_lafayette")
     .row
       .col
@@ -59,9 +61,32 @@ block content
 
     .form-group.row
       .col
-        input.form-control(type="text", id="first_date", name="first_date" placeholder="MM/DD/YYYY", onkeydown="return false")
+        input.form-control(
+          name="first_date" 
+          id="first_date"
+          required
+          type="text"
+          placeholder="MM/DD/YYYY"
+          onkeydown="return false"
+          pattern="\\d{2}\\/\\d{2}\\/\\d{4}"
+          autocomplete="given-name"
+          maxlength=100
+        )
+        .invalid-feedback Please enter a valid start date
       .col
-        input.form-control(type="text", id="last_date", name="last_date" placeholder="MM/DD/YYYY", onkeydown="return false")
+        input.form-control(
+          name="last_date" 
+          id="last_date"
+          required
+          type="text"
+          placeholder="MM/DD/YYYY"
+          onkeydown="return false"
+          pattern="\\d{2}\\/\\d{2}\\/\\d{4}"
+          autocomplete="given-name"
+          maxlength=100
+        )
+        .invalid-feedback Please enter a valid end date
+        
 
     .form-group.row
       label.col-sm-4.col-form-label
@@ -69,10 +94,16 @@ block content
       .col-sm-8
         .input-group
           input.form-control(
-            type="text"
             name="deviation_limit"
+            id="deviation_limit"
             value=defaultDeviationLimit
+            required
+            type="text"
+            pattern="[0-9]{1,}"
+            autocomplete="devaition"
+            maxlength=30
           )
+          .invalid-feedback Please enter a valid deviation limit
           .input-group-append
             span.input-group-text minutes
 
@@ -98,10 +129,6 @@ append scripts
     src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`
   )
   script(
-    type="text/javascript",
-    src="/static/js/location_autocomplete.js"
-  )
-  script(
-    type="text/javascript",
+    type="module",
     src="/static/js/new_trip.js"
   )
