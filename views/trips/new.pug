@@ -76,7 +76,7 @@ block content
           autocomplete="given-name"
           maxlength=100
         )
-        .invalid-feedback Enter a start date that is in the future
+        .invalid-feedback Select a start date 
       .col
         input.form-control(
           name="last_date" 
@@ -89,13 +89,13 @@ block content
           autocomplete="given-name"
           maxlength=100
         )
-        .invalid-feedback Enter a valid end date that is in the future
+        .invalid-feedback Select an end date 
         
 
     .form-group.row
       label.col-sm-4.col-form-label
         | How far can you travel to carpool?
-      .col-sm-8
+      .col-sm-7
         .input-group
           input.form-control(
             name="deviation_limit"
@@ -107,7 +107,7 @@ block content
             autocomplete="devaition"
             maxlength=30
           )
-          .invalid-feedback Enter the number of minutes you are willing to travel off your route to carpool
+          .invalid-feedback Enter the number of minutes you are willing to travel off your route to find a match
           .input-group-append
             span.input-group-text Minutes
 
