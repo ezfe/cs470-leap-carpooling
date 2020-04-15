@@ -43,8 +43,14 @@ routes.post('/', async (req: AuthedReq, res: Response) => {
       })
 
     if (req.user?.allow_notifications) {
-      sendTripProcessingEmail(req.user?.preferred_name || req.user?.first_name!, req.user?.email!, 
-        req.body.trip_direction, req.body.location_description, req.body.first_date, req.body.last_date)
+      sendTripProcessingEmail(
+        req.user?.preferred_name || req.user?.first_name!,
+        req.user?.email!,
+        req.body.trip_direction,
+        req.body.location_description,
+        req.body.first_date,
+        req.body.last_date
+      )
     }
 
     await sampleJob()
