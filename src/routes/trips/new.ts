@@ -3,6 +3,7 @@ import db from '../../db'
 import { TripRequest } from '../../models/trip_requests'
 import { AuthedReq } from '../../utils/authed_req'
 import { sendTripProcessingEmail } from '../../utils/emails'
+import sampleJob from '../../jobs/pairing-job'
 
 const routes = Router()
 
@@ -45,6 +46,8 @@ routes.post('/', async (req: AuthedReq, res: Response) => {
       sendTripProcessingEmail(req.user?.preferred_name || req.user?.first_name!, req.user?.email!, 
         req.body.trip_direction, req.body.location_description, req.body.first_date, req.body.last_date)
     }
+
+    await sampleJob()
 
     res.redirect('/trips')
   } catch (err) {
