@@ -60,6 +60,7 @@ block content
                   id="phone_number"
                   value=currentUser.phone_number
                   type="text"
+                  required
                   pattern=constraints.phoneNumber.pattern.source
                   autocomplete="tel"
                   maxlength=constraints.phoneNumber.max
@@ -92,7 +93,6 @@ block content
                   name= "deviation_limit"
                   id ="deviation_limit"
                   value=currentUser.deviation_limit
-                  required
                   type="number"
                   min=0
                 )

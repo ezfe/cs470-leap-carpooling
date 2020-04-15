@@ -1,45 +1,19 @@
 import Joi from '@hapi/joi'
-
-export const preferredName = {
-  autocomplete: 'given-name',
-  min: 2,
-  max: 100,
-  pattern: /[^0-9_!¡?÷?¿/\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}/
-}
-
-export const preferredEmail = {
-  max: 100
-}
-
-export const phoneNumber = {
-  pattern: /\+?[0-9\(\) -]{10,}/,
-  min: 10,
-  max: 30
-}
-
+import { joiConstraints } from '.'
+import {  } from '.'
 export const settingsSchema = Joi.object({
-  preferred_name: Joi.string()
-    .pattern(preferredName.pattern)
-    .min(preferredName.min)
-    .max(preferredName.max),
-
-  preferred_email: Joi.string()
-    .email()
-    .max(preferredEmail.max),
-
-  phone_number: Joi.string()
-    .pattern(phoneNumber.pattern)
-    .min(phoneNumber.min)
-    .max(phoneNumber.max),
+  preferred_name: joiConstraints.preferred_name,
+  preferred_email: joiConstraints.preferred_email,
+  phone_number: joiConstraints.phone_number,
+  allow_notifications: joiConstraints.allow_notifications,
 
   place_name: Joi.string(),
   place_id: Joi.string(),
 
   deviation_limit: Joi.number()
     .integer()
-    .positive(),
-
-  allow_notifications: Joi.boolean()
-    .truthy('on')
+    .positive()
+    .empty('')
+    .default(null),
 })
 
