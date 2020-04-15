@@ -8,19 +8,13 @@ export const preferredName = {
 }
 
 export const preferredEmail = {
-  type: 'email',
   max: 100
 }
 
 export const phoneNumber = {
-  type: 'tel',
   pattern: /\+?[0-9\(\) -]{10,}/,
   min: 10,
   max: 30
-}
-
-export const deviationLimit = {
-
 }
 
 export const settingsSchema = Joi.object({
