@@ -23,8 +23,10 @@ block content
         input(type="hidden" id="user_role" name="user_role")
         .form-group.row
           .ml-3
-            span.small(id="roleDes" ).text-danger
-              |Select rider or driver
+            span.small(
+              id="roleDes"
+              style="display: none;"
+            ).text-danger Select rider or driver
     .form-group.row
       .col-4.order-1#lafayette_column
         span.small#lafayette_loc_header From
