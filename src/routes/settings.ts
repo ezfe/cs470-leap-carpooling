@@ -6,8 +6,10 @@ import path from 'path'
 import db from '../db'
 import { User } from '../models/users'
 import { ReqAuthedReq } from '../utils/authed_req'
-import { PairRejection } from '../models/pair_rejections'
 import { sendWelcomeEmail } from '../utils/emails'
+import { phoneNumber, preferredEmail, preferredName } from '../validation'
+import { onboardSchema } from '../validation/onboard'
+import { settingsSchema } from '../validation/settings'
 
 const routes = Router()
 
@@ -25,39 +27,29 @@ const upload = multer({ storage });
 routes.get('/onboard', (req: ReqAuthedReq, res: Response) => {
   const profileImageURL = req.user.profile_image_name || 'static/blank-profile.png'
 
-  res.render('settings/onboard', { profileImageURL })
+  const constraints = {
+    preferredName,
+    preferredEmail,
+    phoneNumber
+  }
+
+  res.render('settings/onboard', { profileImageURL, constraints })
 })
 
 routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
-
-  function validate(bodyField: string, length: number): string {
-    const foundValue = req.body[bodyField]
-    if (!foundValue) {
-      const e = Error(`Missing value for ${bodyField}`)
-      e.name = 'validation-error'
-      throw e
-    }
-    return `${foundValue}`
-  }
-
   try {
-    const preferredName = validate('preferred_name', 100)
-    const preferredEmail = validate('preferred_email', 100)
-    const phoneNumber = validate('phone_number', 30)
-    const allowNotifications = (!(req.body.allow_notifications == 'true' || req.body.allow_notifications == 'false' || req.body.allow_notifications == null)) ?
-                               req.user.allow_notifications : req.body.allow_notifications
-    console.log(phoneNumber)
+    const validated = await onboardSchema.validateAsync(req.body)
 
     await db<User>('users').where({ id: req.user.id })
       .update({
-        preferred_name: preferredName,
-        email: preferredEmail,
-        phone_number: phoneNumber,
-        allow_notifications : allowNotifications
+        preferred_name: validated.preferred_name,
+        email: validated.preferred_email,
+        phone_number: validated.phone_number,
+        allow_notifications : validated.allow_notifications
       })
 
-      if (allowNotifications) {
-        sendWelcomeEmail(preferredName || req.user.first_name!, preferredEmail || req.user.email!)
+      if (validated.allow_notifications) {
+        sendWelcomeEmail(validated.preferred_name || req.user.first_name, validated.preferred_email || req.user.email)
       }
 
     res.redirect('/')
@@ -113,13 +105,19 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     return
   }
 
+  const constraints = {
+    preferredName,
+    preferredEmail,
+    phoneNumber
+  }
+
   const profileImageURL = req.user.profile_image_name || '/static/blank-profile.png'
   const blockedUsers: User[] = await db('pair_rejections')
     .select('users.*')
     .where('blocker_id', req.user.id)
     .innerJoin('users', 'users.id', 'pair_rejections.blockee_id')
 
-  res.render('settings/index', { googleMapsAPIKey, profileImageURL, blockedUsers })
+  res.render('settings/index', { constraints, googleMapsAPIKey, profileImageURL, blockedUsers })
 })
 
 routes.get('/remove-profile-image', async (req: ReqAuthedReq, res: Response) => {
@@ -147,19 +145,22 @@ routes.get('/remove-profile-image', async (req: ReqAuthedReq, res: Response) => 
 
 routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
+    const validated = await settingsSchema.validateAsync(req.body)
+
     await db<User>('users').where({ id: req.user.id })
       .update({
-        preferred_name: req.body.preferred_name,
-        email: req.body.preferred_email,
-        phone_number: req.body._phone,
-        default_location: req.body.place_id,
-        default_location_description: req.body.place_name,
-        deviation_limit: req.body.deviation_limit,
-        allow_notifications: (req.body.allow_notifications === 'on')
+        preferred_name: validated.preferred_name,
+        email: validated.preferred_email,
+        phone_number: validated.phone_number,
+        default_location: validated.place_id,
+        default_location_description: validated.place_name,
+        deviation_limit: validated.deviation_limit,
+        allow_notifications: validated.allow_notifications
       })
 
     res.redirect('/settings')
   } catch (err) {
+    console.error(err)
     res.render('database-error')
   }
 })

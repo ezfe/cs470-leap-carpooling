@@ -28,11 +28,11 @@ block content
                   name="preferred_name"
                   id="preferred_name"
                   value=(currentUser.preferred_name || currentUser.first_name)
-                  required
                   type="text"
-                  pattern="[^0-9_!¡?÷?¿/\\\\+=@#$%ˆ&*(){}|~<>;:[\\]]{2,}"
-                  autocomplete="given-name"
-                  maxlength=100
+                  pattern=constraints.preferredName.pattern.source
+                  autocomplete=constraints.preferredName.autocomplete
+                  minlength=constraints.preferredName.min
+                  maxlength=constraints.preferredName.max
                 )
                 .invalid-feedback Please enter a valid preferred name
             .row.mb-2
@@ -44,10 +44,9 @@ block content
                   name="preferred_email"
                   id="preferred_email"
                   value=(currentUser.email || `${currentUser.netid}@lafayette.edu`)
-                  required
-                  type="email"
-                  autocomplete="email"
-                  maxlength=100
+                  type=constraints.preferredEmail.type
+                  autocomplete=constraints.preferredEmail.type
+                  maxlength=constraints.preferredEmail.max
                 )
                 .invalid-feedback Please enter a valid email address
                 
@@ -57,14 +56,15 @@ block content
             .row.mb-4
               .col
                 input.form-control(
-                  name= "_phone"
-                  id="_phone"
+                  name= "phone_number"
+                  id="phone_number"
                   value=currentUser.phone_number
-                  required
                   type="text"
-                  pattern="\\+?[0-9\\(\\) -]{10,}"
+                  required
+                  pattern=constraints.phoneNumber.pattern.source
                   autocomplete="tel"
-                  maxlength=30
+                  maxlength=constraints.phoneNumber.max
+                  minlength=constraints.phoneNumber.min
                 )
                 .invalid-feedback Please enter a valid phone number
             .row.mb-2
@@ -93,11 +93,8 @@ block content
                   name= "deviation_limit"
                   id ="deviation_limit"
                   value=currentUser.deviation_limit
-                  required
-                  type="text"
-                  pattern="[0-9]{1,}"
-                  autocomplete="deviation"
-                  maxlength=30
+                  type="number"
+                  min=0
                 )
                 .invalid-feedback Please enter a valid deviation limit
             .row.mb-4
