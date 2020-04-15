@@ -34,7 +34,7 @@ block content
                   minlength=constraints.preferredName.min
                   maxlength=constraints.preferredName.max
                 )
-                .invalid-feedback Please enter a valid preferred name
+                .invalid-feedback Enter a valid preferred name
             .row.mb-2
               .col
                 b Preferred email
@@ -48,7 +48,7 @@ block content
                   autocomplete=constraints.preferredEmail.type
                   maxlength=constraints.preferredEmail.max
                 )
-                .invalid-feedback Please enter a valid email address
+                .invalid-feedback Enter a valid email address
                 
             .row.mb-2
               .col
@@ -66,7 +66,7 @@ block content
                   maxlength=constraints.phoneNumber.max
                   minlength=constraints.phoneNumber.min
                 )
-                .invalid-feedback Please enter a valid phone number
+                .invalid-feedback Enter a phone number in the format (800)123-5678
             .row.mb-2
               .col
                 b Default location
@@ -83,7 +83,7 @@ block content
                   name="place_id" 
                   value=currentUser.default_location
                 )
-                .invalid-feedback Please enter a valid location
+                .invalid-feedback Enter your most frequent travel location
             .row.mb-2
               .col
                 b Deviation limit
@@ -96,7 +96,7 @@ block content
                   type="number"
                   min=0
                 )
-                .invalid-feedback Please enter a valid deviation limit
+                .invalid-feedback Enter the number of minutes you are willing to travel off your route to find a match
             .row.mb-4
               .col
                 .custom-control.custom-checkbox

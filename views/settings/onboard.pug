@@ -23,7 +23,7 @@ block content
           form#onboard_form(method="POST" novalidate)
             .row.mb-2
               .col
-                h4 Enter your preferred first name
+                h4 Preferred first name
             .row.mb-5
               .col
                 input.form-control(
@@ -36,10 +36,10 @@ block content
                   minlength=constraints.preferredName.min
                   maxlength=constraints.preferredName.max
                 )
-                .invalid-feedback Please enter your preferred first name
+                .invalid-feedback Enter your preferred first name
             .row.mb-2
               .col
-                h4 Enter your preferred email
+                h4 Preferred email
             .row.mb-5
               .col
                 input.form-control(
@@ -50,10 +50,10 @@ block content
                   autocomplete=constraints.preferredEmail.type
                   maxlength=constraints.preferredEmail.max
                 )
-                .invalid-feedback Please enter a valid email address
+                .invalid-feedback Enter a valid email address
             .row.mb-2
               .col
-                h4 Enter your phone number
+                h4 Phone number
             .row.mb-4
               .col
                 input.form-control(
@@ -67,7 +67,8 @@ block content
                   maxlength=constraints.phoneNumber.max
                   minlength=constraints.phoneNumber.min
                 )
-                .invalid-feedback Please enter a valid phone number
+                .invalid-feedback Enter a phone number in the format (800)123-5678
+                                  
             .row.mb-4
               .col
                 .custom-control.custom-checkbox
