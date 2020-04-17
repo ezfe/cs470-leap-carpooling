@@ -1,19 +1,6 @@
-import { setClicked, setUnclicked } from './button_clicks.js'
 import registerAutocomplete from './location_autocomplete.js'
 
 const formSync = registerAutocomplete('location_field', 'place_id_field')
-
-function clickRoleButton(event) {
-  for (const button of document.getElementsByClassName('role_button')) {
-    setUnclicked(button)
-  }
-  setClicked(event.target)
-  document.getElementById('user_role').value = event.target.value
-}
-
-for (const button of document.getElementsByClassName('role_button')) {
-  button.addEventListener('click', clickRoleButton) 
-}
 
 document.getElementById('reverse_locations').addEventListener('click', (event) => {
   const tripDirectionInput = document.getElementById('trip_direction')
@@ -100,23 +87,12 @@ $('#last_date').on('changeDate', function(e) {
   $('#first_date').datepicker('setEndDate', $('#last_date').val())
   console.log(first_date_val)
 });
-document.getElementById('roleDes').style.display = 'none'
+
 document.getElementById('request_form').addEventListener('submit', (event) => {
   let otherOverride = false
 
   if (!formSync()) {
     otherOverride = true
-  }
-
-  // Check User Role
-  const userRoleValue = document.getElementById('user_role').value
-  if (['driver', 'rider'].indexOf(userRoleValue) < 0) {
-    document.getElementById('roleDes').style.display = null
-    //alert('Must select whether you\'re driving or riding')
-    otherOverride = true
-  }
-  else{
-    document.getElementById('roleDes').style.display = 'none'
   }
 
   if (!event.target.checkValidity() || otherOverride) {

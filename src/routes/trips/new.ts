@@ -15,11 +15,8 @@ routes.get('/', (req: AuthedReq, res: Response) => {
     return
   }
 
-  const defaultDeviationLimit = req.user?.deviation_limit
-
   res.render('trips/new', {
-    googleMapsAPIKey,
-    defaultDeviationLimit
+    googleMapsAPIKey
   })
 })
 
