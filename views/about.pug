@@ -1,0 +1,21 @@
+extends base.pug
+
+block navbar_settings
+  - var current_page = "about"
+
+block content
+  .row
+    .col-lg-10.offset-lg-1
+      .card
+        .card-header 
+          h4.mb-0 About Leap Lifts
+        .card-body
+          |Leap Lifts is a software created to help Lafayette students find rides to and from campus. 
+          |This project was specifically designed to try and reduce Lafayette students carbon footprint when traveling from and to campus for breaks. 
+          |This project is a partnership between the Computer Science department and the campus LEAP organization. For more information feel free to reach out to LEAP@LEAP.Leap. 
+   
+
+  script(
+    type="text/javascript",
+    src="/static/js/about.js"
+  )
