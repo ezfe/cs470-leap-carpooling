@@ -67,6 +67,9 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
       tagNameProcessors: [ normalize, stripPrefix ]
     })
 
+    console.log("CAS Response:")
+    console.log(parsedXML)
+
     const failure = parsedXML.serviceresponse.authenticationfailure
     if (failure) {
       console.error('CAS authentication failed (' + failure.$.code + ').')
