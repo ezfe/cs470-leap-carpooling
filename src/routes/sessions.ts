@@ -68,7 +68,7 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
     })
 
     console.log("CAS Response:")
-    console.log(parsedXML)
+    console.log(parsedXML.serviceresponse.authenticationsuccess)
 
     const failure = parsedXML.serviceresponse.authenticationfailure
     if (failure) {
