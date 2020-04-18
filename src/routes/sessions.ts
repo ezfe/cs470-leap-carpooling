@@ -53,7 +53,7 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
     pathname: 'https://cas.lafayette.edu/cas/p3/serviceValidate',
     query: {
         service,
-        ticket: req.query.ticket
+        ticket: req.query.ticket as string
     }
   })
 
@@ -66,9 +66,6 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
       explicitArray: false,
       tagNameProcessors: [ normalize, stripPrefix ]
     })
-
-    console.log("CAS Response:")
-    console.log(parsedXML.serviceresponse.authenticationsuccess)
 
     const failure = parsedXML.serviceresponse.authenticationfailure
     if (failure) {
