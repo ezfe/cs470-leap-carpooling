@@ -36,6 +36,18 @@ document.getElementById('discard_button').addEventListener('click', () => {
   }
 })
 
+function validateUserRole() {
+  if (document.getElementById('request_form').classList.contains('was-validated')) {
+    if (document.getElementById('drive_button').checked || document.getElementById('ride_button').checked) {
+      document.getElementById('role_invalid').style.display = 'none'
+    } else {
+      document.getElementById('role_invalid').style.display = null
+    }
+  }
+}
+
+document.getElementById('drive_button').addEventListener('change', validateUserRole)
+
 const options = {
   format: 'mm/dd/yyyy',
   autoclose: true,
@@ -101,4 +113,5 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     alert("Please correct the highlighted errors")
   }
   event.target.classList.add('was-validated')
+  validateUserRole()
 })
