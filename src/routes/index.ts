@@ -20,5 +20,7 @@ routes.use('/settings', requireAuthenticated, settings)
 routes.get('/', async (req: AuthedReq, res: Response) => {
   res.render('homepage')
 })
-
+routes.get('/about', async (req: AuthedReq, res: Response) => {
+  res.render('about')
+})
 export default routes
