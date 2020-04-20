@@ -5,3 +5,7 @@ document.getElementById('cancel-trip-form').addEventListener('submit', (evt) => 
       evt.preventDefault()
     }
 })
+
+document.getElementById('confirm-trip-form').addEventListener('submit', (evt) => {
+  
+})
