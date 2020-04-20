@@ -87,7 +87,7 @@ block content
             .row.mb-2
               .col
                 b Deviation limit
-            .row.mb-4
+            .row
               .col
                 input.form-control(
                   name= "deviation_limit"
@@ -96,7 +96,10 @@ block content
                   type="number"
                   min=0
                 )
-                .invalid-feedback Enter the number of minutes you are willing to travel off your route to find a match
+            .row.mb-4
+              .col
+                span.small
+                  text.sm-2(name="desc" id = "desc") Enter the number of minutes you are willing to travel off your route to find a match
             .row.mb-4
               .col
                 .custom-control.custom-checkbox
