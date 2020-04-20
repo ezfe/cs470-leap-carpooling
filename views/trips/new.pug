@@ -36,15 +36,16 @@ block content
                       | Drive
 
                     label.btn.btn-light.blue-focus
-                      input#drive_button.custom-control-input(
+                      input#ride_button.custom-control-input(
                         type="radio"
                         name="user_role"
                         value="rider"
                         required
                       )
                       | Ride
-
-                      .invalid-feedback Hello
+                  
+                  br
+                  span.small.text-danger#role_invalid(style="display: none;") You must select either driving or riding
 
             hr.my-3
 
