@@ -12,6 +12,13 @@ append head
 
 block content
 
+  .row
+    .col
+      p
+        = 'You\'ve been matched! Contact '
+        = otherUser.preferred_name || otherUser.first_name
+        = ' and confirm your trip details.'
+
   if driver.id != currentUser.id
     .row.mb-3
       .col
@@ -23,14 +30,42 @@ block content
               | Driver
           .card-body
             .row
-              .col-2
+              .col-8.offset-2.col-sm-3.offset-sm-0.col-lg-2
                 img.rounded.img-fluid(src='/'+driverProfileImageURL, style="width: 300px;")   
-              .col
+              .col-12.col-sm-9.col-md-7.col-lg-5
                 h5.card-title
-                  = driver.preferred_name || driver.first_name
-                p.card-text
-                  = 'Location: '
-                  = driverRequest.location_description
+                  = `${driver.preferred_name || driver.first_name} ${driver.last_name}`
+                table.table.table-sm.table-bordered
+                  tr
+                    th(scope="row") Location
+                    td= driverRequest.location_description
+                  tr
+                    th(scope="row") Phone
+                    td= driver.phone_number
+                  tr
+                    th(scope="row") Email
+                    - const email = driver.email || `${driver.netid}@lafayette.edu`
+                    td
+                      a(href=`mailto:${email}`)= email
+              .col-12.col-sm-6.col-md-5.col-lg-4.offset-lg-1.col-xl-3.offset-xl-2
+                .row.mb-2
+                  .col
+                    if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
+                      button.btn.btn-block.btn-success(type="button" data-toggle="modal" data-target="#confirmModal")
+                        i.fas.fa-check
+                        = ' Confirm Trip'
+                    else if (!tripMatch.driver_confirmed || !tripMatch.rider_confirmed)
+                      span Waiting for the other person to confirm...
+                    else
+                      span
+                        i.fas.fa-check
+                        = ' Trip Confirmed'
+                .row
+                  .col
+                    button.btn.btn-block.btn-warning(type="button" data-toggle="modal" data-target="#rejectModal")
+                      i.fas.fa-sync-alt
+                      = ' Reject Match'
+
   if rider.id != currentUser.id
     .row.mb-3
       .col
@@ -42,15 +77,61 @@ block content
               | Rider
           .card-body
             .row
-              .col-2
+              .col-8.offset-2.col-sm-3.offset-sm-0.col-lg-2
                 img.rounded.img-fluid(src='/'+riderProfileImageURL, style="width: 300px;")   
-              .col
+              .col-12.col-sm-9.col-md-7.col-lg-5
                 h5.card-title
-                  = rider.preferred_name || rider.first_name
-                p.card-text
-                  = 'Location: '
-                  = riderRequest.location_description
+                  = `${rider.preferred_name || rider.first_name} ${rider.last_name}`
+                table.table.table-sm.table-bordered
+                  tr
+                    th(scope="row") Location
+                    td= riderRequest.location_description
+                  tr
+                    th(scope="row") Phone
+                    td= rider.phone_number
+                  tr
+                    th(scope="row") Email
+                    - const email = rider.email || `${rider.netid}@lafayette.edu`
+                    td
+                      a(href=`mailto:${email}`)= email
+              .col-12.col-sm-6.col-md-5.col-lg-4.offset-lg-1.col-xl-3.offset-xl-2
+                .row.mb-2
+                  .col
+                    if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
+                      button.btn.btn-block.btn-success(type="button" data-toggle="modal" data-target="#confirmModal")
+                        i.fas.fa-check
+                        = ' Confirm Trip'
+                    else if (!tripMatch.driver_confirmed || !tripMatch.rider_confirmed)
+                      span Waiting for the other person to confirm...
+                    else
+                      button.btn.btn-light.btn-block(disabled, style="color: black !important;")
+                        i.fas.fa-check
+                        = ' Trip Confirmed'
+                .row
+                  .col
+                    button.btn.btn-block.btn-warning(type="button" data-toggle="modal" data-target="#rejectModal")
+                      i.fas.fa-sync-alt
+                      = ' Reject Match'
 
+  .row
+    .col
+      p If you need to change details of your trip, click "Cancel Trip" and request another trip with the corrected details.
+
+  .row
+    -
+      let currentUserRequestID = null
+      if (driverRequest.member_id == currentUser.id) {
+        currentUserRequestID = driverRequest.id
+      } else if (riderRequest.member_id == currentUser.id) {
+        currentUserRequestID = riderRequest.id
+      }
+    if currentUserRequestID
+      .col.mb-2
+        form#cancel-trip-form(method="POST" action=`/trip-requests/${currentUserRequestID}/cancel`)
+          button.btn.btn-danger(role="submit")
+            i.fas.fa-times
+            = ' Cancel Trip'
+  hr.my-3
   .row
     .col-12.col-lg-6
       .row
@@ -89,56 +170,6 @@ block content
     .col
       h5= `Trip date range: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
 
-  hr.my-4
-  .row
-    .col-12.col-sm-4.col-lg-3.col-xl-2.mb-2
-      if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
-        form(method="POST" action=`/trips/${tripMatch.id}/confirm`)
-          button.btn.btn-block.btn-success(role="submit")
-            i.fas.fa-check
-            = ' Confirm Trip'
-      else if (!tripMatch.driver_confirmed || !tripMatch.rider_confirmed)
-        span Waiting for the other person to confirm...
-      else
-        span
-          i.fas.fa-check
-          = ' Trip Confirmed'
-
-    .col-12.col-sm-4.col-lg-3.col-xl-2.mb-2
-      button.btn.btn-block.btn-warning(type="button" data-toggle="modal" data-target="#rejectModal")
-        i.fas.fa-sync-alt
-        = ' Reject Match'
-
-    -
-      let currentUserRequestID = null
-      if (driverRequest.member_id == currentUser.id) {
-        currentUserRequestID = driverRequest.id
-      } else if (riderRequest.member_id == currentUser.id) {
-        currentUserRequestID = riderRequest.id
-      }
-
-    if currentUserRequestID
-      .col-12.col-sm-4.col-lg-3.col-xl-2.mb-2
-        form#cancel-trip-form(method="POST" action=`/trip-requests/${currentUserRequestID}/cancel`)
-          button.btn.btn-block.btn-danger(role="submit")
-            i.fas.fa-times
-            = ' Cancel Trip'
-
-    .col-12.col-md-6
-      p
-        = 'You\'ve been matched! Contact '
-        = otherUser.preferred_name || otherUser.first_name
-        = ' and make sure that both of you can agree on '
-        | when you will leave (and any other details that concern you).
-      p If everything checks out, click "Confirm Trip" to finalize the match.
-      p
-        | If you're unable to agree on something, or don't want to ride with this person,
-        | click "Reject Match" and indicate a reason (so that we can most efficiently find
-        | you another match).
-      p
-        | If you need to change details like when you are travelling or where you are travelling
-        | to, click "Cancel Trip" and request another trip with the corrected details.
-
   .modal.fade#rejectModal(
     tabindex="-1"
     role="dialog"
@@ -170,6 +201,31 @@ block content
           .modal-footer
             button.btn.btn-secondary(type="button" data-dismiss="modal") Cancel
             button.btn.btn-primary(type="submit") Confirm
+
+  .modal.fade#confirmModal(
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="confirmModalLabel"
+    aria-hidden="true"
+  )
+    .modal-dialog(role="document")
+      .modal-content
+        form(method="POST" action=`/trips/${tripMatch.id}/confirm`)
+          .modal-header
+            h5.modal-title#confirmModalLabel Confirm Match
+            button.close(type="button" data-dismiss="modal" aria-label="Close")
+              span(aria-hidden="true") &times;
+          .modal-body
+            p Have you contacted the other person and confirmed a date and time to travel?
+            p If you haven't, please contact them first!
+
+          .modal-footer
+            button.btn.btn-danger(type="button" data-dismiss="modal")
+              | I need to contact 
+              = ` ${otherUser.preferred_name || otherUser.first_name}`
+            button.btn.btn-success(type="submit")
+              | I've contacted
+              = ` ${otherUser.preferred_name || otherUser.first_name}`
 
 append scripts
   script(

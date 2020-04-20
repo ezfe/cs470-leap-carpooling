@@ -37,6 +37,8 @@ routes.get('/login', async (req: AuthedReq, res: Response) => {
 })
 
 routes.get('/logout', (req, res) => {
+  setLoggedOut(req)
+
   const casURL = format({
     pathname: 'https://cas.lafayette.edu/cas/logout',
     query: {
@@ -44,8 +46,11 @@ routes.get('/logout', (req, res) => {
     }
   })
 
-  setLoggedOut(req)
-  res.redirect(casURL)
+  if (process.env.CAS_ENABLED === "true") {
+    res.redirect(casURL)
+  } else {
+    res.redirect('/')
+  }
 })
 
 routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
