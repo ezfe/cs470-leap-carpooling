@@ -30,11 +30,11 @@ block content
               | Driver
           .card-body
             .row
-              .col-12.col-sm-3
+              .col-8.offset-2.col-sm-3.offset-sm-0.col-lg-2
                 img.rounded.img-fluid(src='/'+driverProfileImageURL, style="width: 300px;")   
               .col-12.col-sm-9.col-md-7.col-lg-5
                 h5.card-title
-                  = driver.preferred_name || driver.first_name
+                  = `${driver.preferred_name || driver.first_name} ${driver.last_name}`
                 table.table.table-sm.table-bordered
                   tr
                     th(scope="row") Location
@@ -82,7 +82,7 @@ block content
                 img.rounded.img-fluid(src='/'+riderProfileImageURL, style="width: 300px;")   
               .col-12.col-sm-9.col-md-7.col-lg-5
                 h5.card-title
-                  = rider.preferred_name || rider.first_name
+                  = `${rider.preferred_name || rider.first_name} ${rider.last_name}`
                 table.table.table-sm.table-bordered
                   tr
                     th(scope="row") Location
@@ -106,7 +106,7 @@ block content
                     else if (!tripMatch.driver_confirmed || !tripMatch.rider_confirmed)
                       span Waiting for the other person to confirm...
                     else
-                      span
+                      button.btn.btn-light.btn-block(disabled, style="color: black !important;")
                         i.fas.fa-check
                         = ' Trip Confirmed'
                 .row
@@ -117,13 +117,7 @@ block content
 
   .row
     .col
-      p If you are ready to accept this trip, click "Confirm Trip" to finalize the match.
-      p
-        | If you are unhappy with this match
-        | click "Reject Match" and indicate a reason (so that we can most efficiently find
-        | you another match).
-      p
-        | If you need to change details of your trip, click "Cancel Trip" and request another trip with the corrected details.
+      p If you need to change details of your trip, click "Cancel Trip" and request another trip with the corrected details.
 
   .row
     -
