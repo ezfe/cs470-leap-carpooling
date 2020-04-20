@@ -45,8 +45,18 @@ function validateUserRole() {
     }
   }
 }
-
 document.getElementById('drive_button').addEventListener('change', validateUserRole)
+
+function updateDeviationExplanationValidation() {
+  if (document.getElementById('request_form').classList.contains('was-validated')) {
+    if (document.getElementById('deviation_limit').checkValidity()) {
+      document.getElementById('deviation_exp').classList.remove('text-danger')
+    } else {
+      document.getElementById('deviation_exp').classList.add('text-danger')
+    }
+  }
+}
+document.getElementById('deviation_limit').addEventListener('keyup', updateDeviationExplanationValidation)
 
 const options = {
   format: 'mm/dd/yyyy',
@@ -114,4 +124,5 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
   }
   event.target.classList.add('was-validated')
   validateUserRole()
+  updateDeviationExplanationValidation()
 })
