@@ -51,10 +51,9 @@ block content
                 .row.mb-2
                   .col
                     if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
-                      form(method="POST" action=`/trips/${tripMatch.id}/confirm`)
-                        button.btn.btn-block.btn-success(role="button", onclick="if (confirm('Have you contacted XYZ and confirmed this trip?')) { console.log('confirm') } else { alert('Please contact XYZ using their email or phone number shown above, and confirm the dates and times for this trip'); }")
-                          i.fas.fa-check
-                          = ' Confirm Trip'
+                      button.btn.btn-block.btn-success(type="button" data-toggle="modal" data-target="#confirmModal")
+                        i.fas.fa-check
+                        = ' Confirm Trip'
                     else if (!tripMatch.driver_confirmed || !tripMatch.rider_confirmed)
                       span Waiting for the other person to confirm...
                     else
@@ -99,10 +98,9 @@ block content
                 .row.mb-2
                   .col
                     if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
-                      form(method="POST" action=`/trips/${tripMatch.id}/confirm`)
-                        button.btn.btn-block.btn-success(role="button", onclick="if (confirm('Have you contacted XYZ and confirmed this trip?')) { console.log('confirm') } else { alert('Please contact XYZ using their email or phone number shown above, and confirm the dates and times for this trip'); }")
-                          i.fas.fa-check
-                          = ' Confirm Trip'
+                      button.btn.btn-block.btn-success(type="button" data-toggle="modal" data-target="#confirmModal")
+                        i.fas.fa-check
+                        = ' Confirm Trip'
                     else if (!tripMatch.driver_confirmed || !tripMatch.rider_confirmed)
                       span Waiting for the other person to confirm...
                     else
@@ -203,6 +201,31 @@ block content
           .modal-footer
             button.btn.btn-secondary(type="button" data-dismiss="modal") Cancel
             button.btn.btn-primary(type="submit") Confirm
+
+  .modal.fade#confirmModal(
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="confirmModalLabel"
+    aria-hidden="true"
+  )
+    .modal-dialog(role="document")
+      .modal-content
+        form(method="POST" action=`/trips/${tripMatch.id}/confirm`)
+          .modal-header
+            h5.modal-title#confirmModalLabel Confirm Match
+            button.close(type="button" data-dismiss="modal" aria-label="Close")
+              span(aria-hidden="true") &times;
+          .modal-body
+            p Have you contacted the other person and confirmed a date and time to travel?
+            p If you haven't, please contact them first!
+
+          .modal-footer
+            button.btn.btn-danger(type="button" data-dismiss="modal")
+              | I need to contact 
+              = ` ${otherUser.preferred_name || otherUser.first_name}`
+            button.btn.btn-success(type="submit")
+              | I've contacted
+              = ` ${otherUser.preferred_name || otherUser.first_name}`
 
 append scripts
   script(
