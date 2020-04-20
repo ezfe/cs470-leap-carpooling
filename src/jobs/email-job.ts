@@ -10,19 +10,16 @@ export default async function job() {
     .where('rider_confirmed', 'true')
     .where('notification_sent', 'false')
     .whereBetween('first_date', [db.raw('now()'), db.raw(`now() + ('1 DAY'::INTERVAL)`)])
-  // console.log(matchesToNotify)
   for (const match of matchesToNotify) {
     notifyMatch(match)
   }
 }
 
 async function notifyMatch(match : TripMatch) {
-  console.log('notifying match')
   const driverRequest = await db('trip_requests').where({ id: match.driver_request_id }).first<TripRequest>()
   const riderRequest = await db('trip_requests').where({ id: match.rider_request_id }).first<TripRequest>()
   const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
   const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
-  console.log('querying')
   if (driver.allow_notifications) {
     sendTripReminderEmail(driver.preferred_name || driver.first_name, driver.email!, match.first_date, match.last_date, true, 
       rider.preferred_name || rider.first_name, driverRequest.direction, driverRequest.location_description, riderRequest.location_description)
