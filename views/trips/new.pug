@@ -36,15 +36,16 @@ block content
                       | Drive
 
                     label.btn.btn-light.blue-focus
-                      input#drive_button.custom-control-input(
+                      input#ride_button.custom-control-input(
                         type="radio"
                         name="user_role"
                         value="rider"
                         required
                       )
                       | Ride
-
-                      .invalid-feedback Hello
+                  
+                  br
+                  span.small.text-danger#role_invalid(style="display: none;") You must select either driving or riding
 
             hr.my-3
 
@@ -113,6 +114,7 @@ block content
             .form-group.row
               label.col-sm-6.col-form-label
                 | How far can you travel to carpool?
+
               .col-sm-6
                 .input-group
                   input.form-control#deviation_limit(
@@ -124,8 +126,9 @@ block content
                   )
                   .input-group-append
                     span.input-group-text(style="border-radius: 0 0.25rem 0.25rem 0;") Minutes
-                  .invalid-feedback Enter the number of minutes you are willing to travel off your route to find a match
-
+                  .row
+                    .col
+                      span.small(id="deviation_exp") Enter the number of minutes you are willing to travel off your route to find a match
             .form-group.row.mt-5
               .col.text-right
                 button#discard_button(type="button").btn.btn-danger

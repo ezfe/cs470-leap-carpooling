@@ -46,4 +46,5 @@ export interface User {
   profile_image_name?: string | null
   created_at: Date | Raw<any>
   allow_notifications: boolean
+  has_onboarded: boolean
 }

@@ -36,6 +36,28 @@ document.getElementById('discard_button').addEventListener('click', () => {
   }
 })
 
+function validateUserRole() {
+  if (document.getElementById('request_form').classList.contains('was-validated')) {
+    if (document.getElementById('drive_button').checked || document.getElementById('ride_button').checked) {
+      document.getElementById('role_invalid').style.display = 'none'
+    } else {
+      document.getElementById('role_invalid').style.display = null
+    }
+  }
+}
+document.getElementById('drive_button').addEventListener('change', validateUserRole)
+
+function updateDeviationExplanationValidation() {
+  if (document.getElementById('request_form').classList.contains('was-validated')) {
+    if (document.getElementById('deviation_limit').checkValidity()) {
+      document.getElementById('deviation_exp').classList.remove('text-danger')
+    } else {
+      document.getElementById('deviation_exp').classList.add('text-danger')
+    }
+  }
+}
+document.getElementById('deviation_limit').addEventListener('keyup', updateDeviationExplanationValidation)
+
 const options = {
   format: 'mm/dd/yyyy',
   autoclose: true,
@@ -101,4 +123,6 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     alert("Please correct the highlighted errors")
   }
   event.target.classList.add('was-validated')
+  validateUserRole()
+  updateDeviationExplanationValidation()
 })

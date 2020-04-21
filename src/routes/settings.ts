@@ -45,7 +45,8 @@ routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
         preferred_name: validated.preferred_name,
         email: validated.preferred_email,
         phone_number: validated.phone_number,
-        allow_notifications : validated.allow_notifications
+        allow_notifications: validated.allow_notifications,
+        has_onboarded: true
       })
 
       if (validated.allow_notifications) {

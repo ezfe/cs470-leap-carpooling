@@ -4,6 +4,7 @@ import { AuthedReq } from '../utils/authed_req'
 
 export async function authenticateUser(req: AuthedReq, res: Response, next: NextFunction) {
   const user = await getUserByID(req?.session?.userID)
+
   req.user = user
   if (user) {
     res.locals.currentUser = user
@@ -26,6 +27,13 @@ export function requireAuthenticated(req: AuthedReq, res: Response, next: NextFu
 
     res.redirect('/sessions/login?forwarding=t')
   } else {
+    if (req.originalUrl.indexOf('onboard') < 0
+        && !req.user.has_onboarded) {
+
+      res.redirect('/settings/onboard')
+      return
+    }
+
     next()
   }
 }
