@@ -73,3 +73,23 @@
     background-color: #1f2d3b;
   }
 }
+
+/** Footer-related styles **/
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 90px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px;
+  color: white;
+  background-color: var(--dark-blue);
+}
