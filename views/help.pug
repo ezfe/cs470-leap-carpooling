@@ -49,7 +49,7 @@ block content
             .card
               .card-header.p-1
                 h2.mb-0
-                  button.btn.btn-block.shadow_none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionFour")
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionFour")
                     i.fas.fa-plus.mr-2
                     | I just got matched, what do I do now?
               .div.collapse#questionFour(data-parent="#faq")
@@ -58,6 +58,29 @@ block content
                   | We make sure to match you with someone who is traveling your way on a day you are available - it's up to
                   | you to determine a departure time (and location, if necessary)! Use the contact information in the details of
                   | your trip to contact your match and make sure you're on the same page, then press confirm.
+            .card
+              .card-header.p-1
+                h2.mb-0
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionFive")
+                    i.fas.fa-plus.mr-2
+                    | Who will see my personal information?
+              .div.collapse#questionFive(data-parent="#faq")
+                .card-body
+                  p.mb-0
+                  | We only share your contact details (phone number, email, location, photo) with people you have matched with.
+                  | If you reject a match or cancel a trip, the other person will no longer have access to your information.
+            .card
+              .card-header.p-1
+                h2.mb-0
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="questionSix")
+                    i.fas.fa-plus.mr-2
+                    | How do I change an aspect of my trip?
+              .div.collapse#questionSix(data-parent="#faq")
+                .card-body
+                  p.mb-0
+                  | Because changing an aspect of your trip might change who is an eligible match, you'll need to navigate to
+                  | your dashboard and cancel the trip in question. Then, submit a new trip request with the correct details
+                  | and we'll match you with someone who has a compatible request.
       .card
         .card-body.m-2
           h3.card-title Contact Us
@@ -75,6 +98,7 @@ block content
                   type=preferredEmail.type
                   autocomplete=preferredEmail.type
                   maxlength=preferredEmail.max
+                  placeholder='Email'
                 )
                 .invalid-feedback Enter a valid email address
             .row
