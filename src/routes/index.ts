@@ -6,6 +6,7 @@ import sessions from './sessions'
 import settings from './settings'
 import tripRequestDetail from './trip-requests/detail'
 import trips from './trips'
+import help from './help'
 
 const routes = Router()
 
@@ -15,6 +16,7 @@ routes.use('/trips', requireAuthenticated, trips)
 routes.use('/trip-requests/:requestID', requireAuthenticated, tripRequestDetail)
 routes.use('/sessions', sessions)
 routes.use('/settings', requireAuthenticated, settings)
+routes.use('/help', help)
 
 // This would be the home page
 routes.get('/', async (req: AuthedReq, res: Response) => {
