@@ -6,41 +6,55 @@ block navbar_settings
 block content
   .row
     .col-12.col-lg-10.offset-lg-1
-      h2.mb-3 FAQ
-      .accordion#faq
-        .card
-          .card-header.p-1
-            h2.mb-0
-              button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionOne")
-                i.fas.fa-plus.mr-2
-                | What if I don't want to ride with the person I matched with?
-          .div.collapse#questionOne(data-parent="#faq")
-            .card-body
-              p.mb-0 Hello this is the body
-        .card
-          .card-header.p-1
-            h2.mb-0
-              button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionTwo")
-                i.fas.fa-plus.mr-2
-                | What if I accidentally block a person I don't mind riding with?
-          .div.collapse#questionTwo(data-parent="#faq")
-            .card-body
-              p.mb-0 Hello this is the answer
-        .card
-          .card-header.p-1
-            h2.mb-0
-              button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionThree")
-                i.fas.fa-plus.mr-2
-                | I still don't have a trip match, what's going on?
-          .div.collapse#questionThree(data-parent="#faq")
-            .card-body
-              p.mb-0 This is the answer you seek
-        .card
-          .card-header.p-1
-            h2.mb-0
-              button.btn.btn-block.shadow_none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionFour")
-                i.fas.fa-plus.mr-2
-                | I just got matched, what do I do now?
-          .div.collapse#questionFour(data-parent="#faq")
-            .card-body
-              p.mb-0 This is another great answer
+      .card
+        .card-body.m-2
+          h2.card-title.mb-4 Frequently Asked Questions
+          .accordion#faq
+            .card
+              .card-header.p-1
+                h2.mb-0
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionOne")
+                    i.fas.fa-plus.mr-2
+                    | What if I don't want to ride with the person I matched with?
+              .div.collapse#questionOne(data-parent="#faq")
+                .card-body
+                  p.mb-0 
+                  | We understand that there might be a variety of reasons why you might not want to ride with whoever you are matched with. Navigate
+                  | to your Dashboard and click into the trip details for the trip in question. From here, click reject match, then note
+                  | your reason for rejecting the match. If you select the 'Do not want to ride with this person' option, you won't match with this
+                  | person for this trip or future trips. If you select a different option, we'll just stop you from matching with this person for
+                  | this trip. Don't worry, the other person won't know why you rejected the match!
+            .card
+              .card-header.p-1
+                h2.mb-0
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionTwo")
+                    i.fas.fa-plus.mr-2
+                    | What if I accidentally block a person I don't mind riding with?
+              .div.collapse#questionTwo(data-parent="#faq")
+                .card-body
+                  p.mb-0 
+                  | No problem! Simply navigate to your settings and find your blocked users list at the bottom of the page.
+                  | Click "Unblock" on the person you want to be able to match with in the future.
+            .card
+              .card-header.p-1
+                h2.mb-0
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionThree")
+                    i.fas.fa-plus.mr-2
+                    | I still don't have a trip match, what's going on?
+              .div.collapse#questionThree(data-parent="#faq")
+                .card-body
+                  p.mb-0 
+                  | It could be that there is no other user along your route to match you with. To increase your chances of
+                  | finding a match, try increasing your deviation limit or the time range in which you are able to travel.
+            .card
+              .card-header.p-1
+                h2.mb-0
+                  button.btn.btn-block.shadow_none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionFour")
+                    i.fas.fa-plus.mr-2
+                    | I just got matched, what do I do now?
+              .div.collapse#questionFour(data-parent="#faq")
+                .card-body
+                  p.mb-0 
+                  | We make sure to match you with someone who is traveling your way on a day you are available - it's up to
+                  | you to determine a departure time (and location, if necessary)! Use the contact information in the details of
+                  | your trip to contact your match and make sure you're on the same page, then press confirm.
