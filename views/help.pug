@@ -2,3 +2,45 @@ extends base.pug
 
 block navbar_settings
   - var current_page = "help"
+
+block content
+  .row
+    .col-12.col-lg-10.offset-lg-1
+      h2.mb-3 FAQ
+      .accordion#faq
+        .card
+          .card-header.p-1
+            h2.mb-0
+              button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionOne")
+                i.fas.fa-plus.mr-2
+                | What if I don't want to ride with the person I matched with?
+          .div.collapse#questionOne(data-parent="#faq")
+            .card-body
+              p.mb-0 Hello this is the body
+        .card
+          .card-header.p-1
+            h2.mb-0
+              button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionTwo")
+                i.fas.fa-plus.mr-2
+                | What if I accidentally block a person I don't mind riding with?
+          .div.collapse#questionTwo(data-parent="#faq")
+            .card-body
+              p.mb-0 Hello this is the answer
+        .card
+          .card-header.p-1
+            h2.mb-0
+              button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionThree")
+                i.fas.fa-plus.mr-2
+                | I still don't have a trip match, what's going on?
+          .div.collapse#questionThree(data-parent="#faq")
+            .card-body
+              p.mb-0 This is the answer you seek
+        .card
+          .card-header.p-1
+            h2.mb-0
+              button.btn.btn-block.shadow_none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionFour")
+                i.fas.fa-plus.mr-2
+                | I just got matched, what do I do now?
+          .div.collapse#questionFour(data-parent="#faq")
+            .card-body
+              p.mb-0 This is another great answer
