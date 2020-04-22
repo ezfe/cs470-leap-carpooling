@@ -1,6 +1,7 @@
 import { Response, Router } from 'express'
 import { AuthedReq } from '../utils/authed_req'
 import { preferredEmail } from '../validation'
+import { sendMessage } from '../utils/emails'
 
 const routes = Router()
 
@@ -10,6 +11,7 @@ routes.get('/', async (req: AuthedReq, res: Response) => {
 })
 
 routes.post('/', async (req: AuthedReq, res: Response) => {
+  sendMessage(req.body.email, req.body.subject, req.body.message)
   res.redirect('/help')
 })
 
