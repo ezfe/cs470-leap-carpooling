@@ -18,6 +18,17 @@ if (!process.env.SESSION_SECRET) {
   console.log('Set SESSION_SECRET=(SOME RANDOM SECRET VALUE) in .env!')
   process.exit(1)
 }
+
+if (!process.env.CONTACT_EMAIL || !process.env.SITE_NAME) {
+  console.log('Set CONTACT_EMAIL and SITE_NAME in .env!')
+  process.exit(1)
+}
+
+if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) {
+  console.log('Set SENDINBLUE_EMAIL and SENDINBLUE_PASSWORD in .env!')
+  process.exit(1)
+}
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
