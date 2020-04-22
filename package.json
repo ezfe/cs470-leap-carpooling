@@ -8,7 +8,7 @@
     "tsc": "tsc",
     "node": "node .",
     "start": "npm-run-all tsc node",
-    "lint": "tslint --fix",
+    "lint": "eslint . --ext .ts",
     "migrate:make": "knex migrate:make",
     "migrate:latest": "knex migrate:latest"
   },

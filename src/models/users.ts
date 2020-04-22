@@ -32,6 +32,14 @@ async function getUserByField(field: string, value: number | string): Promise<Us
   return user || null
 }
 
+export function getPreferredFirstName(user: User): string {
+  return user.preferred_name || user.first_name
+}
+
+export function getEmail(user: User): string {
+  return user.email || `${user.netid}@lafayette.edu`
+}
+
 export interface User {
   id: number
   netid: string

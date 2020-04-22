@@ -27,7 +27,7 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
     const deviationLimit = parseInt(deviationLimitString, 10)
     console.log(deviationLimit)
 
-    await db<TripRequest>('trip_requests').insert({
+    const requests = await db<TripRequest>('trip_requests').insert({
         member_id: req.user?.id,
         role: req.body.user_role,
         location: req.body.place_id,
@@ -37,17 +37,11 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
         first_date: req.body.first_date,
         last_date: req.body.last_date,
         created_at: db.fn.now()
-      })
-
-    if (req.user?.allow_notifications) {
-      sendTripProcessingEmail(
-        req.user.preferred_name || req.user.first_name,
-        req.user.email || `${req.user.netid}@lafayette.edu`,
-        req.body.trip_direction,
-        req.body.location_description,
-        req.body.first_date,
-        req.body.last_date
-      )
+      }).returning("*")
+    
+    const tripRequest = requests[0]
+    if (req.user.allow_notifications) {
+      sendTripProcessingEmail(req.user, tripRequest)
     }
 
     await sampleJob()

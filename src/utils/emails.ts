@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer'
+import { User, getPreferredFirstName, getEmail } from '../models/users';
+import { TripRequest } from '../models/trip_requests';
 
 const transporter = nodemailer.createTransport({
   service: 'SendInBlue',
@@ -26,25 +28,34 @@ export async function sendWelcomeEmail(name: string, email: string) {
 /**
  * Send a given user a trip processing email in response to making a trip request.
  */
-export async function sendTripProcessingEmail(
-  name: string,
-  email: string,
-  tripDirection: string,
-  location: string,
-  firstDate: Date,
-  lastDate: Date) {
+export async function sendTripProcessingEmail(user: User, tripRequest: TripRequest) {
+  if (!(tripRequest.first_date instanceof Date && tripRequest.last_date instanceof Date)) {
+    console.error("Trip request dates weren't the right type")
+    console.error(typeof tripRequest.first_date, typeof tripRequest.last_date)
+    return
+  }
+  
+  const firstDateString = prettyDate(tripRequest.first_date)
+  const lastDateString = prettyDate(tripRequest.last_date)
 
-  const firstDateString = prettyDate(firstDate)
-  const lastDateString = prettyDate(lastDate)
-
-  let message = `Hello ${name}, <br><br> Thanks for submitting a trip request! We have you travelling`
-      message += (tripDirection == 'to_lafayette') ? ` to Lafayette College from ${location}` : ` from Lafayette College to ${location}`
-      message += (firstDateString == lastDateString) ? ` on ${firstDateString}. ` : ` sometime between ${firstDateString} and ${lastDateString}. `
+  let message = `Hello ${getPreferredFirstName(user)},`
+      message += '<br><br>'
+      message += 'Thanks for submitting a trip request! We have you travelling'
+      if (tripRequest.direction == 'towards_lafayette') {
+        message += ` to Lafayette College from ${tripRequest.location_description}`
+      } else {
+        message += ` from Lafayette College to ${tripRequest.location_description}`
+      }
+      if (firstDateString == lastDateString) {
+        message += ` on ${firstDateString}. `
+      } else {
+        message += ` sometime between ${firstDateString} and ${lastDateString}. `
+      }
       message += `We'll let you know once we've found you someone to ride with! <br><br> The LEAP Lifts Team`
 
   await transporter.sendMail({
     from: '"LEAP Lifts" <leaplifts@gmail.com>',
-    to: email,
+    to: getEmail(user),
     subject: "Trip Request Processing",
     html: message
   });
