@@ -129,7 +129,8 @@ block content
               td
                 a(href=`mailto:${email}`)= email
               td
-                a.btn.btn-link(href='#') Unblock
+                form#unblock-form(method="POST" action=`/UnblockUser/details/unblock`)
+                  button.btn.btn-danger(role="submit" ) Unblock
         
 
   script(
