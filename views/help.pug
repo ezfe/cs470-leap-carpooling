@@ -1,0 +1,169 @@
+extends base.pug
+
+block navbar_settings
+  - var current_page = "help"
+
+block content
+  .row
+    .col-12.col-lg-10.offset-lg-1
+      .alert.alert-success.alert-dismissible.fade.show(role="alert" style=`display:${alertDisplay}`) Message sent! We'll get back to you soon!
+        button.close(data-dismiss="alert" type="button")
+          span(aria-hidden="true") &times;
+      .card.mb-4
+        .card-body.m-2
+          h3.card-title.mb-4 Frequently Asked Questions
+          .accordion#faq
+            .card
+              .card-header.p-1#questionOne
+                h2.mb-0
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(
+                    data-toggle="collapse" 
+                    data-target="#answerOne" 
+                    aria-expanded="false" 
+                    aria-controls="answerOne"
+                  )
+                    i.fas.fa-plus.mr-2
+                    | What if I don't want to ride with the person I matched with?
+              .div.collapse#answerOne(data-parent="#faq" aria-labelledby="questionOne")
+                .card-body
+                  p.mb-0 
+                  | We understand that there might be a variety of reasons why you might not want to ride with whoever you are matched with. Navigate
+                  | to your Dashboard and click into the trip details for the trip in question. From here, click reject match, then note
+                  | your reason for rejecting the match. If you select the 'Do not want to ride with this person' option, you won't match with this
+                  | person for this trip or future trips. If you select a different option, we'll just stop you from matching with this person for
+                  | this trip. Don't worry, the other person won't know why you rejected the match!
+            .card
+              .card-header.p-1#questionTwo
+                h2.mb-0
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(
+                    data-toggle="collapse" 
+                    data-target="#answerTwo" 
+                    aria-expanded="false" 
+                    aria-controls="answerTwo"
+                  )
+                    i.fas.fa-plus.mr-2
+                    | What if I accidentally block a person I don't mind riding with?
+              .div.collapse#answerTwo(data-parent="#faq" aria-labelledby="questionTwo")
+                .card-body
+                  p.mb-0 
+                  | No problem! Simply navigate to your settings and find your blocked users list at the bottom of the page.
+                  | Click "Unblock" on the person you want to be able to match with in the future.
+            .card
+              .card-header.p-1#questionThree
+                h2.mb-0
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(
+                    data-toggle="collapse" 
+                    data-target="#answerThree" 
+                    aria-expanded="false" 
+                    aria-controls="answerThree"
+                  )
+                    i.fas.fa-plus.mr-2
+                    | I still don't have a trip match, what's going on?
+              .div.collapse#answerThree(data-parent="#faq" aria-labelledby="questionThree")
+                .card-body
+                  p.mb-0 
+                  | It could be that there is no other user along your route to match you with. To increase your chances of
+                  | finding a match, try increasing your deviation limit or the time range in which you are able to travel.
+            .card
+              .card-header.p-1#questionFour
+                h2.mb-0
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(
+                    data-toggle="collapse" 
+                    data-target="#answerFour" 
+                    aria-expanded="false" 
+                    aria-controls="answerFour"
+                  )
+                    i.fas.fa-plus.mr-2
+                    | I just got matched, what do I do now?
+              .div.collapse#answerFour(data-parent="#faq" aria-labelledby="questionFour")
+                .card-body
+                  p.mb-0 
+                  | We make sure to match you with someone who is traveling your way on a day you are available - it's up to
+                  | you to determine a departure time (and location, if necessary)! Use the contact information in the details of
+                  | your trip to contact your match and make sure you're on the same page, then press confirm.
+            .card
+              .card-header.p-1#questionFive
+                h2.mb-0
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(
+                    data-toggle="collapse" 
+                    data-target="#answerFive" 
+                    aria-expanded="false" 
+                    aria-controls="answerFive"
+                  )
+                    i.fas.fa-plus.mr-2
+                    | Who will see my personal information?
+              .div.collapse#answerFive(data-parent="#faq" aria-labelledby="questionFive")
+                .card-body
+                  p.mb-0
+                  | We only share your contact details (phone number, email, location, photo) with people you have matched with.
+                  | If you reject a match or cancel a trip, the other person will no longer have access to your information.
+            .card
+              .card-header.p-1#questionSix
+                h2.mb-0
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(
+                    data-toggle="collapse" 
+                    data-target="#answerSix" 
+                    aria-expanded="false" 
+                    aria-controls="answerSix"
+                  )
+                    i.fas.fa-plus.mr-2
+                    | How do I change an aspect of my trip?
+              .div.collapse#answerSix(data-parent="#faq" aria-labelledby="questionSix")
+                .card-body
+                  p.mb-0
+                  | Because changing an aspect of your trip might change who is an eligible match, you'll need to navigate to
+                  | your dashboard and cancel the trip in question. Then, submit a new trip request with the correct details
+                  | and we'll match you with someone who has a compatible request.
+      .card
+        .card-body.m-2
+          h3.card-title Contact Us
+          h6.card-subtitle.mb-4.text-muted Can't find what you're looking for? Send us a message!
+          form#email_form(method="POST" novalidate)
+            .row
+              .col
+                h6.font-weight-bold From
+            .row.mb-4
+              .col-lg-6
+                input.form-control(
+                  name="email"
+                  id="email"
+                  value=userEmail
+                  type=preferredEmail.type
+                  autocomplete=preferredEmail.type
+                  maxlength=preferredEmail.max
+                  placeholder='Email'
+                  required
+                )
+                .invalid-feedback Enter a valid email address
+            .row
+              .col
+                h6.font-weight-bold Subject
+            .row.mb-4
+              .col-lg-6
+                input.form-control(
+                  name="subject"
+                  id="subject"
+                  required
+                )
+                .invalid-feedback Fill out this field
+            .row
+              .col
+                h6.font-weight-bold How can we help?
+            .row.mb-4
+              .col
+                textarea.form-control(
+                  name="message"
+                  id="message"
+                  rows=3
+                  required
+                )
+                .invalid-feedback Fill out this field
+            .row
+              .col
+                button.btn.btn-primary(type="submit") Send Message
+  
+  script(
+    type="module",
+    src="/static/js/help.js"
+  )
+

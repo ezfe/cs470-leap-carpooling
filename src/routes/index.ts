@@ -6,6 +6,7 @@ import sessions from './sessions'
 import settings from './settings'
 import tripRequestDetail from './trip-requests/detail'
 import trips from './trips'
+import help from './help'
 import unblockUser from './unblock-user'
 
 const routes = Router()
@@ -16,6 +17,7 @@ routes.use('/trips', requireAuthenticated, trips)
 routes.use('/trip-requests/:requestID', requireAuthenticated, tripRequestDetail)
 routes.use('/sessions', sessions)
 routes.use('/settings', requireAuthenticated, settings)
+routes.use('/help', help)
 routes.use('/unblock-user/:userId', requireAuthenticated, unblockUser)
 
 // This would be the home page

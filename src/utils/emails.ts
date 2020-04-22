@@ -11,6 +11,18 @@ const transporter = nodemailer.createTransport({
 })
 
 /**
+ * Allow users to send a message to LEAP.
+ */
+export async function sendMessage(email: string, subject: string, message: string) {
+  await transporter.sendMail({
+    from: email,
+    to: 'leaplifts@gmail.com',
+    subject: subject,
+    text: message
+  });
+}
+
+/**
  * Send a given user a welcome email.
  */
 export async function sendWelcomeEmail(name: string, email: string) {
