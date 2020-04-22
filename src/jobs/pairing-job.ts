@@ -167,7 +167,7 @@ async function matchFirstPair(pairs: PricedPair[]) {
   const { driver_request_id, rider_request_id, firstPortion, first_date, last_date } = pairs[0]
 
   try {
-    await db<TripMatch>('trip_matches')
+    const matches = await db<TripMatch>('trip_matches')
       .insert({
         driver_request_id,
         rider_request_id,
@@ -178,25 +178,23 @@ async function matchFirstPair(pairs: PricedPair[]) {
         first_portion: firstPortion,
         created_at: db.fn.now(),
         notification_sent: false
-      })
+      }).returning('*')
+    const tripMatch = matches[0]
 
     if (!(first_date instanceof Date && last_date instanceof Date)) {
       console.error(`${first_date} is not a date?`)
       return
     }
 
-
     const driverRequest = await db('trip_requests').where({ id: driver_request_id }).first<TripRequest>()
     const riderRequest = await db('trip_requests').where({ id: rider_request_id }).first<TripRequest>()
     const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
     const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
     if (driver.allow_notifications) {
-      sendTripMatchEmail(driver.preferred_name || driver.first_name, driver.email || `${driver.netid}@lafayette.edu`, true, rider.preferred_name || rider.first_name, rider.last_name,
-        driverRequest.direction, driverRequest.location_description, riderRequest.location_description, first_date, last_date)
+      sendTripMatchEmail(driver, tripMatch, driverRequest, riderRequest, rider)
     }
     if (rider.allow_notifications) {
-      sendTripMatchEmail(rider.preferred_name || rider.first_name, rider.email || `${rider.netid}@lafayette.edu`, false, driver.preferred_name || driver.first_name, driver.last_name,
-        driverRequest.direction, driverRequest.location_description, riderRequest.location_description, first_date, last_date)
+      sendTripMatchEmail(rider, tripMatch, driverRequest, riderRequest, driver)
     }
 
     return

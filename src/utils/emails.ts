@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer'
 import { User, getPreferredFirstName, getEmail } from '../models/users';
 import { TripRequest } from '../models/trip_requests';
+import { TripMatch } from '../models/trip_matches';
 
 const transporter = nodemailer.createTransport({
   service: 'SendInBlue',
@@ -81,33 +82,53 @@ export async function sendTripProcessingEmail(user: User, tripRequest: TripReque
   });
 }
 
+/**
+ * Send a email confirming a trip match
+ * @param user The user to email
+ * @param tripMatch The match that was found
+ * @param driverRequest The driver's request
+ * @param riderRequest The rider's request
+ * @param otherUser The other user in the match
+ */
 export async function sendTripMatchEmail(
-  name: string,
-  email: string,
-  driver: boolean,
-  passengerFirstName: string,
-  passengerLastName: string,
-  trip_direction: string,
-  driverLocation: string,
-  riderLocation: string,
-  firstDate: Date,
-  lastDate: Date) {
+  user: User,
+  tripMatch: TripMatch,
+  driverRequest: TripRequest,
+  riderRequest: TripRequest,
+  otherUser: User) {
 
-  const firstDateString = prettyDate(firstDate)
-  const lastDateString = prettyDate(lastDate)
+  // To assure the database actually gave us a date!
+  if (!(driverRequest.first_date instanceof Date && driverRequest.last_date instanceof Date)) {
+    console.error("Trip request dates weren't the right type")
+    console.error(typeof driverRequest.first_date, typeof driverRequest.last_date)
+    return
+  }
 
-  let message = `Hello ${name}, <br><br> We found you a `
-      message += (driver) ? `rider! You will be driving ${passengerFirstName} ${passengerLastName}` : 
-      `driver! ${passengerFirstName} ${passengerLastName} will be driving you`
-      message += (trip_direction == 'to_lafayette') ? 
-      ` to Lafayette College from ${riderLocation} on the way from ${driverLocation}`  : 
-      ` from Lafayette College to ${riderLocation} on the way to ${driverLocation}`
+  const isDriver = driverRequest.member_id == user.id
+  const tripDirection = driverRequest.direction
+
+  const firstDateString = prettyDate(driverRequest.first_date)
+  const lastDateString = prettyDate(driverRequest.last_date)
+
+  let message = `Hello ${getPreferredFirstName(user)},`
+      message += '<br><br>'
+      message += 'We found you a '
+      if (isDriver) {
+        message += `rider! You will be driving ${getPreferredFirstName(otherUser)} ${otherUser.last_name}`
+      } else {
+        message += `driver! ${getPreferredFirstName(otherUser)} ${otherUser.last_name} will be driving you`
+      }
+      if (tripDirection == 'towards_lafayette') {
+        message += ` to Lafayette College from ${riderRequest.location_description} on the way from ${driverRequest.location}`
+      } else {
+        message += ` from Lafayette College to ${riderRequest.location} on the way to ${driverRequest.location}`
+      }
       message += (firstDateString == lastDateString) ? ` on ${firstDateString}. ` : ` sometime between ${firstDateString} and ${lastDateString}. `
       message += 'Please login to LEAP Lifts to confirm or reject your trip. <br><br> The LEAP Lifts Team'
 
   await transporter.sendMail({
     from: '"LEAP Lifts" <leaplifts@gmail.com>',
-    to: email,
+    to: getEmail(user),
     subject: "Trip Match Found",
     html: message
   });
