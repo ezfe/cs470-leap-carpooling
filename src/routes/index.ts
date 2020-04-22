@@ -23,6 +23,7 @@ routes.get('/', async (req: AuthedReq, res: Response) => {
   res.render('homepage')
 })
 routes.get('/about', async (req: AuthedReq, res: Response) => {
-  res.render('about')
+  const email = process.env.CONTACT_EMAIL
+  res.render('about', { email })
 })
 export default routes
