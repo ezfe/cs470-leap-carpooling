@@ -6,6 +6,9 @@ block navbar_settings
 block content
   .row
     .col-12.col-lg-10.offset-lg-1
+      .alert.alert-success.alert-dismissible.fade.show(role="alert" style=`display:${alertDisplay}`) Message sent! We'll get back to you soon!
+        button.close(data-dismiss="alert" type="button")
+          span(aria-hidden="true") &times;
       .card.mb-4
         .card-body.m-2
           h3.card-title.mb-4 Frequently Asked Questions
@@ -99,6 +102,7 @@ block content
                   autocomplete=preferredEmail.type
                   maxlength=preferredEmail.max
                   placeholder='Email'
+                  required
                 )
                 .invalid-feedback Enter a valid email address
             .row
@@ -109,6 +113,7 @@ block content
                 input.form-control(
                   name="subject"
                   id="subject"
+                  required
                 )
                 .invalid-feedback Fill out this field
             .row
@@ -120,9 +125,16 @@ block content
                   name="message"
                   id="message"
                   rows=3
+                  minlength=15
+                  required
                 )
                 .invalid-feedback Lengthen this text to at least 15 characters
             .row
               .col
                 button.btn.btn-primary(type="submit") Send Message
+  
+  script(
+    type="module",
+    src="/static/js/help.js"
+  )
 
