@@ -98,17 +98,16 @@ export async function sendTripMatchEmail(
   otherUser: User) {
 
   // To assure the database actually gave us a date!
-  if (!(driverRequest.first_date instanceof Date && driverRequest.last_date instanceof Date)) {
+  if (!(tripMatch.first_date instanceof Date && tripMatch.last_date instanceof Date)) {
     console.error("Trip request dates weren't the right type")
-    console.error(typeof driverRequest.first_date, typeof driverRequest.last_date)
+    console.error(typeof tripMatch.first_date, typeof tripMatch.last_date)
     return
   }
+  const firstDateString = prettyDate(tripMatch.first_date)
+  const lastDateString = prettyDate(tripMatch.last_date)
 
   const isDriver = driverRequest.member_id == user.id
   const tripDirection = driverRequest.direction
-
-  const firstDateString = prettyDate(driverRequest.first_date)
-  const lastDateString = prettyDate(driverRequest.last_date)
 
   let message = `Hello ${getPreferredFirstName(user)},`
       message += '<br><br>'
@@ -136,21 +135,39 @@ export async function sendTripMatchEmail(
 
 /**
  * Send a given user an email once both members of a match have confirmed a trip.
+ * @param user The user to email
+ * @param otherUser The other user in the match
+ * @param tripMatch The match
+ * @param userRequest The user's request
+ * @param otherUserRequest The other user's request
  */
 export async function sendTripConfirmationEmail(
-  name: string, email: string, location: string, passengerName: string, passengerLocation: string, firstDate, lastDate) { 
-  firstDate = prettyDate(new Date(firstDate)) 
-  lastDate = prettyDate(new Date(lastDate))
-  let message = `Hello ${name}, <br><br> Both you and ${passengerName} have confirmed your trip.
+  user: User,
+  otherUser: User,
+  tripMatch: TripMatch,
+  userRequest: TripRequest,
+  otherUserRequest: TripRequest) { 
+
+  // To assure the database actually gave us a date!
+  if (!(tripMatch.first_date instanceof Date && tripMatch.last_date instanceof Date)) {
+    console.error("Trip request dates weren't the right type")
+    console.error(typeof tripMatch.first_date, typeof tripMatch.last_date)
+    return
+  }
+  const firstDateString = prettyDate(tripMatch.first_date)
+  const lastDateString = prettyDate(tripMatch.last_date)
+
+  let message = `Hello ${getPreferredFirstName(user)},
+                <br><br> Both you and ${getPreferredFirstName(otherUser)} have confirmed your trip.
                 Here are your trip details: <br>
-                Your location: ${location} <br>
-                ${passengerName}'s location: ${passengerLocation} <br>`
-      message += (firstDate == lastDate) ? `Date: ${firstDate}` : `Date Range: ${firstDate} to ${lastDate}`
+                Your location: ${userRequest.location_description} <br>
+                ${getPreferredFirstName(otherUser)}'s location: ${otherUserRequest.location_description} <br>`
+      message += (firstDateString == lastDateString) ? `Date: ${firstDateString}` : `Date Range: ${firstDateString} to ${lastDateString}`
       message += '<br><br> The LEAP Lifts Team'
   
   await transporter.sendMail({
     from: '"LEAP Lifts" <leaplifts@gmail.com>',
-    to: email,
+    to: getEmail(user),
     subject: "Trip Confirmation",
     html: message
   });

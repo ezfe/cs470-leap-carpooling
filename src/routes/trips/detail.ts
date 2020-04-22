@@ -133,12 +133,22 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
         const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
 
         if (req.user.allow_notifications) {
-          sendTripConfirmationEmail(req.user.preferred_name || req.user.first_name, req.user.email || `${req.user.netid}@lafayette.edu`, driverRequest.location_description,
-            rider.preferred_name || rider.first_name, riderRequest.location_description, tripMatch.first_date, tripMatch.last_date)
+          sendTripConfirmationEmail(
+            req.user,
+            rider,
+            tripMatch,
+            riderRequest,
+            driverRequest
+          )
         }
         if (rider.allow_notifications) {
-          sendTripConfirmationEmail(rider.preferred_name || rider.first_name, rider.email || `${rider.netid}@lafayette.edu`, riderRequest.location_description,
-            req.user.preferred_name || req.user.first_name, driverRequest.location_description, tripMatch.first_date, tripMatch.last_date)
+          sendTripConfirmationEmail(
+            rider,
+            req.user,
+            tripMatch,
+            riderRequest,
+            driverRequest
+          )
         }
       }
     } else if (req.user.id === riderRequest.member_id) {
@@ -151,18 +161,21 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
 
         if (req.user.allow_notifications) {
           sendTripConfirmationEmail(
-            req.user.preferred_name || req.user.first_name,
-            req.user.email || `${req.user.netid}@lafayette.edu`,
-            riderRequest.location_description,
-            driver.preferred_name || driver.first_name,
-            driverRequest.location_description,
-            tripMatch.first_date,
-            tripMatch.last_date
+            req.user,
+            driver,
+            tripMatch,
+            riderRequest,
+            driverRequest
           )
         }
         if (driver.allow_notifications) {
-          sendTripConfirmationEmail(driver.preferred_name || driver.first_name, driver.email || `${driver.netid}@lafayette.edu`, driverRequest.location_description,
-            req.user.preferred_name || req.user.first_name, riderRequest.location_description, tripMatch.first_date, tripMatch.last_date)
+          sendTripConfirmationEmail(
+            driver,
+            req.user,
+            tripMatch,
+            riderRequest,
+            driverRequest
+          )
         }
       }
     } else {
