@@ -14,12 +14,17 @@ block content
           h3.card-title.mb-4 Frequently Asked Questions
           .accordion#faq
             .card
-              .card-header.p-1
+              .card-header.p-1#questionOne
                 h2.mb-0
-                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionOne")
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(
+                    data-toggle="collapse" 
+                    data-target="#answerOne" 
+                    aria-expanded="false" 
+                    aria-controls="answerOne"
+                  )
                     i.fas.fa-plus.mr-2
                     | What if I don't want to ride with the person I matched with?
-              .div.collapse#questionOne(data-parent="#faq")
+              .div.collapse#answerOne(data-parent="#faq" aria-labelledby="questionOne")
                 .card-body
                   p.mb-0 
                   | We understand that there might be a variety of reasons why you might not want to ride with whoever you are matched with. Navigate
@@ -28,57 +33,82 @@ block content
                   | person for this trip or future trips. If you select a different option, we'll just stop you from matching with this person for
                   | this trip. Don't worry, the other person won't know why you rejected the match!
             .card
-              .card-header.p-1
+              .card-header.p-1#questionTwo
                 h2.mb-0
-                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionTwo")
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(
+                    data-toggle="collapse" 
+                    data-target="#answerTwo" 
+                    aria-expanded="false" 
+                    aria-controls="answerTwo"
+                  )
                     i.fas.fa-plus.mr-2
                     | What if I accidentally block a person I don't mind riding with?
-              .div.collapse#questionTwo(data-parent="#faq")
+              .div.collapse#answerTwo(data-parent="#faq" aria-labelledby="questionTwo")
                 .card-body
                   p.mb-0 
                   | No problem! Simply navigate to your settings and find your blocked users list at the bottom of the page.
                   | Click "Unblock" on the person you want to be able to match with in the future.
             .card
-              .card-header.p-1
+              .card-header.p-1#questionThree
                 h2.mb-0
-                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionThree")
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(
+                    data-toggle="collapse" 
+                    data-target="#answerThree" 
+                    aria-expanded="false" 
+                    aria-controls="answerThree"
+                  )
                     i.fas.fa-plus.mr-2
                     | I still don't have a trip match, what's going on?
-              .div.collapse#questionThree(data-parent="#faq")
+              .div.collapse#answerThree(data-parent="#faq" aria-labelledby="questionThree")
                 .card-body
                   p.mb-0 
                   | It could be that there is no other user along your route to match you with. To increase your chances of
                   | finding a match, try increasing your deviation limit or the time range in which you are able to travel.
             .card
-              .card-header.p-1
+              .card-header.p-1#questionFour
                 h2.mb-0
-                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionFour")
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(
+                    data-toggle="collapse" 
+                    data-target="#answerFour" 
+                    aria-expanded="false" 
+                    aria-controls="answerFour"
+                  )
                     i.fas.fa-plus.mr-2
                     | I just got matched, what do I do now?
-              .div.collapse#questionFour(data-parent="#faq")
+              .div.collapse#answerFour(data-parent="#faq" aria-labelledby="questionFour")
                 .card-body
                   p.mb-0 
                   | We make sure to match you with someone who is traveling your way on a day you are available - it's up to
                   | you to determine a departure time (and location, if necessary)! Use the contact information in the details of
                   | your trip to contact your match and make sure you're on the same page, then press confirm.
             .card
-              .card-header.p-1
+              .card-header.p-1#questionFive
                 h2.mb-0
-                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="#questionFive")
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(
+                    data-toggle="collapse" 
+                    data-target="#answerFive" 
+                    aria-expanded="false" 
+                    aria-controls="answerFive"
+                  )
                     i.fas.fa-plus.mr-2
                     | Who will see my personal information?
-              .div.collapse#questionFive(data-parent="#faq")
+              .div.collapse#answerFive(data-parent="#faq" aria-labelledby="questionFive")
                 .card-body
                   p.mb-0
                   | We only share your contact details (phone number, email, location, photo) with people you have matched with.
                   | If you reject a match or cancel a trip, the other person will no longer have access to your information.
             .card
-              .card-header.p-1
+              .card-header.p-1#questionSix
                 h2.mb-0
-                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(data-toggle="collapse" data-target="questionSix")
+                  button.btn.btn-block.shadow-none.text-left.font-weight-bold(
+                    data-toggle="collapse" 
+                    data-target="#answerSix" 
+                    aria-expanded="false" 
+                    aria-controls="answerSix"
+                  )
                     i.fas.fa-plus.mr-2
                     | How do I change an aspect of my trip?
-              .div.collapse#questionSix(data-parent="#faq")
+              .div.collapse#answerSix(data-parent="#faq" aria-labelledby="questionSix")
                 .card-body
                   p.mb-0
                   | Because changing an aspect of your trip might change who is an eligible match, you'll need to navigate to
