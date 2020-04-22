@@ -6,12 +6,14 @@ import tripDetail from './detail'
 import tripCreation from './new'
 import { TripRequest } from '../../models/trip_requests'
 
+
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
 const routes = Router()
 
 routes.use('/new', tripCreation)
 routes.use('/:tripId/', tripDetail)
+
 
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   try {

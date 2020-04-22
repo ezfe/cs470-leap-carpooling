@@ -7,6 +7,7 @@ import settings from './settings'
 import tripRequestDetail from './trip-requests/detail'
 import trips from './trips'
 import help from './help'
+import unblockUser from './unblock-user'
 
 const routes = Router()
 
@@ -17,12 +18,14 @@ routes.use('/trip-requests/:requestID', requireAuthenticated, tripRequestDetail)
 routes.use('/sessions', sessions)
 routes.use('/settings', requireAuthenticated, settings)
 routes.use('/help', help)
+routes.use('/unblock-user/:userId', requireAuthenticated, unblockUser)
 
 // This would be the home page
 routes.get('/', async (req: AuthedReq, res: Response) => {
   res.render('homepage')
 })
 routes.get('/about', async (req: AuthedReq, res: Response) => {
-  res.render('about')
+  const email = process.env.CONTACT_EMAIL
+  res.render('about', { email })
 })
 export default routes

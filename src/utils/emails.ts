@@ -3,8 +3,8 @@ import nodemailer from 'nodemailer'
 const transporter = nodemailer.createTransport({
   service: 'SendInBlue',
   auth: {
-    user: 'leaplifts@gmail.com',
-    pass: 'qW4NAZ6TKaSdBsMJ'
+    user: process.env.SENDINBLUE_EMAIL,
+    pass: process.env.SENDINBLUE_PASSWORD
   }
 })
 

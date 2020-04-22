@@ -22,30 +22,29 @@ block content
 
           form#request_form(method="POST" novalidate)
             .form-group.row
-              label.col-sm-2.col-form-label I want to...
+              label.col-auto.col-form-label I want to...
               .col
-                .custom-control.custom-radio
-                  .btn-group.btn-group-toggle(data-toggle="buttons")
-                    label.btn.btn-light.blue-focus
-                      input#drive_button.custom-control-input(
-                        type="radio"
-                        name="user_role"
-                        value="driver"
-                        required
-                      )
-                      | Drive
+                .btn-group.btn-group-toggle(data-toggle="buttons")
+                  label.btn.btn-light.blue-focus
+                    input#drive_button.custom-control-input(
+                      type="radio"
+                      name="user_role"
+                      value="driver"
+                      required
+                    )
+                    | Drive
 
-                    label.btn.btn-light.blue-focus
-                      input#ride_button.custom-control-input(
-                        type="radio"
-                        name="user_role"
-                        value="rider"
-                        required
-                      )
-                      | Ride
-                  
-                  br
-                  span.small.text-danger#role_invalid(style="display: none;") You must select either driving or riding
+                  label.btn.btn-light.blue-focus
+                    input#ride_button.custom-control-input(
+                      type="radio"
+                      name="user_role"
+                      value="rider"
+                      required
+                    )
+                    | Ride
+                
+                br
+                span.small.text-danger#role_invalid(style="display: none;") You must select either driving or riding
 
             hr.my-3
 
