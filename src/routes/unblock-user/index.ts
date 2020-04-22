@@ -6,21 +6,13 @@ const routes = Router({ mergeParams: true })
 
 routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
-    const id = parseInt(req.params.requestID, 10)
-  
-    console.log("we inn")
-    console.log(id)
-    const blocked = await db('pair_rejections').where({ id }).first()
-    console.log("this si blocked")
-    console.log(blocked)
-    // if (!tripRequest) {
-    //   res.sendStatus(404)
-    //   return
-    // }
+    const id = req.params.userId
+    const blockedid = await db('users').select('id').where('netid', id )
+    const blockeeid = blockedid[0].id
+    const currentUser = req.user.id
+    await db('pair_rejections').where('blockee_id',blockeeid).where('blocker_id', currentUser).del()
 
-    await db('pair_rejections').where('id', blocked.id).del()
-
-     res.redirect('/trips?delete=success')
+     res.redirect('../settings')
   } catch (err) {
     console.error(err)
     res.render('database-error')

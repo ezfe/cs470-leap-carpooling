@@ -16,7 +16,7 @@ routes.use('/trips', requireAuthenticated, trips)
 routes.use('/trip-requests/:requestID', requireAuthenticated, tripRequestDetail)
 routes.use('/sessions', sessions)
 routes.use('/settings', requireAuthenticated, settings)
-routes.use('/unblock-user', requireAuthenticated, unblockUser)
+routes.use('/unblock-user/:userId', requireAuthenticated, unblockUser)
 
 // This would be the home page
 routes.get('/', async (req: AuthedReq, res: Response) => {
