@@ -1,7 +1,8 @@
 import { Response, Router } from 'express'
 import db from '../../db'
+import sampleJob from '../../jobs/pairing-job'
 import { TripRequest } from '../../models/trip_requests'
-import { AuthedReq } from '../../utils/authed_req'
+import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripProcessingEmail } from '../../utils/emails'
 
 const routes = Router()
@@ -14,22 +15,19 @@ routes.get('/', (req: AuthedReq, res: Response) => {
     return
   }
 
-  const defaultDeviationLimit = req.user?.deviation_limit
-
   res.render('trips/new', {
-    googleMapsAPIKey,
-    defaultDeviationLimit
+    googleMapsAPIKey
   })
 })
 
 // POST /trips/new
-routes.post('/', async (req: AuthedReq, res: Response) => {
+routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const deviationLimitString = req.body.deviation_limit
     const deviationLimit = parseInt(deviationLimitString, 10)
     console.log(deviationLimit)
 
-    await db<TripRequest>('trip_requests').insert({
+    const requests = await db<TripRequest>('trip_requests').insert({
         member_id: req.user?.id,
         role: req.body.user_role,
         location: req.body.place_id,
@@ -39,12 +37,14 @@ routes.post('/', async (req: AuthedReq, res: Response) => {
         first_date: req.body.first_date,
         last_date: req.body.last_date,
         created_at: db.fn.now()
-      })
-
-    if (req.user?.allow_notifications) {
-      sendTripProcessingEmail(req.user?.preferred_name || req.user?.first_name!, req.user?.email!, 
-        req.body.trip_direction, req.body.location_description, req.body.first_date, req.body.last_date)
+      }).returning("*")
+    
+    const tripRequest = requests[0]
+    if (req.user.allow_notifications) {
+      sendTripProcessingEmail(req.user, tripRequest)
     }
+
+    await sampleJob()
 
     res.redirect('/trips')
   } catch (err) {

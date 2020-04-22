@@ -38,23 +38,18 @@ routes.get('/login', async (req: AuthedReq, res: Response) => {
 
 routes.get('/logout', (req, res) => {
   setLoggedOut(req)
-  res.redirect('/')
-})
 
-routes.post('/login', async (req: AuthedReq, res: Response) => {
-  const user = await getUserByID(req.body.chosen_user)
-  if (user) {
-    setLoggedInAs(req, user)
-
-    if (req.session?.loginRedirect) {
-      res.redirect(req.session.loginRedirect)
-      delete req.session.loginRedirect
-      return
+  const casURL = format({
+    pathname: 'https://cas.lafayette.edu/cas/logout',
+    query: {
+        service
     }
+  })
 
-    res.redirect('/')
+  if (process.env.CAS_ENABLED === "true") {
+    res.redirect(casURL)
   } else {
-    res.send('User not found')
+    res.redirect('/')
   }
 })
 
@@ -63,7 +58,7 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
     pathname: 'https://cas.lafayette.edu/cas/p3/serviceValidate',
     query: {
         service,
-        ticket: req.query.ticket
+        ticket: req.query.ticket as string
     }
   })
 
@@ -140,21 +135,41 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
   return
 })
 
-// POST /sessions/create-user
-routes.post('/create-user', async (req: AuthedReq, res: Response) => {
-  try {
-    await db<User>('users').insert({
-        netid: req.body.netid,
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
-        created_at: db.fn.now()
-      })
-    const user = await getUserByNetID(req.body.netid)
-    setLoggedInAs(req, user)
-    res.redirect('/')
-  } catch (err) {
-    res.render('database-error')
-  }
-})
+if (process.env.CAS_ENABLED !== "true") {
+  // POST /sessions/login
+  routes.post('/login', async (req: AuthedReq, res: Response) => {
+    const user = await getUserByID(req.body.chosen_user)
+    if (user) {
+      setLoggedInAs(req, user)
+
+      if (req.session?.loginRedirect) {
+        res.redirect(req.session.loginRedirect)
+        delete req.session.loginRedirect
+        return
+      }
+
+      res.redirect('/')
+    } else {
+      res.send('User not found')
+    }
+  })
+
+  // POST /sessions/create-user
+  routes.post('/create-user', async (req: AuthedReq, res: Response) => {
+    try {
+      await db<User>('users').insert({
+          netid: req.body.netid,
+          first_name: req.body.first_name,
+          last_name: req.body.last_name,
+          created_at: db.fn.now()
+        })
+      const user = await getUserByNetID(req.body.netid)
+      setLoggedInAs(req, user)
+      res.redirect('/')
+    } catch (err) {
+      res.render('database-error')
+    }
+  })
+}
 
 export default routes

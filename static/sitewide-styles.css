@@ -44,6 +44,12 @@
   text-decoration: none;
 }
 
+.active.blue-focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 .2rem rgba(0,123,255,.25);
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     background-color: #343a40;
@@ -66,4 +72,23 @@
   .navbar {
     background-color: #1f2d3b;
   }
+}
+
+/** Footer-related styles **/
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 80px;
+}
+
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  color: white;
+  background-color: var(--dark-blue);
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Raw } from "knex";
 import { TripDirection, UserRole } from "./misc_types";
 

@@ -23,7 +23,7 @@ block content
           form#onboard_form(method="POST" novalidate)
             .row.mb-2
               .col
-                h4 Enter your preferred first name
+                h4 Preferred first name
             .row.mb-5
               .col
                 input.form-control(
@@ -31,49 +31,52 @@ block content
                   id="preferred_name"
                   value=(currentUser.preferred_name || currentUser.first_name)
                   type="text"
-                  pattern="[^0-9_!¡?÷?¿/\\\\+=@#$%ˆ&*(){}|~<>;:[\\]]{2,}"
-                  autocomplete="given-name"
-                  required
-                  maxlength=100
+                  pattern=constraints.preferredName.pattern.source
+                  autocomplete=constraints.preferredName.autocomplete
+                  minlength=constraints.preferredName.min
+                  maxlength=constraints.preferredName.max
                 )
-                .invalid-feedback Please enter your preferred first name
+                .invalid-feedback Enter your preferred first name
             .row.mb-2
               .col
-                h4 Enter your preferred email
+                h4 Preferred email
             .row.mb-5
               .col
                 input.form-control(
                   name="preferred_email"
                   id="preferred_email"
                   value=(currentUser.email || `${currentUser.netid}@lafayette.edu`)
-                  required
-                  type="email"
-                  autocomplete="email"
-                  maxlength=100
+                  type=constraints.preferredEmail.type
+                  autocomplete=constraints.preferredEmail.type
+                  maxlength=constraints.preferredEmail.max
                 )
-                .invalid-feedback Please enter a valid email address
+                .invalid-feedback Enter a valid email address
             .row.mb-2
               .col
-                h4 Enter your phone number
+                h4 Phone number
             .row.mb-4
               .col
                 input.form-control(
                   name= "phone_number"
                   id="phone_number"
                   value=currentUser.phone_number
-                  required
                   type="text"
-                  pattern="\\d{10}"
+                  required
+                  pattern=constraints.phoneNumber.pattern.source
                   autocomplete="tel"
-                  maxlength=30
+                  maxlength=constraints.phoneNumber.max
+                  minlength=constraints.phoneNumber.min
                 )
-                .invalid-feedback Please enter a valid phone number
+                .invalid-feedback Enter a phone number in the format (800)123-5678
+                                  
             .row.mb-4
               .col
                 .custom-control.custom-checkbox
-                  input(type="checkbox", name="allow_notifications_box", class="custom-control-input", id="notifications_checkbox", 
-                    checked=currentUser.allow_notifications, onchange="setCheckboxValue(event)")
-                  input#allow_notifications_field(type="hidden", name="allow_notifications", value=currentUser.allow_notifications)
+                  input.custom-control-input#notifications_checkbox(
+                    type="checkbox"
+                    name="allow_notifications"
+                    checked=currentUser.allow_notifications
+                  )
                   label.custom-control-label(for="notifications_checkbox") Allow LEAP Lifts to send email notifications
             .row
               .col.text-center

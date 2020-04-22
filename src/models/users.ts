@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import db from '../db'
 import { Raw } from 'knex'
 import { Request } from 'express'
@@ -31,6 +32,14 @@ async function getUserByField(field: string, value: number | string): Promise<Us
   return user || null
 }
 
+export function getPreferredFirstName(user: User): string {
+  return user.preferred_name || user.first_name
+}
+
+export function getEmail(user: User): string {
+  return user.email || `${user.netid}@lafayette.edu`
+}
+
 export interface User {
   id: number
   netid: string
@@ -46,4 +55,5 @@ export interface User {
   profile_image_name?: string | null
   created_at: Date | Raw<any>
   allow_notifications: boolean
+  has_onboarded: boolean
 }

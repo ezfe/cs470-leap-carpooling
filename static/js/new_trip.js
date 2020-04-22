@@ -1,19 +1,6 @@
-import { setClicked, setUnclicked } from './button_clicks.js'
 import registerAutocomplete from './location_autocomplete.js'
 
 const formSync = registerAutocomplete('location_field', 'place_id_field')
-
-function clickRoleButton(event) {
-  for (const button of document.getElementsByClassName('role_button')) {
-    setUnclicked(button)
-  }
-  setClicked(event.target)
-  document.getElementById('user_role').value = event.target.value
-}
-
-for (const button of document.getElementsByClassName('role_button')) {
-  button.addEventListener('click', clickRoleButton) 
-}
 
 document.getElementById('reverse_locations').addEventListener('click', (event) => {
   const tripDirectionInput = document.getElementById('trip_direction')
@@ -48,6 +35,28 @@ document.getElementById('discard_button').addEventListener('click', () => {
     location.href = "/trips"
   }
 })
+
+function validateUserRole() {
+  if (document.getElementById('request_form').classList.contains('was-validated')) {
+    if (document.getElementById('drive_button').checked || document.getElementById('ride_button').checked) {
+      document.getElementById('role_invalid').style.display = 'none'
+    } else {
+      document.getElementById('role_invalid').style.display = null
+    }
+  }
+}
+document.getElementById('drive_button').addEventListener('change', validateUserRole)
+
+function updateDeviationExplanationValidation() {
+  if (document.getElementById('request_form').classList.contains('was-validated')) {
+    if (document.getElementById('deviation_limit').checkValidity()) {
+      document.getElementById('deviation_exp').classList.remove('text-danger')
+    } else {
+      document.getElementById('deviation_exp').classList.add('text-danger')
+    }
+  }
+}
+document.getElementById('deviation_limit').addEventListener('keyup', updateDeviationExplanationValidation)
 
 const options = {
   format: 'mm/dd/yyyy',
@@ -108,17 +117,12 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
     otherOverride = true
   }
 
-  // Check User Role
-  const userRoleValue = document.getElementById('user_role').value
-  if (['driver', 'rider'].indexOf(userRoleValue) < 0) {
-    alert('Must select whether you\'re driving or riding')
-    otherOverride = true
-  }
-
   if (!event.target.checkValidity() || otherOverride) {
     event.preventDefault()
     event.stopPropagation()
     alert("Please correct the highlighted errors")
   }
   event.target.classList.add('was-validated')
+  validateUserRole()
+  updateDeviationExplanationValidation()
 })
