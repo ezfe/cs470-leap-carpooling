@@ -23,14 +23,15 @@ export async function sendMessage(email: string, subject: string, message: strin
 }
 
 /**
- * Send a given user a welcome email.
+ * Send a user a welcome email
+ * @param user The user to send the email to
  */
-export async function sendWelcomeEmail(name: string, email: string) {
+export async function sendWelcomeEmail(user: User) {
   await transporter.sendMail({
     from: '"LEAP Lifts" <leaplifts@gmail.com>',
-    to: email,
+    to: getEmail(user),
     subject: "Welcome to LEAP Lifts",
-    html: `Hello ${name}, <br><br>
+    html: `Hello ${getPreferredFirstName(user)}, <br><br>
           Thanks for signing up for LEAP Lifts! To get started, visit your dashboard and create a trip request.
           First, we'll match you with another student along your route, then we'll ask for confirmation from both
           of you before confirming your ride. <br><br> Hope to see you soon! <br><br> The LEAP Lifts Team`
@@ -38,9 +39,12 @@ export async function sendWelcomeEmail(name: string, email: string) {
 }
 
 /**
- * Send a given user a trip processing email in response to making a trip request.
+ * Send a user a trip processing email after they make a request
+ * @param user The user to email
+ * @param tripRequest The request information
  */
 export async function sendTripProcessingEmail(user: User, tripRequest: TripRequest) {
+  // To assure the database actually gave us a date!
   if (!(tripRequest.first_date instanceof Date && tripRequest.last_date instanceof Date)) {
     console.error("Trip request dates weren't the right type")
     console.error(typeof tripRequest.first_date, typeof tripRequest.last_date)

@@ -40,7 +40,7 @@ routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
   try {
     const validated = await onboardSchema.validateAsync(req.body)
 
-    await db<User>('users').where({ id: req.user.id })
+    const users = await db<User>('users').where({ id: req.user.id })
       .update({
         preferred_name: validated.preferred_name,
         email: validated.preferred_email,
@@ -48,10 +48,13 @@ routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
         allow_notifications: validated.allow_notifications,
         has_onboarded: true
       })
+      .returning("*")
+    
+    const newUser = users[0]
 
-      if (validated.allow_notifications) {
-        sendWelcomeEmail(validated.preferred_name || req.user.first_name, validated.preferred_email || req.user.email)
-      }
+    if (validated.allow_notifications) {
+      sendWelcomeEmail(newUser)
+    }
 
     res.redirect('/')
   } catch (err) {
