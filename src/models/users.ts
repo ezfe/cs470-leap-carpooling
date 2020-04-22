@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import db from '../db'
 import { Raw } from 'knex'
 import { Request } from 'express'

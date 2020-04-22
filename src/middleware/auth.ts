@@ -1,5 +1,5 @@
+import { NextFunction, Response } from 'express'
 import { getUserByID } from '../models/users'
-import { Request, Response, NextFunction } from 'express'
 import { AuthedReq } from '../utils/authed_req'
 
 export async function authenticateUser(req: AuthedReq, res: Response, next: NextFunction) {

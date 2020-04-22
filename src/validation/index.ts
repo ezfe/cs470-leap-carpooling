@@ -4,7 +4,7 @@ export const preferredName = {
   autocomplete: 'given-name',
   min: 2,
   max: 100,
-  pattern: /[^0-9_!¡?÷?¿/\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}/
+  pattern: /[^0-9_!¡?÷?¿/+=@#$%ˆ&*(){}|~<>;:[\]]{2,}/
 }
 
 export const preferredEmail = {
@@ -12,7 +12,7 @@ export const preferredEmail = {
 }
 
 export const phoneNumber = {
-  pattern: /\+?[0-9\(\) -]{10,}/,
+  pattern: /\+?[0-9() -]{10,}/,
   min: 10,
   max: 30
 }

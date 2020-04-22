@@ -83,6 +83,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       return
     }
 
+    // eslint-disable-next-line no-inner-declarations
     function descriptionFor(placeID) {
       return (driverRequest.location === placeID) ? driverRequest.location_description : ((riderRequest.location === placeID) ? riderRequest.location_description : 'Lafayette College')
     }
@@ -132,11 +133,11 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
         const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
 
         if (req.user.allow_notifications) {
-          sendTripConfirmationEmail(req.user.preferred_name || req.user.first_name, req.user.email!, driverRequest.location_description,
+          sendTripConfirmationEmail(req.user.preferred_name || req.user.first_name, req.user.email || `${req.user.netid}@lafayette.edu`, driverRequest.location_description,
             rider.preferred_name || rider.first_name, riderRequest.location_description, tripMatch.first_date, tripMatch.last_date)
         }
         if (rider.allow_notifications) {
-          sendTripConfirmationEmail(rider.preferred_name || rider.first_name, rider.email!, riderRequest.location_description,
+          sendTripConfirmationEmail(rider.preferred_name || rider.first_name, rider.email || `${rider.netid}@lafayette.edu`, riderRequest.location_description,
             req.user.preferred_name || req.user.first_name, driverRequest.location_description, tripMatch.first_date, tripMatch.last_date)
         }
       }
@@ -151,7 +152,7 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
         if (req.user.allow_notifications) {
           sendTripConfirmationEmail(
             req.user.preferred_name || req.user.first_name,
-            req.user.email!,
+            req.user.email || `${req.user.netid}@lafayette.edu`,
             riderRequest.location_description,
             driver.preferred_name || driver.first_name,
             driverRequest.location_description,
@@ -160,7 +161,7 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
           )
         }
         if (driver.allow_notifications) {
-          sendTripConfirmationEmail(driver.preferred_name || driver.first_name, driver.email!, driverRequest.location_description,
+          sendTripConfirmationEmail(driver.preferred_name || driver.first_name, driver.email || `${driver.netid}@lafayette.edu`, driverRequest.location_description,
             req.user.preferred_name || req.user.first_name, riderRequest.location_description, tripMatch.first_date, tripMatch.last_date)
         }
       }

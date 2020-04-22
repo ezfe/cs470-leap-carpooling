@@ -1,9 +1,9 @@
 import { Response, Router } from 'express'
 import db from '../../db'
-import { TripRequest } from '../../models/trip_requests'
-import { AuthedReq } from '../../utils/authed_req'
-import { sendTripProcessingEmail } from '../../utils/emails'
 import sampleJob from '../../jobs/pairing-job'
+import { TripRequest } from '../../models/trip_requests'
+import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
+import { sendTripProcessingEmail } from '../../utils/emails'
 
 const routes = Router()
 
@@ -21,7 +21,7 @@ routes.get('/', (req: AuthedReq, res: Response) => {
 })
 
 // POST /trips/new
-routes.post('/', async (req: AuthedReq, res: Response) => {
+routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const deviationLimitString = req.body.deviation_limit
     const deviationLimit = parseInt(deviationLimitString, 10)
@@ -41,8 +41,8 @@ routes.post('/', async (req: AuthedReq, res: Response) => {
 
     if (req.user?.allow_notifications) {
       sendTripProcessingEmail(
-        req.user?.preferred_name || req.user?.first_name!,
-        req.user?.email!,
+        req.user.preferred_name || req.user.first_name,
+        req.user.email || `${req.user.netid}@lafayette.edu`,
         req.body.trip_direction,
         req.body.location_description,
         req.body.first_date,
