@@ -7,6 +7,7 @@ import session from 'express-session'
 import { authenticateUser } from './middleware/auth'
 import registerJobs from './jobs'
 
+
 /* Load environment variables from .env file */
 dotenv.config()
 

@@ -4,12 +4,15 @@ import { ReqAuthedReq } from '../../utils/authed_req'
 
 const routes = Router({ mergeParams: true })
 
-routes.post('/unblock', async (req: ReqAuthedReq, res: Response) => {
+routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const id = parseInt(req.params.requestID, 10)
-    console.log("we in")
+  
+    console.log("we inn")
+    console.log(id)
     const blocked = await db('pair_rejections').where({ id }).first()
-
+    console.log("this si blocked")
+    console.log(blocked)
     // if (!tripRequest) {
     //   res.sendStatus(404)
     //   return
