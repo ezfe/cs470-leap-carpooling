@@ -12,11 +12,15 @@ const transporter = nodemailer.createTransport({
 
 /**
  * Allow users to send a message to LEAP.
+ * @param email The email address of the user
+ * @param subject The message subject
+ * @param message The message
  */
-export async function sendMessage(email: string, subject: string, message: string) {
+export async function sendMessage(userEmail: string, subject: string, message: string) {
   await transporter.sendMail({
-    from: email,
+    from: 'leaplifts@gmail.com',
     to: 'leaplifts@gmail.com',
+    replyTo: userEmail,
     subject: subject,
     text: message
   });
