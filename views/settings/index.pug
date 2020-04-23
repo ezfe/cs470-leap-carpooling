@@ -10,13 +10,22 @@ block content
           form#photo_form(method="POST", action="/settings/upload-image", enctype="multipart/form-data")
             .row.mb-4
               .col.text-center
-                a.btn.btn-dark.ml-2.mt-2(id="exitButton", href="/settings/remove-profile-image", style="position:absolute; opacity:0.8;")
-                  img(src="/static/exit.svg")
+                a.btn.btn-dark.ml-2.mt-2#exitButton(
+                  href="/settings/remove-profile-image"
+                  style="position:absolute; opacity:0.8; display: none;"
+                )
+                  i.fas.fa-trash.mr-2
+                  | Delete
                 img.rounded.img-fluid(id="uploadedPhoto", src=profileImageURL, style="width: 300px;")   
             .row.mb-4 
               .col.text-center
-                  label.btn.btn-primary Upload Photo
-                    input.form-control(style="display: none;", type="file", name="profile_photo", accept="image/*", onchange="document.getElementById('photo_form').submit()")
+                label.btn.btn-primary Upload Photo
+                  input.form-control#imageInput(
+                    style="display: none;"
+                    type="file"
+                    name="profile_photo"
+                    accept="image/*"
+                  )
         .col-12.col-lg-8
           form#request_form(method="POST" novalidate)
             .row.mb-2

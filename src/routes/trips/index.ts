@@ -1,11 +1,10 @@
 import { Response, Router } from 'express'
 import db from '../../db'
 import { getTripMatches } from '../../models/trip_matches'
+import { TripRequest } from '../../models/trip_requests'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import tripDetail from './detail'
 import tripCreation from './new'
-import { TripRequest } from '../../models/trip_requests'
-
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -14,7 +13,11 @@ const routes = Router()
 routes.use('/new', tripCreation)
 routes.use('/:tripId/', tripDetail)
 
-
+/**
+ * GET /trips
+ * 
+ * The main list of trips the user is a member of
+ */
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const alerts = {
@@ -22,9 +25,12 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       reject: req.query.reject === 'success'
     }
 
-    const matchedRequests = await getTripMatches(req.user)
-    console.log('Found matched requests')
-    console.log(matchedRequests)
+    const pastMatchedRequests = await getTripMatches(req.user, "past")
+    const futureMatchedRequests = await getTripMatches(req.user, "future")
+    console.log('Found past matched requests')
+    console.log(pastMatchedRequests)
+    console.log('Found future matched requests')
+    console.log(futureMatchedRequests)
 
     const unmatchedRequests: TripRequest[] = await db('trip_requests')
       .select(
@@ -35,10 +41,16 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       }).whereNull('trip_matches.id')
       .andWhere('trip_requests.member_id', req.user.id)
 
-    const context = { matchedRequests, unmatchedRequests, alerts }
-    console.log(context)
+    console.log('Found unmatched requests')
+    console.log(unmatchedRequests)
 
-    res.render('trips/index', context)
+    const trips = [
+      ...futureMatchedRequests,
+      ...unmatchedRequests,
+      ...pastMatchedRequests
+    ]
+
+    res.render('trips/index', { trips, alerts })
   } catch (err) {
     console.error(err)
     res.render('database-error')
