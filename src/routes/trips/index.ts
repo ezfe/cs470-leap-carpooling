@@ -6,7 +6,6 @@ import { ReqAuthedReq } from '../../utils/authed_req'
 import tripDetail from './detail'
 import tripCreation from './new'
 
-
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
 const routes = Router()
@@ -14,7 +13,11 @@ const routes = Router()
 routes.use('/new', tripCreation)
 routes.use('/:tripId/', tripDetail)
 
-
+/**
+ * GET /trips
+ * 
+ * The main list of trips the user is a member of
+ */
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const alerts = {
@@ -38,10 +41,16 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       }).whereNull('trip_matches.id')
       .andWhere('trip_requests.member_id', req.user.id)
 
-    const context = { pastMatchedRequests, futureMatchedRequests, unmatchedRequests, alerts }
-    console.log(context)
+    console.log('Found unmatched requests')
+    console.log(unmatchedRequests)
 
-    res.render('trips/index', context)
+    const trips = [
+      ...futureMatchedRequests,
+      ...unmatchedRequests,
+      ...pastMatchedRequests
+    ]
+
+    res.render('trips/index', { trips, alerts })
   } catch (err) {
     console.error(err)
     res.render('database-error')
