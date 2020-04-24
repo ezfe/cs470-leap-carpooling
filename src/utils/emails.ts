@@ -118,9 +118,17 @@ export async function sendTripMatchEmail(
         message += `driver! ${getPreferredFirstName(otherUser)} ${otherUser.last_name} will be driving you`
       }
       if (tripDirection == 'towards_lafayette') {
-        message += ` to Lafayette College from ${riderRequest.location_description} on the way from ${driverRequest.location_description}`
+        if (riderRequest.location_description == driverRequest.location_description) {
+          message += ` to Lafayette College from ${riderRequest.location_description}`
+        } else {
+          message += ` to Lafayette College from ${riderRequest.location_description} on the way from ${driverRequest.location_description}`
+        }
       } else {
-        message += ` from Lafayette College to ${riderRequest.location_description} on the way to ${driverRequest.location_description}`
+        if (riderRequest.location_description == driverRequest.location_description) {
+          message += ` from Lafayette College to ${riderRequest.location_description}`
+        } else {
+          message += ` from Lafayette College to ${riderRequest.location_description} on the way to ${driverRequest.location_description}`
+        }
       }
       message += (firstDateString == lastDateString) ? ` on ${firstDateString}. ` : ` sometime between ${firstDateString} and ${lastDateString}. `
       message += `Please login to ${process.env.SITE_NAME} to confirm or reject your trip. <br><br> The ${process.env.SITE_NAME} Team`
@@ -184,9 +192,19 @@ export async function sendTripReminderEmail(
   let message = `Hello ${name}, <br><br> Your trip with ${passengerName} is coming up `
       message += (firstDate == lastDate) ? `on ${firstDate}! ` : `between ${firstDate} and ${lastDate}! `
       message += (driver) ? `You will be driving ${passengerName} ` : `${passengerName} will be driving you `
-      message += (trip_direction == 'to_lafayette') ? 
-      ` to Lafayette College from ${riderLocation} on the way from ${driverLocation}.`  : 
-      ` from Lafayette College to ${riderLocation} on the way to ${driverLocation}.`
+      if (trip_direction == 'to_lafayette') {
+        if (riderLocation == driverLocation) {
+          message += ` to Lafayette College from ${riderLocation}.`  
+        } else {
+          message += ` to Lafayette College from ${riderLocation} on the way from ${driverLocation}.`  
+        }
+      } else { 
+        if (riderLocation == driverLocation) {
+          message += ` from Lafayette College to ${riderLocation}.`
+        } else {
+          message += ` from Lafayette College to ${riderLocation} on the way to ${driverLocation}.`
+        }
+      }
       message += `<br><br>Thanks for using ${process.env.SITE_NAME}! <br><br> The ${process.env.SITE_NAME} Team`
 
   await transporter.sendMail({
