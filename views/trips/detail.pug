@@ -57,7 +57,7 @@ block content
                     else if (!tripMatch.driver_confirmed || !tripMatch.rider_confirmed)
                       span Waiting for the other person to confirm...
                     else
-                      span
+                      button.btn.btn-light.btn-block(disabled, style="color: black !important;")
                         i.fas.fa-check
                         = ' Trip Confirmed'
                 .row
@@ -168,7 +168,7 @@ block content
   hr.my-4
   .row.mb-2
     .col
-      h5= `Trip date range: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
+      h5= `Common Travel Days: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
   hr.my-4
 
   .modal.fade#rejectModal(

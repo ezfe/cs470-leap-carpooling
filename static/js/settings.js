@@ -2,9 +2,8 @@ import registerAutocomplete from './location_autocomplete.js'
 
 const formSync = registerAutocomplete('location_field', 'place_id_field')
 
-
-if (document.getElementById("uploadedPhoto").src.includes('/static/blank-profile.png')) {
-  document.getElementById("exitButton").style.visibility = "hidden";
+if (!document.getElementById("uploadedPhoto").src.includes('/static/blank-profile.png')) {
+  document.getElementById("exitButton").style.display = null;
 }
 
 function updateDeviationExplanationValidation() {
@@ -18,7 +17,6 @@ function updateDeviationExplanationValidation() {
 }
 document.getElementById('deviation_limit').addEventListener('keyup', updateDeviationExplanationValidation)
 
-
 document.getElementById('request_form').addEventListener('submit', (event) => {
   if (!event.target.checkValidity() || !formSync()) {
     event.preventDefault()
@@ -28,4 +26,8 @@ document.getElementById('request_form').addEventListener('submit', (event) => {
 
   event.target.classList.add('was-validated')
   updateDeviationExplanationValidation()
+})
+
+document.getElementById('imageInput').addEventListener('change', () => {
+  document.getElementById('photo_form').submit()
 })

@@ -1,7 +1,5 @@
 # CS470-LEAP-Carpooling
 
-![Node Linter](https://github.com/ezfe/cs470-leap-carpooling/workflows/Node%20Linter/badge.svg)
-
 ## Setup Instructions
 
 1. Clone the repository
