@@ -1,7 +1,7 @@
 import { Client } from "@googlemaps/google-maps-services-js"
 
 export async function locationCity(place: string): Promise<{city: string}> {
-  const driverBaseCost = await geocode(place)
+  const placeName = await geocode(place)
       return {city:place}
   }
 
