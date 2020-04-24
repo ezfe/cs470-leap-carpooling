@@ -19,6 +19,9 @@ routes.use('/:tripId/', tripDetail)
  * The main list of trips the user is a member of
  */
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
+  const siteName = process.env.SITE_NAME
+  const contactEmail = process.env.CONTACT_EMAIL
+
   try {
     const alerts = {
       delete: req.query.delete === 'success',
@@ -50,7 +53,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       ...pastMatchedRequests
     ]
 
-    res.render('trips/index', { trips, alerts })
+    res.render('trips/index', { siteName, contactEmail, trips, alerts })
   } catch (err) {
     console.error(err)
     res.render('database-error')

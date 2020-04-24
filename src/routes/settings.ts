@@ -25,6 +25,9 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 routes.get('/onboard', (req: ReqAuthedReq, res: Response) => {
+  const contactEmail = process.env.CONTACT_EMAIL
+  const siteName = process.env.SITE_NAME
+
   const profileImageURL = req.user.profile_image_name || 'static/blank-profile.png'
 
   const constraints = {
@@ -33,7 +36,7 @@ routes.get('/onboard', (req: ReqAuthedReq, res: Response) => {
     phoneNumber
   }
 
-  res.render('settings/onboard', { profileImageURL, constraints })
+  res.render('settings/onboard', { contactEmail, siteName, profileImageURL, constraints })
 })
 
 routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
@@ -103,6 +106,9 @@ routes.get('/onboard/remove-profile-image', async (req: ReqAuthedReq, res: Respo
 })
 
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
+  const contactEmail = process.env.CONTACT_EMAIL
+  const siteName = process.env.SITE_NAME
+
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
   if (!googleMapsAPIKey) {
     res.send('GOOGLE_MAPS_PLACES_KEY is unset')
@@ -121,7 +127,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     .where('blocker_id', req.user.id)
     .innerJoin('users', 'users.id', 'pair_rejections.blockee_id')
 
-  res.render('settings/index', { constraints, googleMapsAPIKey, profileImageURL, blockedUsers })
+  res.render('settings/index', { siteName, contactEmail, constraints, googleMapsAPIKey, profileImageURL, blockedUsers })
 })
 
 routes.get('/remove-profile-image', async (req: ReqAuthedReq, res: Response) => {
