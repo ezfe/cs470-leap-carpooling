@@ -119,7 +119,8 @@ block content
                     id="notifications_checkbox", 
                     checked=currentUser.allow_notifications,
                   )
-                  label.custom-control-label(for="notifications_checkbox") Allow LEAP Lifts to send email notifications
+                  label.custom-control-label(for="notifications_checkbox") 
+                  = `Allow ${siteName} to send email notifications`
             .row.mb-2
               .col.text-center
                 button.btn.btn-primary(type="submit") Update

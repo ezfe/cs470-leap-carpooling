@@ -22,10 +22,13 @@ routes.use('/unblock-user/:userId', requireAuthenticated, unblockUser)
 
 // This would be the home page
 routes.get('/', async (req: AuthedReq, res: Response) => {
-  res.render('homepage')
+  const siteName = process.env.SITE_NAME
+  const contactEmail = process.env.CONTACT_EMAIL
+  res.render('homepage', { siteName, contactEmail })
 })
 routes.get('/about', async (req: AuthedReq, res: Response) => {
-  const email = process.env.CONTACT_EMAIL
-  res.render('about', { email })
+  const siteName = process.env.SITE_NAME
+  const contactEmail = process.env.CONTACT_EMAIL
+  res.render('about', { siteName, contactEmail })
 })
 export default routes

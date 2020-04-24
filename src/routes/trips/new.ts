@@ -9,6 +9,8 @@ const routes = Router()
 
 // GET /trips/new
 routes.get('/', (req: AuthedReq, res: Response) => {
+  const siteName = process.env.SITE_NAME
+  const contactEmail = process.env.CONTACT_EMAIL
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
   if (!googleMapsAPIKey) {
     res.send('GOOGLE_MAPS_PLACES_KEY is unset')
@@ -16,7 +18,9 @@ routes.get('/', (req: AuthedReq, res: Response) => {
   }
 
   res.render('trips/new', {
-    googleMapsAPIKey
+    googleMapsAPIKey,
+    siteName,
+    contactEmail
   })
 })
 
