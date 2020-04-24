@@ -7,6 +7,7 @@ import { User } from '../../models/users'
 import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripConfirmationEmail } from '../../utils/emails'
 import { lafayettePlaceID } from '../../utils/places'
+import { locationCity } from '../../utils/geocoding'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -56,24 +57,29 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     let firstPlaceID: string | null = null
     let midPlaceID: string | null = null
     let lastPlaceID: string | null = null
-
+    
     if (driverRequest.direction === 'from_lafayette') {
       firstPlaceID = lafayettePlaceID
       if (tripMatch.first_portion === 'driver') {
+       
         midPlaceID = riderRequest.location
+        console.log( locationCity(midPlaceID));
         lastPlaceID = driverRequest.location
       } else if (tripMatch.first_portion === 'rider') {
         midPlaceID = driverRequest.location
         lastPlaceID = riderRequest.location
+        console.log( locationCity(midPlaceID));
       }
     } else if (driverRequest.direction === 'towards_lafayette') {
       lastPlaceID = lafayettePlaceID
       if (tripMatch.first_portion === 'driver') {
         firstPlaceID = riderRequest.location
         midPlaceID = driverRequest.location
+        console.log( locationCity(midPlaceID));
       } else if (tripMatch.first_portion === 'rider') {
         firstPlaceID = driverRequest.location
         midPlaceID = riderRequest.location
+        console.log( locationCity(midPlaceID));
       }
     }
 
