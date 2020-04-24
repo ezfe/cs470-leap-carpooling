@@ -32,7 +32,12 @@ export interface AnnotatedTripMatch {
   rider_location_description: number
 }
 
-function tripMatchesBuilder(user: User, filter: "past" | "future" | null) {
+export async function getTripMatches(
+                                      user: User,
+                                      filter: "past" | "future" | null,
+                                      actionNeeded: boolean | null
+                                    ): Promise<AnnotatedTripMatch[]> {
+
   const orderByParam = (filter === 'past' ? 'desc' : 'asc')
 
   let query = db('trip_matches')
@@ -70,11 +75,5 @@ function tripMatchesBuilder(user: User, filter: "past" | "future" | null) {
     query = query.andWhere('trip_matches.last_date', '>=', db.fn.now())
   }
 
-  return query
-}
-
-export async function getTripMatches(user: User, filter: "past" | "future" | null): Promise<AnnotatedTripMatch[]> {
-  const tripRequests = await tripMatchesBuilder(user, filter) // .toSQL()
-
-  return tripRequests
+  return await query
 }
