@@ -18,6 +18,8 @@ const transporter = nodemailer.createTransport({
  * @param message The message
  */
 export async function sendMessage(userEmail: string, subject: string, message: string) {
+  if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
+
   await transporter.sendMail({
     from: userEmail,
     to: process.env.CONTACT_EMAIL,
@@ -32,6 +34,8 @@ export async function sendMessage(userEmail: string, subject: string, message: s
  * @param user The user to send the email to
  */
 export async function sendWelcomeEmail(user: User) {
+  if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
+
   await transporter.sendMail({
     from: `"${process.env.SITE_NAME}" <${process.env.CONTACT_EMAIL}>`,
     to: getEmail(user),
@@ -49,6 +53,8 @@ export async function sendWelcomeEmail(user: User) {
  * @param tripRequest The request information
  */
 export async function sendTripProcessingEmail(user: User, tripRequest: TripRequest) {
+  if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
+
   // To assure the database actually gave us a date!
   if (!(tripRequest.first_date instanceof Date && tripRequest.last_date instanceof Date)) {
     console.error("Trip request dates weren't the right type")
@@ -96,6 +102,7 @@ export async function sendTripMatchEmail(
   driverRequest: TripRequest,
   riderRequest: TripRequest,
   otherUser: User) {
+  if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
 
   // To assure the database actually gave us a date!
   if (!(tripMatch.first_date instanceof Date && tripMatch.last_date instanceof Date)) {
@@ -155,6 +162,7 @@ export async function sendTripConfirmationEmail(
   tripMatch: TripMatch,
   userRequest: TripRequest,
   otherUserRequest: TripRequest) { 
+  if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
 
   // To assure the database actually gave us a date!
   if (!(tripMatch.first_date instanceof Date && tripMatch.last_date instanceof Date)) {
@@ -187,6 +195,8 @@ export async function sendTripConfirmationEmail(
 export async function sendTripReminderEmail(
   name: string, email: string, firstDate, lastDate, driver: boolean, passengerName: string, trip_direction: string, 
   driverLocation: string, riderLocation: string) {
+  if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
+  
   firstDate = prettyDate(new Date(firstDate))
   lastDate = prettyDate(new Date(lastDate))
   let message = `Hello ${name}, <br><br> Your trip with ${passengerName} is coming up `
