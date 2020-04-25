@@ -12,8 +12,6 @@ const routes = Router()
 const service = 'https://carpool.cs.lafayette.edu/sessions/handle-ticket'
 
 routes.get('/login', async (req: AuthedReq, res: Response) => {
-  const siteName = process.env.SITE_NAME
-  const contactEmail = process.env.CONTACT_EMAIL
 
   if (req.session?.loginRedirect && !req.query.forwarding) {
     delete req.session.loginRedirect
@@ -32,7 +30,7 @@ routes.get('/login', async (req: AuthedReq, res: Response) => {
     try {
       const users = await db<User>('users')
       const currentUser = req.user
-      res.render('sessions/choose_user', { users, currentUser, siteName, contactEmail })
+      res.render('sessions/choose_user', { users, currentUser })
     } catch (err) {
       res.render('database-error')
     }

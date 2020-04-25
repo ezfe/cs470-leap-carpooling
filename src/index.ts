@@ -5,6 +5,7 @@ import routes from './routes'
 import bodyParser = require('body-parser')
 import session from 'express-session'
 import { authenticateUser } from './middleware/auth'
+import { addVariables } from './middleware/vars'
 import registerJobs from './jobs'
 
 
@@ -40,6 +41,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.use(authenticateUser)
+app.use(addVariables)
 
 app.use('/public/uploads', express.static('public/uploads'));
 
