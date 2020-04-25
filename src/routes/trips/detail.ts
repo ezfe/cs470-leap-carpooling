@@ -8,6 +8,8 @@ import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripConfirmationEmail } from '../../utils/emails'
 import { lafayettePlaceID } from '../../utils/places'
 import { locationCity } from '../../utils/geocoding'
+import { geocode } from '../../utils/geocoding'
+//import { geocode } from '@googlemaps/google-maps-services-js/dist/geocode/geocode'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -57,7 +59,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     let firstPlaceID: string | null = null
     let midPlaceID: string | null = null
     let lastPlaceID: string | null = null
-    
+    geocode(lafayettePlaceID)
     if (driverRequest.direction === 'from_lafayette') {
       firstPlaceID = lafayettePlaceID
       if (tripMatch.first_portion === 'driver') {

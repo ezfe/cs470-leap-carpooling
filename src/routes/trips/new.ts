@@ -4,6 +4,7 @@ import sampleJob from '../../jobs/pairing-job'
 import { TripRequest } from '../../models/trip_requests'
 import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripProcessingEmail } from '../../utils/emails'
+import { locationCity } from '../../utils/geocoding'
 
 const routes = Router()
 
@@ -26,6 +27,9 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
     const deviationLimitString = req.body.deviation_limit
     const deviationLimit = parseInt(deviationLimitString, 10)
     console.log(deviationLimit)
+    const locDict = locationCity(req.body.place_id)
+    console.log(locDict)
+    
 
     const requests = await db<TripRequest>('trip_requests').insert({
         member_id: req.user?.id,
