@@ -80,23 +80,24 @@ block content
   .row
     .col-12.col-lg-6
       .row
-        .col
+        .col.text-center
           h4 Your Trip
       .row
-        .col
+        .col-8.offset-2.text-center
           span= firstPlaceDescription
       .row
-        .col
+        .col-8.offset-2.text-center
           i.fas.fa-arrow-down
+
       if (midPlaceID !== lastPlaceID && midPlaceID !== firstPlaceID)
         .row
-          .col
+          .col-8.offset-2.text-center
             span= midPlaceDescription
         .row
-          .col
+          .col-8.offset-2.text-center
             i.fas.fa-arrow-down
       .row
-        .col
+        .col-8.offset-2.text-center
           span= lastPlaceDescription
 
     //- a.btn.btn-outline-info(
