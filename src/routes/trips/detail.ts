@@ -1,12 +1,16 @@
-import { Response, Router, NextFunction } from 'express'
+import { NextFunction, Response, Router } from 'express'
 import db from '../../db'
 import { PairRejection } from '../../models/pair_rejections'
 import { TripMatch } from '../../models/trip_matches'
 import { TripRequest } from '../../models/trip_requests'
-import { User, getPreferredFirstName } from '../../models/users'
+import { getPreferredFirstName, User } from '../../models/users'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripConfirmationEmail } from '../../utils/emails'
+import {
+  formatLocation
+} from '../../utils/location_formatter'
 import { lafayettePlaceID } from '../../utils/places'
+//import { geocode } from '@googlemaps/google-maps-services-js/dist/geocode/geocode'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -28,7 +32,7 @@ interface MatchRequest extends ReqAuthedReq {
 routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
   try {
     const id = parseInt(req.params.tripId, 10)
-    
+
     const tripMatch = await db('trip_matches').where({ id }).first<TripMatch>()
     if (!tripMatch) {
       res.send(404)
@@ -36,8 +40,12 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
     }
     req.tripMatch = tripMatch
 
-    const driverRequest = await db('trip_requests').where({ id: tripMatch.driver_request_id }).first<TripRequest>()
-    const riderRequest = await db('trip_requests').where({ id: tripMatch.rider_request_id }).first<TripRequest>()
+    const driverRequest = await db('trip_requests')
+      .where({ id: tripMatch.driver_request_id })
+      .first<TripRequest>()
+    const riderRequest = await db('trip_requests')
+      .where({ id: tripMatch.rider_request_id })
+      .first<TripRequest>()
     if (!driverRequest || !riderRequest) {
       console.error('Failed to retrieve requests from a match')
       console.error('This might indicate database issues')
@@ -46,7 +54,7 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
     }
     req.driverRequest = driverRequest
     req.riderRequest = riderRequest
-    
+
     if (req.driverRequest.member_id == req.user.id) {
       req.isDriver = true
     } else if (req.riderRequest.member_id == req.user.id) {
@@ -56,10 +64,18 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
       return
     }
 
-    const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
-    const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
+    const driver = await db('users')
+      .where({ id: driverRequest.member_id })
+      .first<User>()
+    const rider = await db('users')
+      .where({ id: riderRequest.member_id })
+      .first<User>()
     if (!driver || !rider) {
-      console.error(`The driver ${JSON.stringify(driverRequest)} or rider ${JSON.stringify(riderRequest)} requests has invalid members?`)
+      console.error(
+        `The driver ${JSON.stringify(driverRequest)} or rider ${JSON.stringify(
+          riderRequest
+        )} requests has invalid members?`
+      )
       res.sendStatus(500)
       return
     }
@@ -88,8 +104,10 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
       return
     }
 
-    const driverProfileImageURL = req.driver.profile_image_name || 'static/blank-profile.png'
-    const riderProfileImageURL = req.rider.profile_image_name || 'static/blank-profile.png'
+    const driverProfileImageURL =
+      req.driver.profile_image_name || 'static/blank-profile.png'
+    const riderProfileImageURL =
+      req.rider.profile_image_name || 'static/blank-profile.png'
 
     let firstPlaceID: string | null = null
     let midPlaceID: string | null = null
@@ -131,11 +149,75 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
         return 'Lafayette College'
       }
     }
+    let firstPlaceDescription = ''
+    let lastPlaceDescription = ''
+  
+    let changeRider = false
+    let changeDriver = false
+    //if(req.driverRequest.location!=req.riderRequest.location){
+    if (firstPlaceID === lafayettePlaceID) {
+      firstPlaceDescription = descriptionFor(firstPlaceID)
+    } else {
+      if (
+        (req.isDriver &&
+        firstPlaceID == req.riderRequest.location) &&
+        (req.driverRequest.location!=req.riderRequest.location)
+      ) {
+        changeRider = true
+        firstPlaceDescription = await formatLocation(
+          descriptionFor(firstPlaceID),
+          'city'
+        )
+      } else if (
+        (!req.isDriver &&
+        firstPlaceID == req.driverRequest.location) &&
+        (req.driverRequest.location!=req.riderRequest.location)
+      ) {
+        changeDriver = true
+        firstPlaceDescription = await formatLocation(
+          descriptionFor(firstPlaceID),
+          'city'
+        )
+      } else {
+        firstPlaceDescription = await formatLocation(
+          descriptionFor(firstPlaceID),
+          'full'
+        )
+      }
+    }
+  //}
 
-    const firstPlaceDescription = descriptionFor(firstPlaceID)
-    const midPlaceDescription = descriptionFor(midPlaceID)
-    const lastPlaceDescription = descriptionFor(lastPlaceID)
+    const midPlaceDescription = await formatLocation(
+      descriptionFor(midPlaceID),
+      'full'
+    )
 
+    if (lastPlaceID === lafayettePlaceID) {
+      lastPlaceDescription = descriptionFor(lastPlaceID)
+    } else {
+      if ((req.isDriver && lastPlaceID == req.riderRequest.location)&&
+      (req.driverRequest.location!=req.riderRequest.location)) {
+        changeRider = true
+        lastPlaceDescription = await formatLocation(descriptionFor(lastPlaceID), 'city')
+      } else if ((!req.isDriver && lastPlaceID == req.driverRequest.location)&&
+        (req.driverRequest.location!=req.riderRequest.location)) {
+        changeDriver = true
+        lastPlaceDescription = await formatLocation(descriptionFor(lastPlaceID), 'city')
+      } else {
+        lastPlaceDescription = await formatLocation(
+          descriptionFor(lastPlaceID),
+          'full'
+        )
+      }
+    }
+    let otherLoc =""
+    if(changeRider ==true || changeDriver == true)
+    {
+      otherLoc = formatLocation(req.otherUserRequest.location_description,'city')
+    }
+    else{
+      otherLoc = formatLocation(req.otherUserRequest.location_description,'full')
+    }
     res.render('trips/detail', {
       tripMatch: req.tripMatch,
       driverRequest: req.driverRequest,
@@ -154,7 +236,8 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
       lastPlaceDescription,
       driverProfileImageURL,
       riderProfileImageURL,
-      googleMapsAPIKey
+      googleMapsAPIKey,
+      otherLoc
     })
   } catch (err) {
     console.error(err)
@@ -200,20 +283,36 @@ function sendConfirmationEmails(
 routes.post('/confirm', async (req: MatchRequest, res: Response) => {
   try {
     if (req.isDriver) {
-      await db<TripMatch>('trip_matches').update({
-        driver_confirmed: true
-      }).where('id', req.tripMatch.id)
+      await db<TripMatch>('trip_matches')
+        .update({
+          driver_confirmed: true,
+        })
+        .where('id', req.tripMatch.id)
 
       if (req.tripMatch.rider_confirmed) {
-        sendConfirmationEmails(req.tripMatch, req.driver, req.rider, req.driverRequest, req.riderRequest)
+        sendConfirmationEmails(
+          req.tripMatch,
+          req.driver,
+          req.rider,
+          req.driverRequest,
+          req.riderRequest
+        )
       }
     } else {
-      await db<TripMatch>('trip_matches').update({
-        rider_confirmed: true
-      }).where('id', req.tripMatch.id)
+      await db<TripMatch>('trip_matches')
+        .update({
+          rider_confirmed: true,
+        })
+        .where('id', req.tripMatch.id)
 
       if (req.tripMatch.rider_confirmed) {
-        sendConfirmationEmails(req.tripMatch, req.driver, req.rider, req.driverRequest, req.riderRequest)
+        sendConfirmationEmails(
+          req.tripMatch,
+          req.driver,
+          req.rider,
+          req.driverRequest,
+          req.riderRequest
+        )
       }
     }
 
@@ -226,10 +325,14 @@ routes.post('/confirm', async (req: MatchRequest, res: Response) => {
 })
 
 routes.post('/reject', async (req: MatchRequest, res: Response) => {
-  const reasons = ['incompatible-location', 'incompatible-times', 'block-person']
+  const reasons = [
+    'incompatible-location',
+    'incompatible-times',
+    'block-person',
+  ]
   const requestedReason = req.body.blockReason
   if (!requestedReason) {
-    console.error('Block reason wasn\'t provided')
+    console.error("Block reason wasn't provided")
     res.sendStatus(400)
     return
   }
@@ -242,7 +345,7 @@ routes.post('/reject', async (req: MatchRequest, res: Response) => {
 
   await db<PairRejection>('pair_rejections').insert({
     blocker_id: req.user.id,
-    blockee_id: req.otherUser.id
+    blockee_id: req.otherUser.id,
   })
   await db<TripMatch>('trip_matches').where({ id: req.tripMatch.id }).del()
 

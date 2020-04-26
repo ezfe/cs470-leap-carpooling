@@ -4,7 +4,7 @@ block navbar_settings
   - var current_page = "trip_index"
 
 append head
-  link(rel="stylesheet", href="/static/dashboard.css")
+  link(rel="stylesheet", href="/static/css/dashboard.css")
 
 block content
 
@@ -50,16 +50,18 @@ block content
           h5.card-header(class=cardClass)
             i.mr-2(class=`fas ${cardIcon}`)
             = cardTitle
+            if (trip.driver_id == currentUser.id && !trip.driver_confirmed) || (trip.rider_id == currentUser.id && !trip.rider_confirmed)
+              span.float-right.badge.badge-secondary Action Needed
           .card-body
             h5.card-title
               -
                 let currentUserLocationDescription = "unknown"
                 if (isProcessing) {
-                  currentUserLocationDescription = trip.location_description
+                  currentUserLocationDescription = formatLocation(trip.location_description, 'trip_list')
                 } else {
                   currentUserLocationDescription = (trip.driver_id == currentUser.id)
-                    ? trip.driver_location_description
-                    : trip.rider_location_description
+                    ? formatLocation(trip.driver_location_description, 'trip_list')
+                    : formatLocation(trip.rider_location_description, 'trip_list')
                 }
 
               if trip.direction == 'towards_lafayette'

@@ -83,9 +83,8 @@ block content
               .col
                 input.form-control#location_field(
                   type="text"
-                  name="place_name" 
                   required
-                  value=currentUser.default_location_description
+                  value=formattedLocation
                 )
                 input#place_id_field(
                   type="hidden"

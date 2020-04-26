@@ -1,0 +1,14 @@
+.location-box {
+  border-style: solid;
+  border-color: rgba(124, 124, 124, 0.09);
+  padding: 15px 30px;
+  border-radius: 12px;
+}
+
+.location-box.box-shadow-hover {
+  box-shadow: 0 10px 14px rgba(50, 50, 93, 0.18);
+}
+
+.location-box.box-shadow-hover:hover {
+  box-shadow: 0 10px 20px rgba(50, 50, 93, 0.33);
+}

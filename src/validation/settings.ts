@@ -6,7 +6,6 @@ export const settingsSchema = Joi.object({
   phone_number: joiConstraints.phone_number,
   allow_notifications: joiConstraints.allow_notifications,
 
-  place_name: Joi.string(),
   place_id: Joi.string(),
 
   deviation_limit: Joi.number().integer().positive().empty('').default(null),

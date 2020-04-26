@@ -37,4 +37,6 @@ export const joiConstraints = {
     .max(phoneNumber.max),
 
   allow_notifications: Joi.boolean().truthy('on').default(false),
+
+  deviation_limit: Joi.number().integer().positive().empty('').default(null)
 }
