@@ -1,8 +1,19 @@
-export function locationFormatter(locDesc: string): string {
-  const json = JSON.parse(locDesc)
+type FormatOption = 'full' | 'trip_list' | 'city'
 
-  console.log('@@@@@@@@@@@@@')
-  console.log(json)
+export function formatLocation(locationDescription: string, method: FormatOption): string {
+  if (method == 'full') {
+    return locationFormatter(locationDescription)
+  } else if (method == 'city') {
+    return cityFormatter(locationDescription)
+  } else if (method == 'trip_list') {
+    return tripListFormatter(locationDescription)
+  } else {
+    return `Invalid Location Format Method: ${method}`
+  }
+}
+
+function locationFormatter(locDesc: string): string {
+  const json = JSON.parse(locDesc)
 
   let finalAddress = ''
   if (json.street_number) {
@@ -22,7 +33,7 @@ export function locationFormatter(locDesc: string): string {
   return finalAddress
 }
 
-export function cityFormatter(locDesc: string): string {
+function cityFormatter(locDesc: string): string {
   const json = JSON.parse(locDesc)
   console.log('@@@@@@@@@@@@@')
   console.log(json)
@@ -33,6 +44,29 @@ export function cityFormatter(locDesc: string): string {
     return json.state
   } else {
     console.error('Missing location information')
+    console.error(locDesc)
+    console.error(json)
+    return 'Missing Location Information'
+  }
+}
+
+function tripListFormatter(locDesc: string): string {
+  const json = JSON.parse(locDesc)
+
+  if (json.street) {
+    if (json.street_number) {
+      return `${json.street_number} ${json.street}`
+    } else {
+      return json.street
+    }
+  } else if (json.state) {
+    if (json.locality) {
+      return `${json.locality}, ${json.state}`
+    } else {
+      return json.state
+    }
+  } else {
+    console.error('Missing Location Information')
     console.error(locDesc)
     console.error(json)
     return 'Missing Location Information'

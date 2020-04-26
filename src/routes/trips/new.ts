@@ -5,7 +5,7 @@ import { TripRequest } from '../../models/trip_requests'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripProcessingEmail } from '../../utils/emails'
 import { geocode } from '../../utils/geocoding'
-import { locationFormatter } from '../../utils/location_formatter'
+import { formatLocation } from '../../utils/location_formatter'
 
 const routes = Router()
 
@@ -20,7 +20,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const desc = req.user.default_location_description
   let formattedLocation = ''
   if (desc) {
-    formattedLocation = await locationFormatter(desc)
+    formattedLocation = await formatLocation(desc, 'full')
     console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     console.log(formattedLocation)
     console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')

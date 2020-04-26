@@ -7,8 +7,7 @@ import { getPreferredFirstName, User } from '../../models/users'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripConfirmationEmail } from '../../utils/emails'
 import {
-  cityFormatter,
-  locationFormatter,
+  formatLocation
 } from '../../utils/location_formatter'
 import { lafayettePlaceID } from '../../utils/places'
 //import { geocode } from '@googlemaps/google-maps-services-js/dist/geocode/geocode'
@@ -167,26 +166,30 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
         firstPlaceID == req.riderRequest.location
       ) {
         changeRider = true
-        firstPlaceDescription = await cityFormatter(
-          descriptionFor(firstPlaceID)
+        firstPlaceDescription = await formatLocation(
+          descriptionFor(firstPlaceID),
+          'city'
         )
       } else if (
         !req.isDriver &&
         firstPlaceID == req.driverRequest.location
       ) {
         changeDriver = true
-        firstPlaceDescription = await cityFormatter(
-          descriptionFor(firstPlaceID)
+        firstPlaceDescription = await formatLocation(
+          descriptionFor(firstPlaceID),
+          'city'
         )
       } else {
-        firstPlaceDescription = await locationFormatter(
-          descriptionFor(firstPlaceID)
+        firstPlaceDescription = await formatLocation(
+          descriptionFor(firstPlaceID),
+          'full'
         )
       }
     }
 
-    const midPlaceDescription = await locationFormatter(
-      descriptionFor(midPlaceID)
+    const midPlaceDescription = await formatLocation(
+      descriptionFor(midPlaceID),
+      'full'
     )
 
     if (lastPlaceID === lafayettePlaceID) {
@@ -194,13 +197,14 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
     } else {
       if (req.isDriver && lastPlaceID == req.riderRequest.location) {
         changeRider = true
-        lastPlaceDescription = await cityFormatter(descriptionFor(lastPlaceID))
+        lastPlaceDescription = await formatLocation(descriptionFor(lastPlaceID), 'city')
       } else if (!req.isDriver && lastPlaceID == req.driverRequest.location) {
         changeDriver = true
-        lastPlaceDescription = await cityFormatter(descriptionFor(lastPlaceID))
+        lastPlaceDescription = await formatLocation(descriptionFor(lastPlaceID), 'city')
       } else {
-        lastPlaceDescription = await locationFormatter(
-          descriptionFor(lastPlaceID)
+        lastPlaceDescription = await formatLocation(
+          descriptionFor(lastPlaceID),
+          'full'
         )
       }
     }
@@ -209,18 +213,20 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
     let riderDesc = ''
     let driverDesc = ''
     if (changeRider == true) {
-      riderDesc = await cityFormatter(req.riderRequest.location_description)
+      riderDesc = await formatLocation(req.riderRequest.location_description, 'city')
 
-      driverDesc = await locationFormatter(
-        req.driverRequest.location_description
+      driverDesc = await formatLocation(
+        req.driverRequest.location_description,
+        'full'
       )
     } else if (changeDriver == false) {
-      riderDesc = await locationFormatter(req.riderRequest.location_description)
-      driverDesc = await cityFormatter(req.driverRequest.location_description)
+      riderDesc = await formatLocation(req.riderRequest.location_description, 'full')
+      driverDesc = await formatLocation(req.driverRequest.location_description, 'city')
     } else {
-      riderDesc = await locationFormatter(req.riderRequest.location_description)
-      driverDesc = await locationFormatter(
-        req.driverRequest.location_description
+      riderDesc = await formatLocation(req.riderRequest.location_description, 'full')
+      driverDesc = await formatLocation(
+        req.driverRequest.location_description,
+        'full'
       )
     }
     res.render('trips/detail', {

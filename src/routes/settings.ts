@@ -11,7 +11,7 @@ import { phoneNumber, preferredEmail, preferredName } from '../validation'
 import { onboardSchema } from '../validation/onboard'
 import { settingsSchema } from '../validation/settings'
 import { geocode } from '../utils/geocoding'
-import { locationFormatter } from '../utils/location_formatter'
+import { formatLocation } from '../utils/location_formatter'
 
 const routes = Router()
 
@@ -138,7 +138,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const defaultLocationInformation = req.user.default_location_description
   let formattedLocation = ''
   if (defaultLocationInformation) {
-    formattedLocation = await locationFormatter(defaultLocationInformation)
+    formattedLocation = await formatLocation(defaultLocationInformation, 'full')
 
     console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     console.log(formattedLocation)
