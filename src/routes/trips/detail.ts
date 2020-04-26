@@ -105,11 +105,11 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
     } else if (req.driverRequest.direction === 'towards_lafayette') {
       lastPlaceID = lafayettePlaceID
       if (req.tripMatch.first_portion === 'driver') {
-        firstPlaceID = req.riderRequest.location
-        midPlaceID = req.driverRequest.location
-      } else if (req.tripMatch.first_portion === 'rider') {
         firstPlaceID = req.driverRequest.location
         midPlaceID = req.riderRequest.location
+      } else if (req.tripMatch.first_portion === 'rider') {
+        firstPlaceID = req.riderRequest.location
+        midPlaceID = req.driverRequest.location
       }
     }
 
