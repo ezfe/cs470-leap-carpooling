@@ -11,6 +11,7 @@ import { phoneNumber, preferredEmail, preferredName } from '../validation'
 import { onboardSchema } from '../validation/onboard'
 import { settingsSchema } from '../validation/settings'
 import { locationCity } from '../utils/geocoding'
+import { locationFormatter } from '../utils/location_formatter'
 
 const routes = Router()
 
@@ -121,8 +122,25 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     .select('users.*')
     .where('blocker_id', req.user.id)
     .innerJoin('users', 'users.id', 'pair_rejections.blockee_id')
+    console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    console.log(req.user.default_location_description)
+    console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    //let desc = ""
+    const desc =  req.user.default_location_description
+    let formattedLoc = ""
+    if(desc!= undefined){
+       const result = await(locationFormatter(desc))
+       console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+       console.log(result)
+       console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+       console.log((result.formatted_loc))
+       formattedLoc = result.formatted_loc
+    }
+ 
+    //const temp =await(locationCity(validated.place_id))
+   // const locDict = JSON.stringify(temp)
 
-  res.render('settings/index', { constraints, googleMapsAPIKey, profileImageURL, blockedUsers })
+  res.render('settings/index', { constraints, googleMapsAPIKey, profileImageURL, blockedUsers, formattedLoc})
 })
 
 routes.get('/remove-profile-image', async (req: ReqAuthedReq, res: Response) => {
@@ -166,7 +184,7 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
         allow_notifications: validated.allow_notifications
       })
 
-    res.render('/settings')
+    res.redirect('/settings')
   } catch (err) {
     console.error(err)
     res.render('database-error')
