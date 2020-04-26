@@ -1,9 +1,10 @@
 import { Client } from "@googlemaps/google-maps-services-js"
 
-export async function locationCity(place: string): Promise<{city: string}> {
+export async function locationCity(place: string): Promise<{street_number: string, street: string, locality: string, state: string, zip: string}> {
   const placeName = await geocode(place)
+  console.log("&&&&&&&&&&&&&&&&&& printing from locationCity &&&&&&&&&&&&&&&&&&&&&&")
   console.log(placeName)
-      return {city:place}
+      return placeName
   }
 
 
@@ -15,13 +16,6 @@ export async function geocode(placeID: string): Promise<{ street_number: string,
     return {street_number: "", street: "", locality: "", state: "", zip: ""}
 
   }
-
-  // const redisKey = `placeid:${placeID}`
-
-  // const redisFoundValue = await redisClient.get(redisKey)
-  // if (redisFoundValue) {
-  //   return 
-  // }
 
   const c = new Client({})
   const response = await c.placeDetails({

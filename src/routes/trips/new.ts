@@ -27,15 +27,19 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
     const deviationLimitString = req.body.deviation_limit
     const deviationLimit = parseInt(deviationLimitString, 10)
     console.log(deviationLimit)
-    const locDict = locationCity(req.body.place_id)
+    const temp =await(locationCity(req.body.place_id))
+    console.log(temp)
+    const locDict = JSON.stringify(temp)
+    console.log("***************this is what will be inserted into the db **************************")
     console.log(locDict)
+    console.log("***************************************************************")
     
 
     const requests = await db<TripRequest>('trip_requests').insert({
         member_id: req.user?.id,
         role: req.body.user_role,
         location: req.body.place_id,
-        location_description: req.body.location_description,
+        location_description: locDict,
         deviation_limit: deviationLimit,
         direction: req.body.trip_direction,
         first_date: req.body.first_date,

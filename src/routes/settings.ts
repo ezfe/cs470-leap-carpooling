@@ -10,6 +10,7 @@ import { sendWelcomeEmail } from '../utils/emails'
 import { phoneNumber, preferredEmail, preferredName } from '../validation'
 import { onboardSchema } from '../validation/onboard'
 import { settingsSchema } from '../validation/settings'
+import { locationCity } from '../utils/geocoding'
 
 const routes = Router()
 
@@ -151,13 +152,16 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const validated = await settingsSchema.validateAsync(req.body)
 
+    const temp =await(locationCity(validated.place_id))
+    const locDict = JSON.stringify(temp)
+    
     await db<User>('users').where({ id: req.user.id })
       .update({
         preferred_name: validated.preferred_name,
         email: validated.preferred_email,
         phone_number: validated.phone_number,
         default_location: validated.place_id,
-        default_location_description: validated.place_name,
+        default_location_description: locDict,
         deviation_limit: validated.deviation_limit,
         allow_notifications: validated.allow_notifications
       })
