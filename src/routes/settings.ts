@@ -166,7 +166,7 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
         allow_notifications: validated.allow_notifications
       })
 
-    res.redirect('/settings')
+    res.render('/settings')
   } catch (err) {
     console.error(err)
     res.render('database-error')
