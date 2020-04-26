@@ -5,6 +5,7 @@ import { TripRequest } from '../../models/trip_requests'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import tripDetail from './detail'
 import tripCreation from './new'
+import { locationFormatter } from '../../utils/location_formatter'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -56,7 +57,8 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     console.log("this is trips")
     console.log(trips)
 
-    res.render('trips/index', { trips, alerts })
+    res.locals.locationFormatter = locationFormatter
+    res.render('trips/index', { trips, alerts,  })
   } catch (err) {
     console.error(err)
     res.render('database-error')
