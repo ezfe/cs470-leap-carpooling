@@ -1,7 +1,7 @@
 import db from '../db'
 import { TripMatch } from '../models/trip_matches'
 import { TripRequest } from '../models/trip_requests'
-import { User } from '../models/users'
+import { User, getEmail, getPreferredFirstName } from '../models/users'
 import { sendTripReminderEmail } from '../utils/emails'
 
 export default async function job(): Promise<void> {
@@ -19,13 +19,13 @@ export default async function job(): Promise<void> {
 async function notifyMatch(match: TripMatch): Promise<void> {
   const driverRequest = await db('trip_requests').where({ id: match.driver_request_id }).first<TripRequest>()
   const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
-  const driverName = driver.preferred_name || driver.first_name
-  const driverEmail = driver.email || `${driver.netid}@lafayette.edu`
+  const driverName = getPreferredFirstName(driver)
+  const driverEmail = getEmail(driver)
 
   const riderRequest = await db('trip_requests').where({ id: match.rider_request_id }).first<TripRequest>()
   const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
-  const riderName = rider.preferred_name || rider.first_name
-  const riderEmail = rider.email || `${rider.netid}@lafayette.edu`
+  const riderName = getPreferredFirstName(rider)
+  const riderEmail = getEmail(rider)
 
   // Send Driver Notification
   if (driver.allow_notifications) {

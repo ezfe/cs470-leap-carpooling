@@ -52,7 +52,7 @@ block content
                 input.form-control(
                   name="preferred_email"
                   id="preferred_email"
-                  value=(currentUser.email || `${currentUser.netid}@lafayette.edu`)
+                  value=getEmail(currentUser)
                   type=constraints.preferredEmail.type
                   autocomplete=constraints.preferredEmail.type
                   maxlength=constraints.preferredEmail.max
@@ -133,7 +133,7 @@ block content
             tr
               td= user.first_name
               td= user.last_name
-              - const email = user.email || `${user.netid}@lafayette.edu`
+              - const email = getEmail(user)
               td
                 a(href=`mailto:${email}`)= email
               td

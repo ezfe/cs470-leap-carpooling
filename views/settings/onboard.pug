@@ -45,7 +45,7 @@ block content
                 input.form-control(
                   name="preferred_email"
                   id="preferred_email"
-                  value=(currentUser.email || `${currentUser.netid}@lafayette.edu`)
+                  value=getEmail(currentUser)
                   type=constraints.preferredEmail.type
                   autocomplete=constraints.preferredEmail.type
                   maxlength=constraints.preferredEmail.max

@@ -43,7 +43,7 @@ block content
                   td= otherUser.phone_number
                 tr
                   th(scope="row") Email
-                  - const email = otherUser.email || `${otherUser.netid}@lafayette.edu`
+                  - const email = getEmail(otherUser)
                   td
                     a(href=`mailto:${email}`)= email
             .col-12.col-sm-6.col-md-5.col-lg-4.offset-lg-1.col-xl-3.offset-xl-2
