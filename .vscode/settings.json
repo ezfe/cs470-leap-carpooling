@@ -3,5 +3,7 @@
     "editor.tabSize": 2,
     "eslint.enable": true,
     "eslint.packageManager": "yarn",
-    "files.autoSave": "afterDelay"
+    "files.autoSave": "afterDelay",
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
