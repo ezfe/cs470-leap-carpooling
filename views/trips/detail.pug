@@ -5,6 +5,7 @@ block navbar_settings
 
 append head
   link(rel="stylesheet", href="/static/dashboard.css")
+  link(rel="stylesheet", href="/static/css/trip_detail.css")
 
   meta(name="firstPlaceID" content=firstPlaceID)
   meta(name="midPlaceID" content=midPlaceID)
@@ -77,28 +78,22 @@ block content
           = ' Cancel Trip'
 
   hr.my-3
+
   .row
-    .col-12.col-lg-6
+    .col-12.col-lg-6.mb-4
       .row
         .col.text-center
           h4 Your Trip
-      .row
-        .col-8.offset-2.text-center
-          span= firstPlaceDescription
-      .row
-        .col-8.offset-2.text-center
-          i.fas.fa-arrow-down
-
-      if (midPlaceID !== lastPlaceID && midPlaceID !== firstPlaceID)
-        .row
-          .col-8.offset-2.text-center
-            span= midPlaceDescription
-        .row
-          .col-8.offset-2.text-center
+      .row.d-flex.flex-column.align-items-center
+        .col-auto.d-flex.flex-column.align-items-stretch.text-center
+          .location-box.box-shadow-hover= firstPlaceDescription
+          div.mt-3.mb-1
             i.fas.fa-arrow-down
-      .row
-        .col-8.offset-2.text-center
-          span= lastPlaceDescription
+          if (midPlaceID !== lastPlaceID && midPlaceID !== firstPlaceID)
+            .location-box.box-shadow-hover= midPlaceDescription
+            div.mt-3.mb-1
+              i.fas.fa-arrow-down
+          .location-box.box-shadow-hover= lastPlaceDescription
 
     //- a.btn.btn-outline-info(
     //-   href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(riderRequest.location_description)}&query_place_id=${riderRequest.location}`
@@ -106,12 +101,13 @@ block content
     //-   fa.fas.fa-location-arrow
     //-   = ' Google Maps'
 
-    .col-12.col-lg-6
+    .col-12.col-lg-6.mb-4
       #googleMap(style="height: 300px")
 
   include prettyDate
 
-  hr.my-4
+  hr.mb-4
+
   .row.mb-2
     .col
       h5= `Common Travel Days: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
