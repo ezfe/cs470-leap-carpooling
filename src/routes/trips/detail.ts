@@ -9,6 +9,7 @@ import { sendTripConfirmationEmail } from '../../utils/emails'
 import { lafayettePlaceID } from '../../utils/places'
 import { locationCity } from '../../utils/geocoding'
 import { geocode } from '../../utils/geocoding'
+import { locationFormatter } from '../../utils/location_formatter'
 //import { geocode } from '@googlemaps/google-maps-services-js/dist/geocode/geocode'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
@@ -90,11 +91,25 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     function descriptionFor(placeID) {
       return (driverRequest.location === placeID) ? driverRequest.location_description : ((riderRequest.location === placeID) ? riderRequest.location_description : 'Lafayette College')
     }
-
-    const firstPlaceDescription = descriptionFor(firstPlaceID)
-    const midPlaceDescription = descriptionFor(midPlaceID)
-    const lastPlaceDescription = descriptionFor(lastPlaceID)
-
+    let firstPlaceDescription =""
+    let lastPlaceDescription = ""
+    if(descriptionFor(firstPlaceID)=='Lafayette College'){
+      firstPlaceDescription = descriptionFor(firstPlaceID)
+    }else {
+      firstPlaceDescription = (await(locationFormatter(descriptionFor(firstPlaceID)))).formatted_loc
+    }
+    const midPlaceDescription = (await(locationFormatter(descriptionFor(midPlaceID)))).formatted_loc
+    
+    if(descriptionFor(lastPlaceID)=='Lafayette College'){
+     lastPlaceDescription = descriptionFor(lastPlaceID)
+    }
+    else {
+    lastPlaceDescription = (await(locationFormatter(descriptionFor(lastPlaceID)))).formatted_loc
+    }
+    console.log("^^^^^^^^^^^^^^^^^^^^^^^")
+    console.log(midPlaceDescription)
+    const riderDesc = (await(locationFormatter(riderRequest.location_description))).formatted_loc
+    const driverDesc = (await(locationFormatter(driverRequest.location_description))).formatted_loc
     res.render('trips/detail', {
       tripMatch,
       driverRequest,
@@ -110,7 +125,9 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       lastPlaceDescription,
       driverProfileImageURL,
       riderProfileImageURL,
-      googleMapsAPIKey
+      googleMapsAPIKey,
+      riderDesc,
+      driverDesc
     })
   } catch (err) {
     console.error(err)
