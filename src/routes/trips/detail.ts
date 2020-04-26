@@ -79,9 +79,6 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
 })
 
 routes.get('/', async (req: MatchRequest, res: Response) => {
-  const siteName = process.env.SITE_NAME
-  const contactEmail = process.env.CONTACT_EMAIL
-
   try {
     const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
     if (!googleMapsAPIKey) {
@@ -138,8 +135,6 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
     const lastPlaceDescription = descriptionFor(lastPlaceID)
 
     res.render('trips/detail', {
-      siteName,
-      contactEmail,
       tripMatch: req.tripMatch,
       driverRequest: req.driverRequest,
       riderRequest: req.riderRequest,

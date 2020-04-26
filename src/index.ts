@@ -5,6 +5,7 @@ import routes from './routes'
 import bodyParser = require('body-parser')
 import session from 'express-session'
 import { authenticateUser } from './middleware/auth'
+import { addVariables } from './middleware/vars'
 import registerJobs from './jobs'
 
 
@@ -24,11 +25,6 @@ if (!process.env.CONTACT_EMAIL || !process.env.SITE_NAME) {
   process.exit(1)
 }
 
-if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) {
-  console.log('Set SENDINBLUE_EMAIL and SENDINBLUE_PASSWORD in .env!')
-  process.exit(1)
-}
-
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
@@ -40,6 +36,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.use(authenticateUser)
+app.use(addVariables)
 
 app.use('/public/uploads', express.static('public/uploads'));
 
