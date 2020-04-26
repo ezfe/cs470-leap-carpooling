@@ -5,6 +5,7 @@ import { TripRequest } from '../../models/trip_requests'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import tripDetail from './detail'
 import tripCreation from './new'
+import { formatLocation } from '../../utils/location_formatter'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -28,12 +29,6 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     const pastMatchedRequests = await getTripMatches(req.user, "past", null)
     const futureActionNotNeeded = await getTripMatches(req.user, "future", false)
     const futureActionNeeded = await getTripMatches(req.user, "future", true)
-    console.log('Found past matched requests')
-    console.log(pastMatchedRequests)
-    console.log('Found future matched requests [action]')
-    console.log(futureActionNeeded)
-    console.log('Found future matched requests [no action]')
-    console.log(futureActionNotNeeded)
 
     const unmatchedRequests: TripRequest[] = await db('trip_requests')
       .select(
@@ -44,9 +39,6 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       }).whereNull('trip_matches.id')
       .andWhere('trip_requests.member_id', req.user.id)
 
-    console.log('Found unmatched requests')
-    console.log(unmatchedRequests)
-
     const trips = [
       ...futureActionNeeded,
       ...futureActionNotNeeded,
@@ -54,7 +46,8 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       ...pastMatchedRequests
     ]
 
-    res.render('trips/index', { trips, alerts })
+    res.locals.formatLocation = formatLocation
+    res.render('trips/index', { trips, alerts,  })
   } catch (err) {
     console.error(err)
     res.render('database-error')

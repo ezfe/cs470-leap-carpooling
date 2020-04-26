@@ -1,7 +1,9 @@
 {
-    "editor.fontFamily": "'SF Mono', Menlo, Monaco, 'Courier New', monospace",
-    "editor.tabSize": 2,
-    "eslint.enable": true,
-    "eslint.packageManager": "yarn",
-    "files.autoSave": "afterDelay"
+  "editor.tabSize": 2,
+  "eslint.enable": true,
+  "eslint.packageManager": "yarn",
+  "files.autoSave": "afterDelay",
+  "editor.formatOnSave": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.fontFamily": "'SF Mono', Menlo, Monaco, 'Courier New', monospace"
 }

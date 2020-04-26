@@ -57,11 +57,11 @@ block content
               -
                 let currentUserLocationDescription = "unknown"
                 if (isProcessing) {
-                  currentUserLocationDescription = trip.location_description
+                  currentUserLocationDescription = formatLocation(trip.location_description, 'trip_list')
                 } else {
                   currentUserLocationDescription = (trip.driver_id == currentUser.id)
-                    ? trip.driver_location_description
-                    : trip.rider_location_description
+                    ? formatLocation(trip.driver_location_description, 'trip_list')
+                    : formatLocation(trip.rider_location_description, 'trip_list')
                 }
 
               if trip.direction == 'towards_lafayette'
