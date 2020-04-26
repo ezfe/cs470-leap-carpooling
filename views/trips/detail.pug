@@ -70,12 +70,17 @@ block content
       p If you need to change details of your trip, click "Cancel Trip" and request another trip with the corrected details.
 
   .row
-    .col.mb-2
-      form#cancel-trip-form(method="POST" action=`/trip-requests/${currentUserRequest.id}/cancel`)
+    
+  
+  .row.mb-2
+    .col
+      h5= `Common Travel Days: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
+    .col
+      form.float-right#cancel-trip-form(method="POST" action=`/trip-requests/${currentUserRequest.id}/cancel`)
         button.btn.btn-danger(role="submit")
           i.fas.fa-times
           = ' Cancel Trip'
-
+  
   hr.my-3
 
   .row
@@ -101,16 +106,14 @@ block content
     //-   = ' Google Maps'
 
     .col-12.col-lg-6.mb-4
-      #googleMap(style="height: 300px")
+      #mapLoading
+        .d-flex.flex-column.justify-content-center.align-items-center(style="height: 100px;")
+          .spinner-border(role="status")
+          span.mt-2 Loading Map...
+      #mapWrapper.invisible
+        #googleMap(style="height: 300px;")
 
   include prettyDate
-
-  hr.mb-4
-
-  .row.mb-2
-    .col
-      h5= `Common Travel Days: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
-  hr.my-4
 
   .modal.fade#rejectModal(
     tabindex="-1"

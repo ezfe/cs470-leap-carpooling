@@ -1,5 +1,3 @@
-'use strict'
-
 import getMeta from './getMeta.js'
 
 function myMap() {
@@ -25,6 +23,8 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay){
     travelMode: 'DRIVING'
   }, function(response, status){
     if (status === 'OK'){
+      document.getElementById('mapLoading').classList.add('d-none')
+      document.getElementById('mapWrapper').classList.remove('invisible')
       directionsDisplay.setDirections(response);
     }else{
       window.alert('Directions request failed due to ' + status);

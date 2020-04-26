@@ -5,5 +5,3 @@ document.getElementById('cancel-trip-form').addEventListener('submit', (evt) => 
       evt.preventDefault()
     }
 })
-
-
