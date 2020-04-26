@@ -1,4 +1,4 @@
-export async function locationFormatter(locDesc: string): Promise<string> {
+export function locationFormatter(locDesc: string): string {
   const json = JSON.parse(locDesc)
 
   console.log('@@@@@@@@@@@@@')
@@ -22,7 +22,7 @@ export async function locationFormatter(locDesc: string): Promise<string> {
   return finalAddress
 }
 
-export async function cityFormatter(locDesc: string): Promise<string> {
+export function cityFormatter(locDesc: string): string {
   const json = JSON.parse(locDesc)
   console.log('@@@@@@@@@@@@@')
   console.log(json)
