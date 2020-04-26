@@ -5,19 +5,30 @@ import { TripRequest } from '../../models/trip_requests'
 import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripProcessingEmail } from '../../utils/emails'
 import { locationCity } from '../../utils/geocoding'
+import { locationFormatter } from '../../utils/location_formatter'
 
 const routes = Router()
 
 // GET /trips/new
-routes.get('/', (req: AuthedReq, res: Response) => {
+routes.get('/', async(req: ReqAuthedReq, res: Response) => {
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
+    const desc =  req.user.default_location_description
+    let formattedLoc = ""
+    if(desc!= undefined){
+       const result = await(locationFormatter(desc))
+       console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+       console.log(result)
+       console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+       console.log((result.formatted_loc))
+       formattedLoc = result.formatted_loc
+    }
   if (!googleMapsAPIKey) {
     res.send('GOOGLE_MAPS_PLACES_KEY is unset')
     return
   }
 
   res.render('trips/new', {
-    googleMapsAPIKey
+    googleMapsAPIKey, formattedLoc
   })
 })
 

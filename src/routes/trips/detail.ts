@@ -9,7 +9,8 @@ import { sendTripConfirmationEmail } from '../../utils/emails'
 import { lafayettePlaceID } from '../../utils/places'
 import { locationCity } from '../../utils/geocoding'
 import { geocode } from '../../utils/geocoding'
-import { locationFormatter } from '../../utils/location_formatter'
+import { locationFormatter, cityFormatter } from '../../utils/location_formatter'
+import { close } from 'fs'
 //import { geocode } from '@googlemaps/google-maps-services-js/dist/geocode/geocode'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
@@ -54,6 +55,10 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     }
 
     const otherUser = driver.id === req.user.id ? rider : driver
+    console.log("this is other user")
+    console.log(otherUser)
+    console.log("this is my id")
+    console.log(req.user.id)
     const driverProfileImageURL = driver.profile_image_name || 'static/blank-profile.png'
     const riderProfileImageURL = rider.profile_image_name || 'static/blank-profile.png'
 
@@ -63,7 +68,6 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     if (driverRequest.direction === 'from_lafayette') {
       firstPlaceID = lafayettePlaceID
       if (tripMatch.first_portion === 'driver') {
-       
         midPlaceID = riderRequest.location
         lastPlaceID = driverRequest.location
       } else if (tripMatch.first_portion === 'rider') {
@@ -93,10 +97,24 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     }
     let firstPlaceDescription =""
     let lastPlaceDescription = ""
+    let changeRider = false
+    let changeDriver = false
     if(descriptionFor(firstPlaceID)=='Lafayette College'){
       firstPlaceDescription = descriptionFor(firstPlaceID)
     }else {
+      if((req.user.id==driver.id&& firstPlaceID == riderRequest.location))
+      {
+        changeRider = true
+        firstPlaceDescription = (await(cityFormatter(descriptionFor(firstPlaceID)))).formatted_loc
+      }
+      else if((req.user.id==rider.id&& firstPlaceID == driverRequest.location))
+      {
+        changeDriver= true
+        firstPlaceDescription = (await(cityFormatter(descriptionFor(firstPlaceID)))).formatted_loc
+      }
+      else{
       firstPlaceDescription = (await(locationFormatter(descriptionFor(firstPlaceID)))).formatted_loc
+      }
     }
     const midPlaceDescription = (await(locationFormatter(descriptionFor(midPlaceID)))).formatted_loc
     
@@ -104,12 +122,38 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
      lastPlaceDescription = descriptionFor(lastPlaceID)
     }
     else {
+      if((req.user.id==driver.id&& lastPlaceID == riderRequest.location))
+      {
+        changeRider = true
+        lastPlaceDescription = (await(cityFormatter(descriptionFor(lastPlaceID)))).formatted_loc
+      }
+      else if((req.user.id==rider.id&& lastPlaceID == driverRequest.location))
+      {
+        changeDriver = true
+        lastPlaceDescription = (await(cityFormatter(descriptionFor(lastPlaceID)))).formatted_loc
+      }
+      else{
     lastPlaceDescription = (await(locationFormatter(descriptionFor(lastPlaceID)))).formatted_loc
+      }
     }
     console.log("^^^^^^^^^^^^^^^^^^^^^^^")
     console.log(midPlaceDescription)
-    const riderDesc = (await(locationFormatter(riderRequest.location_description))).formatted_loc
-    const driverDesc = (await(locationFormatter(driverRequest.location_description))).formatted_loc
+    let riderDesc= ""
+    let driverDesc= ""
+    if(changeRider == true)
+    {
+      riderDesc = (await(cityFormatter(riderRequest.location_description))).formatted_loc
+      driverDesc = (await(locationFormatter(driverRequest.location_description))).formatted_loc
+    }
+    else if(changeDriver == false)
+    {
+       riderDesc = (await(locationFormatter(riderRequest.location_description))).formatted_loc
+       driverDesc = (await(cityFormatter(driverRequest.location_description))).formatted_loc
+    }
+    else{
+    riderDesc = (await(locationFormatter(riderRequest.location_description))).formatted_loc
+    driverDesc = (await(locationFormatter(driverRequest.location_description))).formatted_loc
+    }
     res.render('trips/detail', {
       tripMatch,
       driverRequest,

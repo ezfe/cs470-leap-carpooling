@@ -49,6 +49,8 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       ...unmatchedRequests,
       ...pastMatchedRequests
     ]
+    console.log("this is trips")
+    console.log(trips)
 
     res.render('trips/index', { trips, alerts })
   } catch (err) {
