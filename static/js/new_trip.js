@@ -45,7 +45,10 @@ function validateUserRole() {
     }
   }
 }
+document.getElementById('ride_button').addEventListener('change', validateUserRole)
+document.getElementById('ride_button').addEventListener('click', validateUserRole)
 document.getElementById('drive_button').addEventListener('change', validateUserRole)
+document.getElementById('drive_button').addEventListener('click', validateUserRole)
 
 function updateDeviationExplanationValidation() {
   if (document.getElementById('request_form').classList.contains('was-validated')) {
