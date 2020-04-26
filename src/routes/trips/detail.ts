@@ -208,27 +208,28 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
         )
       }
     }
-    console.log('^^^^^^^^^^^^^^^^^^^^^^^')
-    console.log(midPlaceDescription)
-    let riderDesc = ''
-    let driverDesc = ''
-    if (changeRider == true) {
-      riderDesc = await formatLocation(req.riderRequest.location_description, 'city')
+    // console.log('^^^^^^^^^^^^^^^^^^^^^^^')
+    // console.log(midPlaceDescription)
+    // let riderDesc = ''
+    // let driverDesc = ''
+    // if (changeRider == true) {
+    //   riderDesc = await formatLocation(req.riderRequest.location_description, 'city')
 
-      driverDesc = await formatLocation(
-        req.driverRequest.location_description,
-        'full'
-      )
-    } else if (changeDriver == false) {
-      riderDesc = await formatLocation(req.riderRequest.location_description, 'full')
-      driverDesc = await formatLocation(req.driverRequest.location_description, 'city')
-    } else {
-      riderDesc = await formatLocation(req.riderRequest.location_description, 'full')
-      driverDesc = await formatLocation(
-        req.driverRequest.location_description,
-        'full'
-      )
-    }
+    //   driverDesc = await formatLocation(
+    //     req.driverRequest.location_description,
+    //     'full'
+    //   )
+    // } else if (changeDriver == false) {
+    //   riderDesc = await formatLocation(req.riderRequest.location_description, 'full')
+    //   driverDesc = await formatLocation(req.driverRequest.location_description, 'city')
+    // } else {
+    //   riderDesc = await formatLocation(req.riderRequest.location_description, 'full')
+    //   driverDesc = await formatLocation(
+    //     req.driverRequest.location_description,
+    //     'full'
+    //   )
+    // }
+    const otherLoc = formatLocation(req.otherUserRequest.location_description,'full')
     res.render('trips/detail', {
       tripMatch: req.tripMatch,
       driverRequest: req.driverRequest,
@@ -248,8 +249,7 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
       driverProfileImageURL,
       riderProfileImageURL,
       googleMapsAPIKey,
-      riderDesc,
-      driverDesc,
+      otherLoc
     })
   } catch (err) {
     console.error(err)
