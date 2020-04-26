@@ -1,6 +1,6 @@
 import Joi from '@hapi/joi'
 import { joiConstraints } from '.'
-import {  } from '.'
+
 export const settingsSchema = Joi.object({
   preferred_name: joiConstraints.preferred_name,
   preferred_email: joiConstraints.preferred_email,
