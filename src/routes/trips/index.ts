@@ -15,7 +15,7 @@ routes.use('/:tripId/', tripDetail)
 
 /**
  * GET /trips
- * 
+ *
  * The main list of trips the user is a member of
  */
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
