@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Raw } from "knex";
-import db from "../db";
-import { User } from "./users";
-import { UserRole, TripDirection } from "./misc_types";
+import { Raw } from 'knex'
+import db from '../db'
+import { User } from './users'
+import { UserRole, TripDirection } from './misc_types'
 
 export interface TripMatch {
   id: number
@@ -26,8 +26,8 @@ export interface AnnotatedTripMatch {
   direction: TripDirection
   driver_request_id: number
   rider_request_id: number
-  driver_id: number,
-  rider_id: number,
+  driver_id: number
+  rider_id: number
   driver_location_description: number
   rider_location_description: number
 }
@@ -59,25 +59,29 @@ export async function getTripMatches(
       db.ref('driver_t.member_id').as('driver_id'),
       db.ref('rider_t.member_id').as('rider_id'),
       db.ref('driver_t.location_description').as('driver_location_description'),
-      db.ref('rider_t.location_description').as('rider_location_description'),
+      db.ref('rider_t.location_description').as('rider_location_description')
     )
     .join(
       'trip_requests as driver_t',
-      'trip_matches.driver_request_id', 'driver_t.id'
+      'trip_matches.driver_request_id',
+      'driver_t.id'
     )
     .join(
       'trip_requests as rider_t',
-      'trip_matches.rider_request_id', 'rider_t.id'
+      'trip_matches.rider_request_id',
+      'rider_t.id'
     )
     .orderBy('trip_matches.first_date', orderByParam)
-    .where(function() {
-      this.where('driver_t.member_id', user.id)
-          .orWhere('rider_t.member_id', user.id)
+    .where(function () {
+      this.where('driver_t.member_id', user.id).orWhere(
+        'rider_t.member_id',
+        user.id
+      )
     })
 
-  if (filter === "past") {
+  if (filter === 'past') {
     query = query.andWhere('trip_matches.last_date', '<', db.fn.now())
-  } else if (filter === "future") {
+  } else if (filter === 'future') {
     query = query.andWhere('trip_matches.last_date', '>=', db.fn.now())
   }
 

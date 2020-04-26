@@ -1,7 +1,7 @@
-import { Client } from "@googlemaps/google-maps-services-js"
-import redisClient from "../db/redis"
-import { TripDirection } from "../models/misc_types"
-import { lafayettePlaceID } from "./places"
+import { Client } from '@googlemaps/google-maps-services-js'
+import redisClient from '../db/redis'
+import { TripDirection } from '../models/misc_types'
+import { lafayettePlaceID } from './places'
 
 /**
  * Compute the distance matrix concerning a driver, rider, and direction
