@@ -50,6 +50,8 @@ block content
           h5.card-header(class=cardClass)
             i.mr-2(class=`fas ${cardIcon}`)
             = cardTitle
+            if (trip.driver_id == currentUser.id && !trip.driver_confirmed) || (trip.rider_id == currentUser.id && !trip.rider_confirmed)
+              span.float-right.badge.badge-secondary Action Needed
           .card-body
             h5.card-title
               -
