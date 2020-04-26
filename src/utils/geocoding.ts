@@ -1,4 +1,5 @@
 import { Client } from '@googlemaps/google-maps-services-js'
+import redisClient from '../db/redis'
 
 interface GeocodeResult {
   street_number: string | null
@@ -21,6 +22,12 @@ export async function geocode(placeID: string): Promise<GeocodeResult> {
   if (!googleMapsKey) {
     console.error('GOOGLE_MAPS_ROUTING_KEY is not set')
     return data
+  }
+
+  const redisKey = `geocode_placeid:${placeID}`
+  const redisFoundValue = await redisClient.get(redisKey)
+  if (redisFoundValue) {
+    return JSON.parse(redisFoundValue)
   }
 
   const c = new Client({})
@@ -49,6 +56,9 @@ export async function geocode(placeID: string): Promise<GeocodeResult> {
       }
     }
   }
+
+  await redisClient.set(redisKey, JSON.stringify(data))
+  await redisClient.expire(redisKey, 604800) // 1 week
 
   return data
 }
