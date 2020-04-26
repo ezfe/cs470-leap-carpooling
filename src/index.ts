@@ -1,12 +1,12 @@
 // import { Request, Response, Application } from 'express';
-import express = require('express');
+import express = require('express')
 import dotenv = require('dotenv')
 import routes from './routes'
 import bodyParser = require('body-parser')
 import session from 'express-session'
 import { authenticateUser } from './middleware/auth'
+import { addVariables } from './middleware/vars'
 import registerJobs from './jobs'
-
 
 /* Load environment variables from .env file */
 dotenv.config()
@@ -24,24 +24,22 @@ if (!process.env.CONTACT_EMAIL || !process.env.SITE_NAME) {
   process.exit(1)
 }
 
-if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) {
-  console.log('Set SENDINBLUE_EMAIL and SENDINBLUE_PASSWORD in .env!')
-  process.exit(1)
-}
-
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 604800000 } // 7 days
-}))
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 604800000 }, // 7 days
+  })
+)
 
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.use(authenticateUser)
+app.use(addVariables)
 
-app.use('/public/uploads', express.static('public/uploads'));
+app.use('/public/uploads', express.static('public/uploads'))
 
 registerJobs()
 

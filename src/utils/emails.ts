@@ -12,15 +12,17 @@ const transporter = nodemailer.createTransport({
 })
 
 /**
- * Allow users to send a message to LEAP.
- * @param email The email address of the user
+ * Allow users to send a message to site contact.
+ * @param userEmail The email address of the user
  * @param subject The message subject
  * @param message The message
  */
 export async function sendMessage(userEmail: string, subject: string, message: string) {
+  if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
+
   await transporter.sendMail({
-    from: 'leaplifts@gmail.com',
-    to: 'leaplifts@gmail.com',
+    from: userEmail,
+    to: process.env.CONTACT_EMAIL,
     replyTo: userEmail,
     subject: subject,
     text: message
@@ -32,14 +34,16 @@ export async function sendMessage(userEmail: string, subject: string, message: s
  * @param user The user to send the email to
  */
 export async function sendWelcomeEmail(user: User) {
+  if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
+
   await transporter.sendMail({
-    from: '"LEAP Lifts" <leaplifts@gmail.com>',
+    from: `"${process.env.SITE_NAME}" <${process.env.CONTACT_EMAIL}>`,
     to: getEmail(user),
-    subject: "Welcome to LEAP Lifts",
+    subject: `Welcome to ${process.env.SITE_NAME}`,
     html: `Hello ${getPreferredFirstName(user)}, <br><br>
-          Thanks for signing up for LEAP Lifts! To get started, visit your dashboard and create a trip request.
+          Thanks for signing up for ${process.env.SITE_NAME}! To get started, visit your dashboard and create a trip request.
           First, we'll match you with another student along your route, then we'll ask for confirmation from both
-          of you before confirming your ride. <br><br> Hope to see you soon! <br><br> The LEAP Lifts Team`
+          of you before confirming your ride. <br><br> Hope to see you soon! <br><br> The ${process.env.SITE_NAME} Team`
   });
 }
 
@@ -49,6 +53,8 @@ export async function sendWelcomeEmail(user: User) {
  * @param tripRequest The request information
  */
 export async function sendTripProcessingEmail(user: User, tripRequest: TripRequest) {
+  if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
+
   // To assure the database actually gave us a date!
   if (!(tripRequest.first_date instanceof Date && tripRequest.last_date instanceof Date)) {
     console.error("Trip request dates weren't the right type")
@@ -72,10 +78,10 @@ export async function sendTripProcessingEmail(user: User, tripRequest: TripReque
       } else {
         message += ` sometime between ${firstDateString} and ${lastDateString}. `
       }
-      message += `We'll let you know once we've found you someone to ride with! <br><br> The LEAP Lifts Team`
+      message += `We'll let you know once we've found you someone to ride with! <br><br> The ${process.env.SITE_NAME} Team`
 
   await transporter.sendMail({
-    from: '"LEAP Lifts" <leaplifts@gmail.com>',
+    from: `"${process.env.SITE_NAME}" <${process.env.CONTACT_EMAIL}>`,
     to: getEmail(user),
     subject: "Trip Request Processing",
     html: message
@@ -96,6 +102,7 @@ export async function sendTripMatchEmail(
   driverRequest: TripRequest,
   riderRequest: TripRequest,
   otherUser: User) {
+  if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
 
   // To assure the database actually gave us a date!
   if (!(tripMatch.first_date instanceof Date && tripMatch.last_date instanceof Date)) {
@@ -118,15 +125,23 @@ export async function sendTripMatchEmail(
         message += `driver! ${getPreferredFirstName(otherUser)} ${otherUser.last_name} will be driving you`
       }
       if (tripDirection == 'towards_lafayette') {
-        message += ` to Lafayette College from ${riderRequest.location_description} on the way from ${driverRequest.location}`
+        if (riderRequest.location_description == driverRequest.location_description) {
+          message += ` to Lafayette College from ${riderRequest.location_description}`
+        } else {
+          message += ` to Lafayette College from ${riderRequest.location_description} on the way from ${driverRequest.location_description}`
+        }
       } else {
-        message += ` from Lafayette College to ${riderRequest.location} on the way to ${driverRequest.location}`
+        if (riderRequest.location_description == driverRequest.location_description) {
+          message += ` from Lafayette College to ${riderRequest.location_description}`
+        } else {
+          message += ` from Lafayette College to ${riderRequest.location_description} on the way to ${driverRequest.location_description}`
+        }
       }
       message += (firstDateString == lastDateString) ? ` on ${firstDateString}. ` : ` sometime between ${firstDateString} and ${lastDateString}. `
-      message += 'Please login to LEAP Lifts to confirm or reject your trip. <br><br> The LEAP Lifts Team'
+      message += `Please login to ${process.env.SITE_NAME} to confirm or reject your trip. <br><br> The ${process.env.SITE_NAME} Team`
 
   await transporter.sendMail({
-    from: '"LEAP Lifts" <leaplifts@gmail.com>',
+    from: `"${process.env.SITE_NAME}" <${process.env.CONTACT_EMAIL}>`,
     to: getEmail(user),
     subject: "Trip Match Found",
     html: message
@@ -147,6 +162,7 @@ export async function sendTripConfirmationEmail(
   tripMatch: TripMatch,
   userRequest: TripRequest,
   otherUserRequest: TripRequest) { 
+  if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
 
   // To assure the database actually gave us a date!
   if (!(tripMatch.first_date instanceof Date && tripMatch.last_date instanceof Date)) {
@@ -163,10 +179,10 @@ export async function sendTripConfirmationEmail(
                 Your location: ${userRequest.location_description} <br>
                 ${getPreferredFirstName(otherUser)}'s location: ${otherUserRequest.location_description} <br>`
       message += (firstDateString == lastDateString) ? `Date: ${firstDateString}` : `Date Range: ${firstDateString} to ${lastDateString}`
-      message += '<br><br> The LEAP Lifts Team'
+      message += `<br><br> The ${process.env.SITE_NAME} Team`
   
   await transporter.sendMail({
-    from: '"LEAP Lifts" <leaplifts@gmail.com>',
+    from: `"${process.env.SITE_NAME}" <${process.env.CONTACT_EMAIL}>`,
     to: getEmail(user),
     subject: "Trip Confirmation",
     html: message
@@ -179,18 +195,30 @@ export async function sendTripConfirmationEmail(
 export async function sendTripReminderEmail(
   name: string, email: string, firstDate, lastDate, driver: boolean, passengerName: string, trip_direction: string, 
   driverLocation: string, riderLocation: string) {
+  if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
+  
   firstDate = prettyDate(new Date(firstDate))
   lastDate = prettyDate(new Date(lastDate))
   let message = `Hello ${name}, <br><br> Your trip with ${passengerName} is coming up `
       message += (firstDate == lastDate) ? `on ${firstDate}! ` : `between ${firstDate} and ${lastDate}! `
       message += (driver) ? `You will be driving ${passengerName} ` : `${passengerName} will be driving you `
-      message += (trip_direction == 'to_lafayette') ? 
-      ` to Lafayette College from ${riderLocation} on the way from ${driverLocation}.`  : 
-      ` from Lafayette College to ${riderLocation} on the way to ${driverLocation}.`
-      message += `<br><br>Thanks for using LEAP Lifts! <br><br> The LEAP Lifts Team`
+      if (trip_direction == 'to_lafayette') {
+        if (riderLocation == driverLocation) {
+          message += ` to Lafayette College from ${riderLocation}.`  
+        } else {
+          message += ` to Lafayette College from ${riderLocation} on the way from ${driverLocation}.`  
+        }
+      } else { 
+        if (riderLocation == driverLocation) {
+          message += ` from Lafayette College to ${riderLocation}.`
+        } else {
+          message += ` from Lafayette College to ${riderLocation} on the way to ${driverLocation}.`
+        }
+      }
+      message += `<br><br>Thanks for using ${process.env.SITE_NAME}! <br><br> The ${process.env.SITE_NAME} Team`
 
   await transporter.sendMail({
-    from: '"LEAP Lifts" <leaplifts@gmail.com>',
+    from: `"${process.env.SITE_NAME}" <${process.env.CONTACT_EMAIL}>`,
     to: email,
     subject: "Trip Reminder",
     html: message

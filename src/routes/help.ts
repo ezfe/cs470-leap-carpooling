@@ -5,7 +5,7 @@ import { sendMessage } from '../utils/emails'
 
 const routes = Router()
 
-routes.get('/', async (req: AuthedReq, res: Response) => {
+routes.get('/', async (req: AuthedReq, res: Response) => {  
   const userEmail = (req.user) ? req.user.email : ''
   const alertDisplay = 'none'
   res.render('help', { userEmail, preferredEmail, alertDisplay })

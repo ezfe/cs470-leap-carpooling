@@ -1,10 +1,10 @@
-import { Response, Router } from 'express'
+import { Response, Router, NextFunction } from 'express'
 import db from '../../db'
 import { PairRejection } from '../../models/pair_rejections'
 import { TripMatch } from '../../models/trip_matches'
 import { TripRequest } from '../../models/trip_requests'
-import { User } from '../../models/users'
-import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
+import { User, getPreferredFirstName } from '../../models/users'
+import { ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripConfirmationEmail } from '../../utils/emails'
 import { lafayettePlaceID } from '../../utils/places'
 import { locationCity } from '../../utils/geocoding'
@@ -17,21 +17,75 @@ import { close } from 'fs'
 
 const routes = Router({ mergeParams: true })
 
-async function preprocess(req: AuthedReq): Promise<{ tripMatch: TripMatch, driverRequest: TripRequest, riderRequest: TripRequest } | null> {
-  const id = parseInt(req.params.tripId, 10)
-
-  const tripMatch = await db('trip_matches').where({ id }).first<TripMatch>()
-  if (!tripMatch) {
-    return null
-  }
-
-  const driverRequest = await db('trip_requests').where({ id: tripMatch.driver_request_id }).first<TripRequest>()
-  const riderRequest = await db('trip_requests').where({ id: tripMatch.rider_request_id }).first<TripRequest>()
-
-  return { tripMatch, driverRequest, riderRequest }
+interface MatchRequest extends ReqAuthedReq {
+  tripMatch: TripMatch
+  driver: User
+  driverRequest: TripRequest
+  rider: User
+  riderRequest: TripRequest
+  otherUser: User
+  otherUserRequest: TripRequest
+  currentUserRequest: TripRequest
+  isDriver: boolean
 }
 
-routes.get('/', async (req: ReqAuthedReq, res: Response) => {
+// Middleware for just this file's routes
+routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
+  try {
+    const id = parseInt(req.params.tripId, 10)
+    
+    const tripMatch = await db('trip_matches').where({ id }).first<TripMatch>()
+    if (!tripMatch) {
+      res.send(404)
+      return
+    }
+    req.tripMatch = tripMatch
+
+    const driverRequest = await db('trip_requests').where({ id: tripMatch.driver_request_id }).first<TripRequest>()
+    const riderRequest = await db('trip_requests').where({ id: tripMatch.rider_request_id }).first<TripRequest>()
+    if (!driverRequest || !riderRequest) {
+      console.error('Failed to retrieve requests from a match')
+      console.error('This might indicate database issues')
+      res.sendStatus(500)
+      return
+    }
+    req.driverRequest = driverRequest
+    req.riderRequest = riderRequest
+    
+    if (req.driverRequest.member_id == req.user.id) {
+      req.isDriver = true
+    } else if (req.riderRequest.member_id == req.user.id) {
+      req.isDriver = false
+    } else {
+      res.sendStatus(403)
+      return
+    }
+
+    const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
+    const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
+    if (!driver || !rider) {
+      console.error(`The driver ${JSON.stringify(driverRequest)} or rider ${JSON.stringify(riderRequest)} requests has invalid members?`)
+      res.sendStatus(500)
+      return
+    }
+    req.driver = driver
+    req.rider = rider
+
+    req.otherUser = req.isDriver ? rider : driver
+    req.otherUserRequest = req.isDriver ? riderRequest : driverRequest
+    req.currentUserRequest = req.isDriver ? driverRequest : riderRequest
+
+    res.locals.getPreferredFirstName = getPreferredFirstName
+
+    next()
+  } catch (err) {
+    console.error(err)
+    res.sendStatus(500)
+    return
+  }
+})
+
+routes.get('/', async (req: MatchRequest, res: Response) => {
   try {
     const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
     if (!googleMapsAPIKey) {
@@ -39,61 +93,53 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       return
     }
 
-    const processed = await preprocess(req)
-    if (!processed) {
-      res.sendStatus(404)
-      return
-    }
-    const { tripMatch, driverRequest, riderRequest } = processed
-
-    const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
-    const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
-    if (!driver || !rider) {
-      console.error(`The driver ${JSON.stringify(driverRequest)} or rider ${JSON.stringify(riderRequest)} requests has invalid members?`)
-      res.sendStatus(510)
-      return
-    }
-
-    const otherUser = driver.id === req.user.id ? rider : driver
     console.log("this is other user")
-    console.log(otherUser)
+    console.log(req.otherUser.id)
     console.log("this is my id")
     console.log(req.user.id)
-    const driverProfileImageURL = driver.profile_image_name || 'static/blank-profile.png'
-    const riderProfileImageURL = rider.profile_image_name || 'static/blank-profile.png'
+
+    const driverProfileImageURL = req.driver.profile_image_name || 'static/blank-profile.png'
+    const riderProfileImageURL = req.rider.profile_image_name || 'static/blank-profile.png'
 
     let firstPlaceID: string | null = null
     let midPlaceID: string | null = null
     let lastPlaceID: string | null = null
-    if (driverRequest.direction === 'from_lafayette') {
+
+    if (req.driverRequest.direction === 'from_lafayette') {
       firstPlaceID = lafayettePlaceID
-      if (tripMatch.first_portion === 'driver') {
-        midPlaceID = riderRequest.location
-        lastPlaceID = driverRequest.location
-      } else if (tripMatch.first_portion === 'rider') {
-        midPlaceID = driverRequest.location
-        lastPlaceID = riderRequest.location
+      if (req.tripMatch.first_portion === 'driver') {
+        midPlaceID = req.riderRequest.location
+        lastPlaceID = req.driverRequest.location
+      } else if (req.tripMatch.first_portion === 'rider') {
+        midPlaceID = req.driverRequest.location
+        lastPlaceID = req.riderRequest.location
       }
-    } else if (driverRequest.direction === 'towards_lafayette') {
+    } else if (req.driverRequest.direction === 'towards_lafayette') {
       lastPlaceID = lafayettePlaceID
-      if (tripMatch.first_portion === 'driver') {
-        firstPlaceID = riderRequest.location
-        midPlaceID = driverRequest.location
-      } else if (tripMatch.first_portion === 'rider') {
-        firstPlaceID = driverRequest.location
-        midPlaceID = riderRequest.location
+      if (req.tripMatch.first_portion === 'driver') {
+        firstPlaceID = req.driverRequest.location
+        midPlaceID = req.riderRequest.location
+      } else if (req.tripMatch.first_portion === 'rider') {
+        firstPlaceID = req.riderRequest.location
+        midPlaceID = req.driverRequest.location
       }
     }
 
     if (!firstPlaceID || !midPlaceID || !lastPlaceID) {
       console.error('Unable to find all place IDs!')
-      res.send('An error occurred generating place IDs')
+      res.sendStatus(500)
       return
     }
 
     // eslint-disable-next-line no-inner-declarations
     function descriptionFor(placeID) {
-      return (driverRequest.location === placeID) ? driverRequest.location_description : ((riderRequest.location === placeID) ? riderRequest.location_description : 'Lafayette College')
+      if (req.driverRequest.location === placeID) {
+        return req.driverRequest.location_description
+      } else if (req.riderRequest.location === placeID) {
+        return req.riderRequest.location_description
+      } else {
+        return 'Lafayette College'
+      }
     }
     let firstPlaceDescription =""
     let lastPlaceDescription = ""
@@ -155,12 +201,15 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     driverDesc = (await(locationFormatter(driverRequest.location_description))).formatted_loc
     }
     res.render('trips/detail', {
-      tripMatch,
-      driverRequest,
-      riderRequest,
-      driver,
-      rider,
-      otherUser,
+      tripMatch: req.tripMatch,
+      driverRequest: req.driverRequest,
+      riderRequest: req.riderRequest,
+      currentUserRequest: req.currentUserRequest,
+      otherUserRequest: req.otherUserRequest,
+      driver: req.driver,
+      rider: req.rider,
+      otherUser: req.otherUser,
+      isDriver: req.isDriver,
       firstPlaceID,
       lastPlaceID,
       midPlaceID,
@@ -179,76 +228,62 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   }
 })
 
-routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
-  try {
-    const processed = await preprocess(req)
-    if (!processed) {
-      res.sendStatus(404)
-      return
-    }
-    const { tripMatch, driverRequest, riderRequest } = processed
+/**
+ * Send confirmation emails when both members confirm a trip
+ * @param tripMatch The trip to confirm
+ * @param driver The driver
+ * @param rider The rider
+ * @param driverRequest The driver's request
+ * @param riderRequest The rider's request
+ */
+function sendConfirmationEmails(
+  tripMatch: TripMatch,
+  driver: User,
+  rider: User,
+  driverRequest: TripRequest,
+  riderRequest: TripRequest
+) {
+  if (driver.allow_notifications) {
+    sendTripConfirmationEmail(
+      driver,
+      rider,
+      tripMatch,
+      riderRequest,
+      driverRequest
+    )
+  }
+  if (rider.allow_notifications) {
+    sendTripConfirmationEmail(
+      rider,
+      driver,
+      tripMatch,
+      riderRequest,
+      driverRequest
+    )
+  }
+}
 
-    if (req.user.id === driverRequest.member_id) {
+routes.post('/confirm', async (req: MatchRequest, res: Response) => {
+  try {
+    if (req.isDriver) {
       await db<TripMatch>('trip_matches').update({
         driver_confirmed: true
-      }).where('id', tripMatch.id)
+      }).where('id', req.tripMatch.id)
 
-      if (tripMatch.rider_confirmed) {
-        const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
-
-        if (req.user.allow_notifications) {
-          sendTripConfirmationEmail(
-            req.user,
-            rider,
-            tripMatch,
-            riderRequest,
-            driverRequest
-          )
-        }
-        if (rider.allow_notifications) {
-          sendTripConfirmationEmail(
-            rider,
-            req.user,
-            tripMatch,
-            riderRequest,
-            driverRequest
-          )
-        }
-      }
-    } else if (req.user.id === riderRequest.member_id) {
-      await db<TripMatch>('trip_matches').update({
-        rider_confirmed: true
-      }).where('id', tripMatch.id)
-
-      if (tripMatch.driver_confirmed) {
-        const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
-
-        if (req.user.allow_notifications) {
-          sendTripConfirmationEmail(
-            req.user,
-            driver,
-            tripMatch,
-            riderRequest,
-            driverRequest
-          )
-        }
-        if (driver.allow_notifications) {
-          sendTripConfirmationEmail(
-            driver,
-            req.user,
-            tripMatch,
-            riderRequest,
-            driverRequest
-          )
-        }
+      if (req.tripMatch.rider_confirmed) {
+        sendConfirmationEmails(req.tripMatch, req.driver, req.rider, req.driverRequest, req.riderRequest)
       }
     } else {
-      console.error('Forbidden to confirm trip when not a member of the trip')
-      res.sendStatus(403)
-      return
+      await db<TripMatch>('trip_matches').update({
+        rider_confirmed: true
+      }).where('id', req.tripMatch.id)
+
+      if (req.tripMatch.rider_confirmed) {
+        sendConfirmationEmails(req.tripMatch, req.driver, req.rider, req.driverRequest, req.riderRequest)
+      }
     }
 
-    res.redirect(`/trips/${tripMatch.id}`)
+    res.redirect(`/trips/${req.tripMatch.id}`)
     return
   } catch (err) {
     console.error(err)
@@ -256,31 +291,15 @@ routes.post('/confirm', async (req: ReqAuthedReq, res: Response) => {
   }
 })
 
-routes.post('/reject', async (req: ReqAuthedReq, res: Response) => {
-  const processed = await preprocess(req)
-  if (!processed) {
-    res.sendStatus(404)
-    return
-  }
-  const { tripMatch, driverRequest, riderRequest } = processed
-
-  let myRequest: TripRequest | null = null
-  let otherRequest: TripRequest | null = null
-
-  if (driverRequest.member_id === req.user.id) {
-    myRequest = driverRequest
-    otherRequest = riderRequest
-  } else if (riderRequest.member_id === req.user.id) {
-    myRequest = riderRequest
-    otherRequest = driverRequest
-  } else {
-    console.error('Forbidden to reject trip when not a member of the trip')
-    res.sendStatus(403)
-    return
-  }
-
+routes.post('/reject', async (req: MatchRequest, res: Response) => {
   const reasons = ['incompatible-location', 'incompatible-times', 'block-person']
   const requestedReason = req.body.blockReason
+  if (!requestedReason) {
+    console.error('Block reason wasn\'t provided')
+    res.sendStatus(400)
+    return
+  }
+
   if (reasons.indexOf(requestedReason) < 0) {
     console.error(`Forbidden block reason: ${requestedReason}`)
     res.sendStatus(403)
@@ -288,10 +307,10 @@ routes.post('/reject', async (req: ReqAuthedReq, res: Response) => {
   }
 
   await db<PairRejection>('pair_rejections').insert({
-    blocker_id: myRequest.member_id,
-    blockee_id: otherRequest.member_id
+    blocker_id: req.user.id,
+    blockee_id: req.otherUser.id
   })
-  await db<TripMatch>('trip_matches').where({ id: tripMatch.id }).del()
+  await db<TripMatch>('trip_matches').where({ id: req.tripMatch.id }).del()
 
   res.redirect('/trips?reject=success')
   return

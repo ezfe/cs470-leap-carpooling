@@ -7,4 +7,3 @@ export default function registerJobs(): void {
   schedule.scheduleJob('*/5 * * * * *', emailJob)
   schedule.scheduleJob('*/10 * * * *', sampleJob)
 }
-

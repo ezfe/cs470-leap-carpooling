@@ -4,7 +4,7 @@ block navbar_settings
   - var current_page = "trip_detail"
 
 append head
-  link(rel="stylesheet", href="/static/dashboard.css")
+  link(rel="stylesheet", href="/static/css/trip_detail.css")
 
   meta(name="firstPlaceID" content=firstPlaceID)
   meta(name="midPlaceID" content=midPlaceID)
@@ -19,140 +19,80 @@ block content
         = otherUser.preferred_name || otherUser.first_name
         = ' and confirm your trip details.'
 
-  if driver.id != currentUser.id
-    .row.mb-3
-      .col
-        .card
-          h5.card-header
-            if rider.id == currentUser.id
-              | Driving You
-            else
-              | Driver
-          .card-body
-            .row
-              .col-8.offset-2.col-sm-3.offset-sm-0.col-lg-2
-                img.rounded.img-fluid(src='/'+driverProfileImageURL, style="width: 300px;")   
-              .col-12.col-sm-9.col-md-7.col-lg-5
-                h5.card-title
-                  = `${driver.preferred_name || driver.first_name} ${driver.last_name}`
-                table.table.table-sm.table-bordered
-                  tr
-                    th(scope="row") Location
-                    td= driverDesc
-                  tr
-                    th(scope="row") Phone
-                    td= driver.phone_number
-                  tr
-                    th(scope="row") Email
-                    - const email = driver.email || `${driver.netid}@lafayette.edu`
-                    td
-                      a(href=`mailto:${email}`)= email
-              .col-12.col-sm-6.col-md-5.col-lg-4.offset-lg-1.col-xl-3.offset-xl-2
-                .row.mb-2
-                  .col
-                    if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
-                      button.btn.btn-block.btn-success(type="button" data-toggle="modal" data-target="#confirmModal")
-                        i.fas.fa-check
-                        = ' Confirm Trip'
-                    else if (!tripMatch.driver_confirmed || !tripMatch.rider_confirmed)
-                      span Waiting for the other person to confirm...
-                    else
-                      button.btn.btn-light.btn-block(disabled, style="color: black !important;")
-                        i.fas.fa-check
-                        = ' Trip Confirmed'
-                .row
-                  .col
-                    button.btn.btn-block.btn-warning(type="button" data-toggle="modal" data-target="#rejectModal")
-                      i.fas.fa-sync-alt
-                      = ' Reject Match'
-
-  if rider.id != currentUser.id
-    .row.mb-3
-      .col
-        .card
-          h5.card-header
-            if driver.id == currentUser.id
-              | Riding With You
-            else
-              | Rider
-          .card-body
-            .row
-              .col-8.offset-2.col-sm-3.offset-sm-0.col-lg-2
-                img.rounded.img-fluid(src='/'+riderProfileImageURL, style="width: 300px;")   
-              .col-12.col-sm-9.col-md-7.col-lg-5
-                h5.card-title
-                  = `${rider.preferred_name || rider.first_name} ${rider.last_name}`
-                table.table.table-sm.table-bordered
-                  tr
-                    th(scope="row") Location
-                    td= riderDesc
-                  tr
-                    th(scope="row") Phone
-                    td= rider.phone_number
-                  tr
-                    th(scope="row") Email
-                    - const email = rider.email || `${rider.netid}@lafayette.edu`
-                    td
-                      a(href=`mailto:${email}`)= email
-              .col-12.col-sm-6.col-md-5.col-lg-4.offset-lg-1.col-xl-3.offset-xl-2
-                .row.mb-2
-                  .col
-                    if (driverRequest.member_id == currentUser.id && !tripMatch.driver_confirmed) || (riderRequest.member_id == currentUser.id && !tripMatch.rider_confirmed)
-                      button.btn.btn-block.btn-success(type="button" data-toggle="modal" data-target="#confirmModal")
-                        i.fas.fa-check
-                        = ' Confirm Trip'
-                    else if (!tripMatch.driver_confirmed || !tripMatch.rider_confirmed)
-                      span Waiting for the other person to confirm...
-                    else
-                      button.btn.btn-light.btn-block(disabled, style="color: black !important;")
-                        i.fas.fa-check
-                        = ' Trip Confirmed'
-                .row
-                  .col
-                    button.btn.btn-block.btn-warning(type="button" data-toggle="modal" data-target="#rejectModal")
-                      i.fas.fa-sync-alt
-                      = ' Reject Match'
+  .row.mb-3
+    .col
+      .card
+        h5.card-header
+          if isDriver
+            | Riding With You
+          else
+            | Driving You
+        .card-body
+          .row
+            .col-8.offset-2.col-sm-3.offset-sm-0.col-lg-2
+              - const profileURL = isDriver ? riderProfileImageURL : driverProfileImageURL
+              img.rounded.img-fluid(src='/'+profileURL, style="width: 300px;")   
+            .col-12.col-sm-9.col-md-7.col-lg-5
+              h5.card-title= `${getPreferredFirstName(otherUser)} ${otherUser.last_name}`
+              table.table.table-sm.table-bordered
+                tr
+                  th(scope="row") Location
+                  td= otherUserRequest.location_description
+                tr
+                  th(scope="row") Phone
+                  td= otherUser.phone_number
+                tr
+                  th(scope="row") Email
+                  - const email = otherUser.email || `${otherUser.netid}@lafayette.edu`
+                  td
+                    a(href=`mailto:${email}`)= email
+            .col-12.col-sm-6.col-md-5.col-lg-4.offset-lg-1.col-xl-3.offset-xl-2
+              .row.mb-2
+                .col
+                  if (isDriver && !tripMatch.driver_confirmed) || (!isDriver && !tripMatch.rider_confirmed)
+                    button.btn.btn-block.btn-success(type="button" data-toggle="modal" data-target="#confirmModal")
+                      i.fas.fa-check
+                      = ' Confirm Trip'
+                  else if (!tripMatch.driver_confirmed || !tripMatch.rider_confirmed)
+                    span Waiting for the other person to confirm...
+                  else
+                    button.btn.btn-light.btn-block(disabled, style="color: black !important;")
+                      i.fas.fa-check
+                      = ' Trip Confirmed'
+              .row
+                .col
+                  button.btn.btn-block.btn-warning(type="button" data-toggle="modal" data-target="#rejectModal")
+                    i.fas.fa-sync-alt
+                    = ' Reject Match'
 
   .row
     .col
       p If you need to change details of your trip, click "Cancel Trip" and request another trip with the corrected details.
 
   .row
-    -
-      let currentUserRequestID = null
-      if (driverRequest.member_id == currentUser.id) {
-        currentUserRequestID = driverRequest.id
-      } else if (riderRequest.member_id == currentUser.id) {
-        currentUserRequestID = riderRequest.id
-      }
-    if currentUserRequestID
-      .col.mb-2
-        form#cancel-trip-form(method="POST" action=`/trip-requests/${currentUserRequestID}/cancel`)
-          button.btn.btn-danger(role="submit")
-            i.fas.fa-times
-            = ' Cancel Trip'
+    .col.mb-2
+      form#cancel-trip-form(method="POST" action=`/trip-requests/${currentUserRequest.id}/cancel`)
+        button.btn.btn-danger(role="submit")
+          i.fas.fa-times
+          = ' Cancel Trip'
+
   hr.my-3
+
   .row
-    .col-12.col-lg-6
+    .col-12.col-lg-6.mb-4
       .row
-        .col
+        .col.text-center
           h4 Your Trip
-      .row
-        .col
-          span= firstPlaceDescription
-      .row
-        .col
-          i.fas.fa-arrow-down
-      if (midPlaceID !== lastPlaceID && midPlaceID !== firstPlaceID)
-        .row
-          .col
-            span= midPlaceDescription
-        .row
-          .col
+      .row.d-flex.flex-column.align-items-center
+        .col-auto.d-flex.flex-column.align-items-stretch.text-center
+          .location-box.box-shadow-hover= firstPlaceDescription
+          div.mt-3.mb-1
             i.fas.fa-arrow-down
-      .row
-        .col
-          span= lastPlaceDescription
+          if (midPlaceID !== lastPlaceID && midPlaceID !== firstPlaceID)
+            .location-box.box-shadow-hover= midPlaceDescription
+            div.mt-3.mb-1
+              i.fas.fa-arrow-down
+          .location-box.box-shadow-hover= lastPlaceDescription
 
     //- a.btn.btn-outline-info(
     //-   href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(riderRequest.location_description)}&query_place_id=${riderRequest.location}`
@@ -160,12 +100,13 @@ block content
     //-   fa.fas.fa-location-arrow
     //-   = ' Google Maps'
 
-    .col-12.col-lg-6
+    .col-12.col-lg-6.mb-4
       #googleMap(style="height: 300px")
 
   include prettyDate
 
-  hr.my-4
+  hr.mb-4
+
   .row.mb-2
     .col
       h5= `Common Travel Days: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
@@ -193,7 +134,7 @@ block content
             .form-check
               input.form-check-input#radio-incompatible-times(type="radio" name="blockReason" value="incompatible-times")
               label.form-check-label(for="radio-incompatible-times") Cannot agree on when to travel
-            if driverRequest.member_id == currentUser.id && tripMatch.first_portion == 'driver'
+            if isDriver && tripMatch.first_portion == 'driver'
               .form-check
                 input.form-check-input#radio-incompatible-location(type="radio" name="blockReason" value="incompatible-location")
                 label.form-check-label(for="radio-incompatible-location")

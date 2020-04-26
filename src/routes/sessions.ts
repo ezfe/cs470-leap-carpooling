@@ -16,12 +16,12 @@ routes.get('/login', async (req: AuthedReq, res: Response) => {
     delete req.session.loginRedirect
   }
 
-  if (process.env.CAS_ENABLED === "true") {
+  if (process.env.CAS_ENABLED === 'true') {
     const casURL = format({
       pathname: 'https://cas.lafayette.edu/cas/login',
       query: {
-          service
-      }
+        service,
+      },
     })
 
     res.redirect(casURL)
@@ -42,11 +42,11 @@ routes.get('/logout', (req, res) => {
   const casURL = format({
     pathname: 'https://cas.lafayette.edu/cas/logout',
     query: {
-        service
-    }
+      service,
+    },
   })
 
-  if (process.env.CAS_ENABLED === "true") {
+  if (process.env.CAS_ENABLED === 'true') {
     res.redirect(casURL)
   } else {
     res.redirect('/')
@@ -57,9 +57,9 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
   const requestURL = format({
     pathname: 'https://cas.lafayette.edu/cas/p3/serviceValidate',
     query: {
-        service,
-        ticket: req.query.ticket as string
-    }
+      service,
+      ticket: req.query.ticket as string,
+    },
   })
 
   try {
@@ -69,7 +69,7 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
       trim: true,
       normalize: true,
       explicitArray: false,
-      tagNameProcessors: [ normalize, stripPrefix ]
+      tagNameProcessors: [normalize, stripPrefix],
     })
 
     const failure = parsedXML.serviceresponse.authenticationfailure
@@ -135,7 +135,7 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
   return
 })
 
-if (process.env.CAS_ENABLED !== "true") {
+if (process.env.CAS_ENABLED !== 'true') {
   // POST /sessions/login
   routes.post('/login', async (req: AuthedReq, res: Response) => {
     const user = await getUserByID(req.body.chosen_user)
