@@ -23,10 +23,10 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@googlemaps/google-maps-services-js@^2.5.5":
-  version "2.5.5"
-  resolved "https://registry.yarnpkg.com/@googlemaps/google-maps-services-js/-/google-maps-services-js-2.5.5.tgz#80dd42c38c5365ad25086fc163909476441d8357"
-  integrity sha512-/F1otFx6JrZNBpkTmVcwS2GsJFSmd6FnZAMXhze1MK6C7nA/OjZaV5vtdIfHn3+BDfQuZu0r9mXUW/h82Z0yOA==
+"@googlemaps/google-maps-services-js@^2.6.0":
+  version "2.6.0"
+  resolved "https://registry.yarnpkg.com/@googlemaps/google-maps-services-js/-/google-maps-services-js-2.6.0.tgz#cbaacf8f0f8961f9faf94c83231d1640aef38aec"
+  integrity sha512-+eVnmvMxfp++yGiwewSUyNtAy0Rd6E2b+Fs9IlzWERq0J8jsX4U/s9LoG0qc+yNEYZGh0GX6fNYVGpYyuZ4+Yw==
   dependencies:
     agentkeepalive "^4.1.0"
     axios "^0.19.0"
@@ -163,10 +163,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.0.tgz#30d2d09f623fe32cde9cb582c7a6eda2788ce4a8"
   integrity sha512-WE4IOAC6r/yBZss1oQGM5zs2D7RuKR6Q+w+X2SouPofnWn+LbCqClRyhO3ZE7Ix8nmFgo/oVuuE01cJT2XB13A==
 
-"@types/node@^13.13.2":
-  version "13.13.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.2.tgz#160d82623610db590a64e8ca81784e11117e5a54"
-  integrity sha512-LB2R1Oyhpg8gu4SON/mfforE525+Hi/M1ineICEDftqNVTyFg1aRIeGuTvXAoWHc4nbrFncWtJgMmoyRvuGh7A==
+"@types/node@^13.13.3":
+  version "13.13.3"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.3.tgz#385263e71ff584729ced140a935f3d029e3c8d1e"
+  integrity sha512-FiVARmwSn2s0nXKJM9V7jWtGiSeUc58dxIRIhLPrPZTPRUEoHMK7BDEo0XWxQ9vNflxoUQlGDBn9/gLxORzLKQ==
 
 "@types/nodemailer@^6.4.0":
   version "6.4.0"
