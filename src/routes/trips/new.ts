@@ -16,7 +16,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     res.send('GOOGLE_MAPS_PLACES_KEY is unset')
     return
   }
-  
+
   const desc = req.user.default_location_description
   let formattedLocation = ''
   if (desc) {
