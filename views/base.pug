@@ -84,11 +84,11 @@ html(lang="en")
                   )= user_preferred_name
                   div.dropdown-menu(aria-labelledby="navbarDropdown")
                     a.dropdown-item(href="/settings")
-                      i.fas.fa-cog
-                      = ' Settings'
+                      i.fas.fa-cog.mr-2
+                      | Settings
                     a.dropdown-item(href="/sessions/logout")
-                      i.fas.fa-sign-out-alt
-                      = ' Sign Out'
+                      i.fas.fa-sign-out-alt.mr-2
+                      | Sign Out
               else
                 li.nav-item
                   a.nav-link(href="/sessions/login") Sign in or Register
