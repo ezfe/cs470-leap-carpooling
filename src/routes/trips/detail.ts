@@ -49,7 +49,7 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
     
     if (req.driverRequest.member_id == req.user.id) {
       req.isDriver = true
-    } else if (req.driverRequest.member_id == req.user.id) {
+    } else if (req.riderRequest.member_id == req.user.id) {
       req.isDriver = false
     } else {
       res.sendStatus(403)
