@@ -29,12 +29,6 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     const pastMatchedRequests = await getTripMatches(req.user, "past", null)
     const futureActionNotNeeded = await getTripMatches(req.user, "future", false)
     const futureActionNeeded = await getTripMatches(req.user, "future", true)
-    console.log('Found past matched requests')
-    console.log(pastMatchedRequests)
-    console.log('Found future matched requests [action]')
-    console.log(futureActionNeeded)
-    console.log('Found future matched requests [no action]')
-    console.log(futureActionNotNeeded)
 
     const unmatchedRequests: TripRequest[] = await db('trip_requests')
       .select(
@@ -45,17 +39,12 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       }).whereNull('trip_matches.id')
       .andWhere('trip_requests.member_id', req.user.id)
 
-    console.log('Found unmatched requests')
-    console.log(unmatchedRequests)
-
     const trips = [
       ...futureActionNeeded,
       ...futureActionNotNeeded,
       ...unmatchedRequests,
       ...pastMatchedRequests
     ]
-    console.log("this is trips")
-    console.log(trips)
 
     res.locals.formatLocation = formatLocation
     res.render('trips/index', { trips, alerts,  })

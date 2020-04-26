@@ -104,11 +104,6 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
       return
     }
 
-    console.log('this is other user')
-    console.log(req.otherUser.id)
-    console.log('this is my id')
-    console.log(req.user.id)
-
     const driverProfileImageURL =
       req.driver.profile_image_name || 'static/blank-profile.png'
     const riderProfileImageURL =

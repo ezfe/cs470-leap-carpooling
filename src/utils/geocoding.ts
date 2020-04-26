@@ -9,8 +9,6 @@ interface GeocodeResult {
 }
 
 export async function geocode(placeID: string): Promise<GeocodeResult> {
-  console.log('in geocodeeeeeeeee')
-
   const data: GeocodeResult = {
     street_number: null,
     street: null,
@@ -34,9 +32,7 @@ export async function geocode(placeID: string): Promise<GeocodeResult> {
   })
 
   const res = response.data.result.address_components
-  console.log('this is the result!!!!!!!!!!!!!!!!!!')
   if (res) {
-    console.log(res)
     for (let i = 0; i < res.length; i++) {
       for (let j = 0; j < res[i].types.length; j++) {
         if (res[i].types[j] == 'street_number') {

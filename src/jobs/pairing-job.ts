@@ -9,20 +9,12 @@ import { Raw } from 'knex'
 import { sendTripMatchEmail } from '../utils/emails'
 
 export default async function job(): Promise<void> {
-  // console.log("Starting Pairing Process")
-
-  // console.log('Generating Pairs From Lafayette')
   const pairsFromLafayette = await calculatePairsWithCost('from_lafayette')
-  // console.log('Found pairs', pairsFromLafayette)
-
-  // console.log('Generating Pairs Towards Lafayette')
   const pairsTowardsLafayette = await calculatePairsWithCost('towards_lafayette')
-  // console.log('Found pairs', pairsTowardsLafayette)
 
   const pairs = [...pairsFromLafayette, ...pairsTowardsLafayette]
   pairs.sort((a, b) => { return a.cost - b.cost })
 
-  // console.log('Matching Pairs')
   matchFirstPair(pairs)
 }
 

@@ -35,8 +35,6 @@ function locationFormatter(locDesc: string): string {
 
 function cityFormatter(locDesc: string): string {
   const json = JSON.parse(locDesc)
-  console.log('@@@@@@@@@@@@@')
-  console.log(json)
 
   if (json.locality && json.state) {
     return `${json.locality}, ${json.state}`

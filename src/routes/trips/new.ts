@@ -21,9 +21,6 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   let formattedLocation = ''
   if (desc) {
     formattedLocation = await formatLocation(desc, 'full')
-    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    console.log(formattedLocation)
-    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
   }
 
   res.render('trips/new', {

@@ -139,10 +139,6 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   let formattedLocation = ''
   if (defaultLocationInformation) {
     formattedLocation = await formatLocation(defaultLocationInformation, 'full')
-
-    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-    console.log(formattedLocation)
-    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
   }
 
   //const temp =await(locationCity(validated.place_id))
