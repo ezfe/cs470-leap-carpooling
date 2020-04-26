@@ -159,11 +159,11 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
     let lastPlaceDescription = ''
     let changeRider = false
     let changeDriver = false
-    if (descriptionFor(firstPlaceID) == 'Lafayette College') {
+    if (firstPlaceID === lafayettePlaceID) {
       firstPlaceDescription = descriptionFor(firstPlaceID)
     } else {
       if (
-        req.user.id == req.driver.id &&
+        req.isDriver &&
         firstPlaceID == req.riderRequest.location
       ) {
         changeRider = true
@@ -171,7 +171,7 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
           descriptionFor(firstPlaceID)
         )
       } else if (
-        req.user.id == req.rider.id &&
+        !req.isDriver &&
         firstPlaceID == req.driverRequest.location
       ) {
         changeDriver = true
@@ -184,11 +184,12 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
         )
       }
     }
+
     const midPlaceDescription = await locationFormatter(
       descriptionFor(midPlaceID)
     )
 
-    if (descriptionFor(lastPlaceID) == 'Lafayette College') {
+    if (lastPlaceID === lafayettePlaceID) {
       lastPlaceDescription = descriptionFor(lastPlaceID)
     } else {
       if (req.isDriver && lastPlaceID == req.riderRequest.location) {
