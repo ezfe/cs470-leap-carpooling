@@ -25,12 +25,15 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
       reject: req.query.reject === 'success'
     }
 
-    const pastMatchedRequests = await getTripMatches(req.user, "past")
-    const futureMatchedRequests = await getTripMatches(req.user, "future")
+    const pastMatchedRequests = await getTripMatches(req.user, "past", null)
+    const futureActionNotNeeded = await getTripMatches(req.user, "future", false)
+    const futureActionNeeded = await getTripMatches(req.user, "future", true)
     console.log('Found past matched requests')
     console.log(pastMatchedRequests)
-    console.log('Found future matched requests')
-    console.log(futureMatchedRequests)
+    console.log('Found future matched requests [action]')
+    console.log(futureActionNeeded)
+    console.log('Found future matched requests [no action]')
+    console.log(futureActionNotNeeded)
 
     const unmatchedRequests: TripRequest[] = await db('trip_requests')
       .select(
@@ -45,7 +48,8 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     console.log(unmatchedRequests)
 
     const trips = [
-      ...futureMatchedRequests,
+      ...futureActionNeeded,
+      ...futureActionNotNeeded,
       ...unmatchedRequests,
       ...pastMatchedRequests
     ]

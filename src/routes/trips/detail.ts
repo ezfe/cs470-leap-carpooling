@@ -3,7 +3,7 @@ import db from '../../db'
 import { PairRejection } from '../../models/pair_rejections'
 import { TripMatch } from '../../models/trip_matches'
 import { TripRequest } from '../../models/trip_requests'
-import { User } from '../../models/users'
+import { User, getPreferredFirstName } from '../../models/users'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripConfirmationEmail } from '../../utils/emails'
 import { lafayettePlaceID } from '../../utils/places'
@@ -49,7 +49,7 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
     
     if (req.driverRequest.member_id == req.user.id) {
       req.isDriver = true
-    } else if (req.driverRequest.member_id == req.user.id) {
+    } else if (req.riderRequest.member_id == req.user.id) {
       req.isDriver = false
     } else {
       res.sendStatus(403)
@@ -69,6 +69,8 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
     req.otherUser = req.isDriver ? rider : driver
     req.otherUserRequest = req.isDriver ? riderRequest : driverRequest
     req.currentUserRequest = req.isDriver ? driverRequest : riderRequest
+
+    res.locals.getPreferredFirstName = getPreferredFirstName
 
     next()
   } catch (err) {
@@ -105,11 +107,11 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
     } else if (req.driverRequest.direction === 'towards_lafayette') {
       lastPlaceID = lafayettePlaceID
       if (req.tripMatch.first_portion === 'driver') {
-        firstPlaceID = req.riderRequest.location
-        midPlaceID = req.driverRequest.location
-      } else if (req.tripMatch.first_portion === 'rider') {
         firstPlaceID = req.driverRequest.location
         midPlaceID = req.riderRequest.location
+      } else if (req.tripMatch.first_portion === 'rider') {
+        firstPlaceID = req.riderRequest.location
+        midPlaceID = req.driverRequest.location
       }
     }
 
@@ -138,9 +140,12 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
       tripMatch: req.tripMatch,
       driverRequest: req.driverRequest,
       riderRequest: req.riderRequest,
+      currentUserRequest: req.currentUserRequest,
+      otherUserRequest: req.otherUserRequest,
       driver: req.driver,
       rider: req.rider,
       otherUser: req.otherUser,
+      isDriver: req.isDriver,
       firstPlaceID,
       lastPlaceID,
       midPlaceID,

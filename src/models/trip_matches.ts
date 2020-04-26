@@ -32,8 +32,19 @@ export interface AnnotatedTripMatch {
   rider_location_description: number
 }
 
-function tripMatchesBuilder(user: User, filter: 'past' | 'future' | null) {
-  const orderByParam = filter === 'past' ? 'desc' : 'asc'
+/**
+ * Get annotated TripMatches
+ * @param user The user who must be a member of the match
+ * @param filter Filter for matches in the future or the past
+ * @param actionNeeded Whether the user in question also needs to confirm the trip
+ */
+export async function getTripMatches(
+                                      user: User,
+                                      filter: "past" | "future" | null,
+                                      actionNeeded: boolean | null
+                                    ): Promise<AnnotatedTripMatch[]> {
+
+  const orderByParam = (filter === 'past' ? 'desc' : 'asc')
 
   let query = db('trip_matches')
     .select(
@@ -74,14 +85,29 @@ function tripMatchesBuilder(user: User, filter: 'past' | 'future' | null) {
     query = query.andWhere('trip_matches.last_date', '>=', db.fn.now())
   }
 
-  return query
-}
+  // Since in JavaScript, null is falsy,
+  // can't just if (actionNeeded) else if (!actionNeeded)
+  if (actionNeeded === true) {
+    query = query.andWhere(function() {
+      this.where({
+        'trip_matches.driver_confirmed': false,
+        'driver_t.member_id': user.id
+      }).orWhere({
+        'trip_matches.rider_confirmed': false,
+        'rider_t.member_id': user.id
+      })
+    })
+  } else if (actionNeeded === false) {
+    query = query.andWhere(function() {
+      this.where({
+        'trip_matches.driver_confirmed': true,
+        'driver_t.member_id': user.id
+      }).orWhere({
+        'trip_matches.rider_confirmed': true,
+        'rider_t.member_id': user.id
+      })
+    })
+  }
 
-export async function getTripMatches(
-  user: User,
-  filter: 'past' | 'future' | null
-): Promise<AnnotatedTripMatch[]> {
-  const tripRequests = await tripMatchesBuilder(user, filter) // .toSQL()
-
-  return tripRequests
+  return await query
 }
