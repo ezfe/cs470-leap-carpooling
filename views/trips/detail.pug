@@ -16,7 +16,7 @@ block content
     .col
       p
         = 'You\'ve been matched! Contact '
-        = otherUser.preferred_name || otherUser.first_name
+        = getPreferredFirstName(otherUser)
         = ' and confirm your trip details.'
 
   .row.mb-3
@@ -130,7 +130,7 @@ block content
               input.form-check-input#radio-block-person(type="radio" name="blockReason" value="block-person")
               label.form-check-label(for="radio-block-person")
                 = 'Do not want to ride with '
-                = otherUser.preferred_name || otherUser.first_name
+                = getPreferredFirstName(otherUser)
             .form-check
               input.form-check-input#radio-incompatible-times(type="radio" name="blockReason" value="incompatible-times")
               label.form-check-label(for="radio-incompatible-times") Cannot agree on when to travel
@@ -163,11 +163,11 @@ block content
 
           .modal-footer
             button.btn.btn-danger(type="button" data-dismiss="modal")
-              | I need to contact 
-              = ` ${otherUser.preferred_name || otherUser.first_name}`
+              = 'I need to contact '
+              = getPreferredFirstName(otherUser)
             button.btn.btn-success(type="submit")
-              | I've contacted
-              = ` ${otherUser.preferred_name || otherUser.first_name}`
+              = 'I\'ve contacted '
+              = getPreferredFirstName(otherUser)
 
 append scripts
   script(

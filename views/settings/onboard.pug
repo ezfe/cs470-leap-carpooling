@@ -29,7 +29,7 @@ block content
                 input.form-control(
                   name="preferred_name"
                   id="preferred_name"
-                  value=(currentUser.preferred_name || currentUser.first_name)
+                  value=getPreferredFirstName(currentUser)
                   type="text"
                   pattern=constraints.preferredName.pattern.source
                   autocomplete=constraints.preferredName.autocomplete
