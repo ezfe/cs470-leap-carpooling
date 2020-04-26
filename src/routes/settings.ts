@@ -10,7 +10,7 @@ import { sendWelcomeEmail } from '../utils/emails'
 import { phoneNumber, preferredEmail, preferredName } from '../validation'
 import { onboardSchema } from '../validation/onboard'
 import { settingsSchema } from '../validation/settings'
-import { locationCity } from '../utils/geocoding'
+import { geocode } from '../utils/geocoding'
 import { locationFormatter } from '../utils/location_formatter'
 
 const routes = Router()
@@ -129,15 +129,16 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
 
   const profileImageURL =
     req.user.profile_image_name || '/static/blank-profile.png'
+
   const blockedUsers: User[] = await db('pair_rejections')
     .select('users.*')
     .where('blocker_id', req.user.id)
     .innerJoin('users', 'users.id', 'pair_rejections.blockee_id')
 
-  const currentDescription = req.user.default_location_description
+  const defaultLocationInformation = req.user.default_location_description
   let formattedLocation = ''
-  if (currentDescription) {
-    formattedLocation = await locationFormatter(currentDescription)
+  if (defaultLocationInformation) {
+    formattedLocation = await locationFormatter(defaultLocationInformation)
 
     console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
     console.log(formattedLocation)
@@ -185,15 +186,15 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const validated = await settingsSchema.validateAsync(req.body)
 
-    const temp = await locationCity(validated.place_id)
-    const locDict = JSON.stringify(temp)
+    const locationInformation = await geocode(validated.place_id)
+    const locationJSON = JSON.stringify(locationInformation)
 
     await db<User>('users').where({ id: req.user.id }).update({
       preferred_name: validated.preferred_name,
       email: validated.preferred_email,
       phone_number: validated.phone_number,
       default_location: validated.place_id,
-      default_location_description: locDict,
+      default_location_description: locationJSON,
       deviation_limit: validated.deviation_limit,
       allow_notifications: validated.allow_notifications,
     })
