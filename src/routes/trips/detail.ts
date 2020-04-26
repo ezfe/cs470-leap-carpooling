@@ -156,14 +156,17 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
     }
     let firstPlaceDescription = ''
     let lastPlaceDescription = ''
+  
     let changeRider = false
     let changeDriver = false
+    //if(req.driverRequest.location!=req.riderRequest.location){
     if (firstPlaceID === lafayettePlaceID) {
       firstPlaceDescription = descriptionFor(firstPlaceID)
     } else {
       if (
-        req.isDriver &&
-        firstPlaceID == req.riderRequest.location
+        (req.isDriver &&
+        firstPlaceID == req.riderRequest.location) &&
+        (req.driverRequest.location!=req.riderRequest.location)
       ) {
         changeRider = true
         firstPlaceDescription = await formatLocation(
@@ -171,8 +174,9 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
           'city'
         )
       } else if (
-        !req.isDriver &&
-        firstPlaceID == req.driverRequest.location
+        (!req.isDriver &&
+        firstPlaceID == req.driverRequest.location) &&
+        (req.driverRequest.location!=req.riderRequest.location)
       ) {
         changeDriver = true
         firstPlaceDescription = await formatLocation(
@@ -186,6 +190,7 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
         )
       }
     }
+  //}
 
     const midPlaceDescription = await formatLocation(
       descriptionFor(midPlaceID),
@@ -195,10 +200,12 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
     if (lastPlaceID === lafayettePlaceID) {
       lastPlaceDescription = descriptionFor(lastPlaceID)
     } else {
-      if (req.isDriver && lastPlaceID == req.riderRequest.location) {
+      if ((req.isDriver && lastPlaceID == req.riderRequest.location)&&
+      (req.driverRequest.location!=req.riderRequest.location)) {
         changeRider = true
         lastPlaceDescription = await formatLocation(descriptionFor(lastPlaceID), 'city')
-      } else if (!req.isDriver && lastPlaceID == req.driverRequest.location) {
+      } else if ((!req.isDriver && lastPlaceID == req.driverRequest.location)&&
+        (req.driverRequest.location!=req.riderRequest.location)) {
         changeDriver = true
         lastPlaceDescription = await formatLocation(descriptionFor(lastPlaceID), 'city')
       } else {
@@ -208,28 +215,14 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
         )
       }
     }
-    // console.log('^^^^^^^^^^^^^^^^^^^^^^^')
-    // console.log(midPlaceDescription)
-    // let riderDesc = ''
-    // let driverDesc = ''
-    // if (changeRider == true) {
-    //   riderDesc = await formatLocation(req.riderRequest.location_description, 'city')
-
-    //   driverDesc = await formatLocation(
-    //     req.driverRequest.location_description,
-    //     'full'
-    //   )
-    // } else if (changeDriver == false) {
-    //   riderDesc = await formatLocation(req.riderRequest.location_description, 'full')
-    //   driverDesc = await formatLocation(req.driverRequest.location_description, 'city')
-    // } else {
-    //   riderDesc = await formatLocation(req.riderRequest.location_description, 'full')
-    //   driverDesc = await formatLocation(
-    //     req.driverRequest.location_description,
-    //     'full'
-    //   )
-    // }
-    const otherLoc = formatLocation(req.otherUserRequest.location_description,'full')
+    let otherLoc =""
+    if(changeRider ==true || changeDriver == true)
+    {
+      otherLoc = formatLocation(req.otherUserRequest.location_description,'city')
+    }
+    else{
+      otherLoc = formatLocation(req.otherUserRequest.location_description,'full')
+    }
     res.render('trips/detail', {
       tripMatch: req.tripMatch,
       driverRequest: req.driverRequest,
