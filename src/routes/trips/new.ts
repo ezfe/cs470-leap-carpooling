@@ -2,7 +2,7 @@ import { Response, Router } from 'express'
 import db from '../../db'
 import sampleJob from '../../jobs/pairing-job'
 import { TripRequest } from '../../models/trip_requests'
-import { AuthedReq, ReqAuthedReq } from '../../utils/authed_req'
+import { ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripProcessingEmail } from '../../utils/emails'
 import { locationCity } from '../../utils/geocoding'
 import { locationFormatter } from '../../utils/location_formatter'
@@ -10,25 +10,25 @@ import { locationFormatter } from '../../utils/location_formatter'
 const routes = Router()
 
 // GET /trips/new
-routes.get('/', async(req: ReqAuthedReq, res: Response) => {
+routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
-    const desc =  req.user.default_location_description
-    let formattedLoc = ""
-    if(desc!= undefined){
-       const result = await(locationFormatter(desc))
-       console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-       console.log(result)
-       console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-       console.log((result.formatted_loc))
-       formattedLoc = result.formatted_loc
-    }
   if (!googleMapsAPIKey) {
     res.send('GOOGLE_MAPS_PLACES_KEY is unset')
     return
   }
+  
+  const desc = req.user.default_location_description
+  let formattedLocation = ''
+  if (desc) {
+    formattedLocation = await locationFormatter(desc)
+    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    console.log(formattedLocation)
+    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+  }
 
   res.render('trips/new', {
-    googleMapsAPIKey, formattedLoc
+    googleMapsAPIKey,
+    formattedLocation,
   })
 })
 
@@ -38,15 +38,19 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
     const deviationLimitString = req.body.deviation_limit
     const deviationLimit = parseInt(deviationLimitString, 10)
     console.log(deviationLimit)
-    const temp =await(locationCity(req.body.place_id))
+    const temp = await locationCity(req.body.place_id)
     console.log(temp)
     const locDict = JSON.stringify(temp)
-    console.log("***************this is what will be inserted into the db **************************")
+    console.log(
+      '***************this is what will be inserted into the db **************************'
+    )
     console.log(locDict)
-    console.log("***************************************************************")
-    
+    console.log(
+      '***************************************************************'
+    )
 
-    const requests = await db<TripRequest>('trip_requests').insert({
+    const requests = await db<TripRequest>('trip_requests')
+      .insert({
         member_id: req.user?.id,
         role: req.body.user_role,
         location: req.body.place_id,
@@ -55,9 +59,10 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
         direction: req.body.trip_direction,
         first_date: req.body.first_date,
         last_date: req.body.last_date,
-        created_at: db.fn.now()
-      }).returning("*")
-    
+        created_at: db.fn.now(),
+      })
+      .returning('*')
+
     const tripRequest = requests[0]
     if (req.user.allow_notifications) {
       sendTripProcessingEmail(req.user, tripRequest)

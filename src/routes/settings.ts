@@ -19,20 +19,24 @@ const storage = multer.diskStorage({
   destination: 'public/uploads/',
   filename: (req, file, callback) => {
     crypto.randomBytes(16, (err, raw) => {
-      callback(null, Date.now() + '-' + raw.toString('hex') + path.extname(file.originalname));
-    });
-  }
-});
+      callback(
+        null,
+        Date.now() + '-' + raw.toString('hex') + path.extname(file.originalname)
+      )
+    })
+  },
+})
 
-const upload = multer({ storage });
+const upload = multer({ storage })
 
 routes.get('/onboard', (req: ReqAuthedReq, res: Response) => {
-  const profileImageURL = req.user.profile_image_name || 'static/blank-profile.png'
+  const profileImageURL =
+    req.user.profile_image_name || 'static/blank-profile.png'
 
   const constraints = {
     preferredName,
     preferredEmail,
-    phoneNumber
+    phoneNumber,
   }
 
   res.render('settings/onboard', { profileImageURL, constraints })
@@ -42,16 +46,17 @@ routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
   try {
     const validated = await onboardSchema.validateAsync(req.body)
 
-    const users = await db<User>('users').where({ id: req.user.id })
+    const users = await db<User>('users')
+      .where({ id: req.user.id })
       .update({
         preferred_name: validated.preferred_name,
         email: validated.preferred_email,
         phone_number: validated.phone_number,
         allow_notifications: validated.allow_notifications,
-        has_onboarded: true
+        has_onboarded: true,
       })
-      .returning("*")
-    
+      .returning('*')
+
     const newUser = users[0]
 
     if (validated.allow_notifications) {
@@ -69,40 +74,45 @@ routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
   }
 })
 
-routes.post('/onboard/upload-onboard-image', upload.single('profile_photo'), async (req: ReqAuthedReq, res: Response) => {
-  try {
-    await db<User>('users').where({ id: req.user.id })
-    .update({
-      profile_image_name: req.file.path
-    })
-    res.redirect('/settings/onboard')
-  } catch (err) {
-    res.render('database-error')
+routes.post(
+  '/onboard/upload-onboard-image',
+  upload.single('profile_photo'),
+  async (req: ReqAuthedReq, res: Response) => {
+    try {
+      await db<User>('users').where({ id: req.user.id }).update({
+        profile_image_name: req.file.path,
+      })
+      res.redirect('/settings/onboard')
+    } catch (err) {
+      res.render('database-error')
+    }
   }
-})
+)
 
-routes.get('/onboard/remove-profile-image', async (req: ReqAuthedReq, res: Response) => {
-  try {
-    await db<User>('users').where({ id: req.user.id })
-      .update({
-        profile_image_name: null
+routes.get(
+  '/onboard/remove-profile-image',
+  async (req: ReqAuthedReq, res: Response) => {
+    try {
+      await db<User>('users').where({ id: req.user.id }).update({
+        profile_image_name: null,
       })
 
-    if (req.user.profile_image_name) {
-      try {
-        fs.unlinkSync(req.user.profile_image_name)
-      } catch (err) {
-        // An error deleting the file shouldn't be a failure,
-        // since it probably means the file doesn't exist
-        console.error(err)
+      if (req.user.profile_image_name) {
+        try {
+          fs.unlinkSync(req.user.profile_image_name)
+        } catch (err) {
+          // An error deleting the file shouldn't be a failure,
+          // since it probably means the file doesn't exist
+          console.error(err)
+        }
       }
+      res.redirect('/settings/onboard')
+    } catch (err) {
+      console.error(err)
+      res.render('database-error')
     }
-    res.redirect('/settings/onboard')
-  } catch (err) {
-    console.error(err)
-    res.render('database-error')
   }
-})
+)
 
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
@@ -114,75 +124,79 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const constraints = {
     preferredName,
     preferredEmail,
-    phoneNumber
+    phoneNumber,
   }
 
-  const profileImageURL = req.user.profile_image_name || '/static/blank-profile.png'
+  const profileImageURL =
+    req.user.profile_image_name || '/static/blank-profile.png'
   const blockedUsers: User[] = await db('pair_rejections')
     .select('users.*')
     .where('blocker_id', req.user.id)
     .innerJoin('users', 'users.id', 'pair_rejections.blockee_id')
-    console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    console.log(req.user.default_location_description)
-    console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    //let desc = ""
-    const desc =  req.user.default_location_description
-    let formattedLoc = ""
-    if(desc!= undefined){
-       const result = await(locationFormatter(desc))
-       console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-       console.log(result)
-       console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-       console.log((result.formatted_loc))
-       formattedLoc = result.formatted_loc
-    }
- 
-    //const temp =await(locationCity(validated.place_id))
-   // const locDict = JSON.stringify(temp)
 
-  res.render('settings/index', { constraints, googleMapsAPIKey, profileImageURL, blockedUsers, formattedLoc})
+  const currentDescription = req.user.default_location_description
+  let formattedLocation = ''
+  if (currentDescription) {
+    formattedLocation = await locationFormatter(currentDescription)
+
+    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+    console.log(formattedLocation)
+    console.log('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+  }
+
+  //const temp =await(locationCity(validated.place_id))
+  // const locDict = JSON.stringify(temp)
+
+  res.render('settings/index', {
+    constraints,
+    googleMapsAPIKey,
+    profileImageURL,
+    blockedUsers,
+    formattedLocation,
+  })
 })
 
-routes.get('/remove-profile-image', async (req: ReqAuthedReq, res: Response) => {
-  try {
-    await db<User>('users').where({ id: req.user.id })
-      .update({
-        profile_image_name: null
+routes.get(
+  '/remove-profile-image',
+  async (req: ReqAuthedReq, res: Response) => {
+    try {
+      await db<User>('users').where({ id: req.user.id }).update({
+        profile_image_name: null,
       })
 
-    if (req.user.profile_image_name) {
-      try {
-        fs.unlinkSync(req.user.profile_image_name)
-      } catch (err) {
-        // An error deleting the file shouldn't be a failure,
-        // since it probably means the file doesn't exist
-        console.error(err)
+      if (req.user.profile_image_name) {
+        try {
+          fs.unlinkSync(req.user.profile_image_name)
+        } catch (err) {
+          // An error deleting the file shouldn't be a failure,
+          // since it probably means the file doesn't exist
+          console.error(err)
+        }
       }
+      res.redirect('/settings')
+    } catch (err) {
+      console.error(err)
+      res.render('database-error')
     }
-    res.redirect('/settings')
-  } catch (err) {
-    console.error(err)
-    res.render('database-error')
   }
-})
+)
 
 routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const validated = await settingsSchema.validateAsync(req.body)
 
-    const temp =await(locationCity(validated.place_id))
+    const temp = await locationCity(validated.place_id)
     const locDict = JSON.stringify(temp)
-    
-    await db<User>('users').where({ id: req.user.id })
-      .update({
-        preferred_name: validated.preferred_name,
-        email: validated.preferred_email,
-        phone_number: validated.phone_number,
-        default_location: validated.place_id,
-        default_location_description: locDict,
-        deviation_limit: validated.deviation_limit,
-        allow_notifications: validated.allow_notifications
-      })
+
+    await db<User>('users').where({ id: req.user.id }).update({
+      preferred_name: validated.preferred_name,
+      email: validated.preferred_email,
+      phone_number: validated.phone_number,
+      default_location: validated.place_id,
+      default_location_description: locDict,
+      deviation_limit: validated.deviation_limit,
+      allow_notifications: validated.allow_notifications,
+    })
 
     res.redirect('/settings')
   } catch (err) {
@@ -191,17 +205,20 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   }
 })
 
-routes.post('/upload-image', upload.single('profile_photo'), async (req: ReqAuthedReq, res: Response) => {
-  try {
-    // Prepend a / so that public/uploads/file.jpg becomes /public/uploads/file.jpg
-    await db<User>('users').where({ id: req.user.id })
-    .update({
-      profile_image_name: req.file.path
-    })
-    res.redirect('/settings')
-  } catch (err) {
-    res.render('database-error')
+routes.post(
+  '/upload-image',
+  upload.single('profile_photo'),
+  async (req: ReqAuthedReq, res: Response) => {
+    try {
+      // Prepend a / so that public/uploads/file.jpg becomes /public/uploads/file.jpg
+      await db<User>('users').where({ id: req.user.id }).update({
+        profile_image_name: req.file.path,
+      })
+      res.redirect('/settings')
+    } catch (err) {
+      res.render('database-error')
+    }
   }
-})
+)
 
 export default routes
