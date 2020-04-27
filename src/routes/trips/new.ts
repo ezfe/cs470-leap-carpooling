@@ -15,7 +15,8 @@ const routes = Router()
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
   if (!googleMapsAPIKey) {
-    res.send('GOOGLE_MAPS_PLACES_KEY is unset')
+    console.error('GOOGLE_MAPS_PLACES_KEY must be set to load the new trips page')
+    internalError(req, res, 'google-maps-key')
     return
   }
 

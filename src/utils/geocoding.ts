@@ -20,7 +20,7 @@ export async function geocode(placeID: string): Promise<GeocodeResult> {
 
   const googleMapsKey = process.env.GOOGLE_MAPS_ROUTING_KEY
   if (!googleMapsKey) {
-    console.error('GOOGLE_MAPS_ROUTING_KEY is not set')
+    console.error('GOOGLE_MAPS_ROUTING_KEY must be set to geocode locations')
     return data
   }
 

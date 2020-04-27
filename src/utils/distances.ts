@@ -52,7 +52,7 @@ export async function distanceMatrix(
 export async function timeBetween(originPlace, destinationPlace): Promise<number> {
   const googleMapsKey = process.env.GOOGLE_MAPS_ROUTING_KEY
   if (!googleMapsKey) {
-    console.error('GOOGLE_MAPS_ROUTING_KEY is not set')
+    console.error('GOOGLE_MAPS_ROUTING_KEY must be set to get travel times')
     // Without a routing key, can treat all numbers as infinite
     // No trips can be compiled like this, unfortunately
     // but there's no other way to do this
