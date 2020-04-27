@@ -69,17 +69,15 @@ block content
     .col
       p If you need to change details of your trip, click "Cancel Trip" and request another trip with the corrected details.
 
-  .row
-    
-  
-  .row.mb-2
-    .col
-      h5= `Common Travel Days: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
-    .col
+    .col-auto
       form.float-right#cancel-trip-form(method="POST" action=`/trip-requests/${currentUserRequest.id}/cancel`)
         button.btn.btn-danger(role="submit")
           i.fas.fa-times
           = ' Cancel Trip'
+  
+  .row.mb-2
+    .col
+      h5= `Common Travel Days: ${prettyDates(tripMatch.first_date, tripMatch.last_date)}`
   
   hr.my-3
 

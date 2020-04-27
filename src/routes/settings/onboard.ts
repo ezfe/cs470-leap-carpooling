@@ -1,6 +1,7 @@
+import path from 'path'
+import crypto from 'crypto'
 import { Response, Router } from 'express'
 import fs from 'fs'
-import { upload } from '.'
 import db from '../../db'
 import { User } from '../../models/users'
 import { ReqAuthedReq } from '../../utils/authed_req'
@@ -8,8 +9,23 @@ import { sendWelcomeEmail } from '../../utils/emails'
 import { phoneNumber, preferredEmail, preferredName } from '../../validation'
 import { onboardSchema } from '../../validation/onboard'
 import { internalError } from '../errors/internal-error'
+import multer from 'multer'
 
 const routes = Router()
+
+const storage = multer.diskStorage({
+  destination: 'public/uploads/',
+  filename: (req, file, callback) => {
+    crypto.randomBytes(16, (err, raw) => {
+      callback(
+        null,
+        Date.now() + '-' + raw.toString('hex') + path.extname(file.originalname)
+      )
+    })
+  },
+})
+
+const upload = multer({ storage })
 
 routes.get('/onboard', (req: ReqAuthedReq, res: Response) => {
   const profileImageURL =

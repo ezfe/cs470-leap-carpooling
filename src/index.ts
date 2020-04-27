@@ -15,12 +15,15 @@ dotenv.config()
 const app = express()
 
 if (!process.env.SESSION_SECRET) {
-  console.log('Set SESSION_SECRET=(SOME RANDOM SECRET VALUE) in .env!')
+  console.error('SESSION_SECRET must be set')
+  console.error('It should be a random value (used to sign session data)')
+  console.error('Use .env file to configure environment variables')
   process.exit(1)
 }
 
 if (!process.env.CONTACT_EMAIL || !process.env.SITE_NAME) {
-  console.log('Set CONTACT_EMAIL and SITE_NAME in .env!')
+  console.log('CONTACT_EMAIL and SITE_NAME must be set')
+  console.error('Use .env file to configure environment variables')
   process.exit(1)
 }
 
