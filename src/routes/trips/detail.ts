@@ -6,12 +6,11 @@ import { TripRequest } from '../../models/trip_requests'
 import { getPreferredFirstName, User } from '../../models/users'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripConfirmationEmail } from '../../utils/emails'
-import {
-  formatLocation
-} from '../../utils/location_formatter'
+import { formatLocation } from '../../utils/location_formatter'
 import { lafayettePlaceID } from '../../utils/places'
 import { notFound } from '../errors/not-found'
 import { internalError } from '../errors/internal-error'
+import pairingJob from '../../jobs/pairing-job'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -92,7 +91,7 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
     next()
   } catch (err) {
     console.error(err)
-    internalError(req, res, "internal-error")
+    internalError(req, res, 'internal-error')
   }
 })
 
@@ -100,7 +99,9 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
   try {
     const googleMapsAPIKey = process.env.GOOGLE_MAPS_BROWSER_KEY
     if (!googleMapsAPIKey) {
-      console.error('GOOGLE_MAPS_BROWSER_KEY is unset, so trip map won\'t appear')
+      console.error(
+        "GOOGLE_MAPS_BROWSER_KEY is unset, so trip map won't appear"
+      )
     }
 
     const driverProfileImageURL =
@@ -150,7 +151,7 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
     }
     let firstPlaceDescription = ''
     let lastPlaceDescription = ''
-  
+
     let changeRider = false
     let changeDriver = false
     //if(req.driverRequest.location!=req.riderRequest.location){
@@ -158,9 +159,9 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
       firstPlaceDescription = descriptionFor(firstPlaceID)
     } else {
       if (
-        (req.isDriver &&
-        firstPlaceID == req.riderRequest.location) &&
-        (req.driverRequest.location!=req.riderRequest.location)
+        req.isDriver &&
+        firstPlaceID == req.riderRequest.location &&
+        req.driverRequest.location != req.riderRequest.location
       ) {
         changeRider = true
         firstPlaceDescription = await formatLocation(
@@ -168,9 +169,9 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
           'city'
         )
       } else if (
-        (!req.isDriver &&
-        firstPlaceID == req.driverRequest.location) &&
-        (req.driverRequest.location!=req.riderRequest.location)
+        !req.isDriver &&
+        firstPlaceID == req.driverRequest.location &&
+        req.driverRequest.location != req.riderRequest.location
       ) {
         changeDriver = true
         firstPlaceDescription = await formatLocation(
@@ -184,7 +185,7 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
         )
       }
     }
-  //}
+    //}
 
     const midPlaceDescription = await formatLocation(
       descriptionFor(midPlaceID),
@@ -194,14 +195,26 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
     if (lastPlaceID === lafayettePlaceID) {
       lastPlaceDescription = descriptionFor(lastPlaceID)
     } else {
-      if ((req.isDriver && lastPlaceID == req.riderRequest.location)&&
-      (req.driverRequest.location!=req.riderRequest.location)) {
+      if (
+        req.isDriver &&
+        lastPlaceID == req.riderRequest.location &&
+        req.driverRequest.location != req.riderRequest.location
+      ) {
         changeRider = true
-        lastPlaceDescription = await formatLocation(descriptionFor(lastPlaceID), 'city')
-      } else if ((!req.isDriver && lastPlaceID == req.driverRequest.location)&&
-        (req.driverRequest.location!=req.riderRequest.location)) {
+        lastPlaceDescription = await formatLocation(
+          descriptionFor(lastPlaceID),
+          'city'
+        )
+      } else if (
+        !req.isDriver &&
+        lastPlaceID == req.driverRequest.location &&
+        req.driverRequest.location != req.riderRequest.location
+      ) {
         changeDriver = true
-        lastPlaceDescription = await formatLocation(descriptionFor(lastPlaceID), 'city')
+        lastPlaceDescription = await formatLocation(
+          descriptionFor(lastPlaceID),
+          'city'
+        )
       } else {
         lastPlaceDescription = await formatLocation(
           descriptionFor(lastPlaceID),
@@ -209,13 +222,17 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
         )
       }
     }
-    let otherLoc =""
-    if(changeRider ==true || changeDriver == true)
-    {
-      otherLoc = formatLocation(req.otherUserRequest.location_description,'city')
-    }
-    else{
-      otherLoc = formatLocation(req.otherUserRequest.location_description,'full')
+    let otherLoc = ''
+    if (changeRider == true || changeDriver == true) {
+      otherLoc = formatLocation(
+        req.otherUserRequest.location_description,
+        'city'
+      )
+    } else {
+      otherLoc = formatLocation(
+        req.otherUserRequest.location_description,
+        'full'
+      )
     }
     res.render('trips/detail', {
       tripMatch: req.tripMatch,
@@ -236,7 +253,7 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
       driverProfileImageURL,
       riderProfileImageURL,
       googleMapsAPIKey,
-      otherLoc
+      otherLoc,
     })
   } catch (err) {
     console.error(err)
@@ -347,6 +364,8 @@ routes.post('/reject', async (req: MatchRequest, res: Response) => {
     blockee_id: req.otherUser.id,
   })
   await db<TripMatch>('trip_matches').where({ id: req.tripMatch.id }).del()
+
+  await pairingJob()
 
   res.redirect('/trips?reject=success')
   return
