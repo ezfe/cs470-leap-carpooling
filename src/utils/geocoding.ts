@@ -18,9 +18,9 @@ export async function geocode(placeID: string): Promise<GeocodeResult> {
     zip: null,
   }
 
-  const googleMapsKey = process.env.GOOGLE_MAPS_ROUTING_KEY
+  const googleMapsKey = process.env.GOOGLE_MAPS_SERVER_KEY
   if (!googleMapsKey) {
-    console.error('GOOGLE_MAPS_ROUTING_KEY must be set to geocode locations')
+    console.error('GOOGLE_MAPS_SERVER_KEY must be set to geocode locations')
     return data
   }
 

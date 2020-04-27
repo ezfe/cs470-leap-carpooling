@@ -98,7 +98,10 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
 
 routes.get('/', async (req: MatchRequest, res: Response) => {
   try {
-    const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
+    const googleMapsAPIKey = process.env.GOOGLE_MAPS_BROWSER_KEY
+    if (!googleMapsAPIKey) {
+      console.error('GOOGLE_MAPS_BROWSER_KEY is unset, so trip map won\'t appear')
+    }
 
     const driverProfileImageURL =
       req.driver.profile_image_name || 'static/blank-profile.png'

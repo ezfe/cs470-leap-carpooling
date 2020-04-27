@@ -13,9 +13,9 @@ const routes = Router()
 
 // GET /trips/new
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
-  const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
+  const googleMapsAPIKey = process.env.GOOGLE_MAPS_BROWSER_KEY
   if (!googleMapsAPIKey) {
-    console.error('GOOGLE_MAPS_PLACES_KEY must be set to load the new trips page')
+    console.error('GOOGLE_MAPS_BROWSER_KEY must be set to load the new trips page')
     internalError(req, res, 'google-maps-key')
     return
   }
