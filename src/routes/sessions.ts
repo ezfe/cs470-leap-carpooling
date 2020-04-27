@@ -7,6 +7,8 @@ import db from '../db'
 import { getUserByID, getUserByNetID, setLoggedInAs, setLoggedOut, User } from '../models/users'
 import { AuthedReq } from '../utils/authed_req'
 import axios from 'axios'
+import { internalError } from './errors/internal-error'
+import { notFound } from './errors/not-found'
 
 const routes = Router()
 const service = 'https://carpool.cs.lafayette.edu/sessions/handle-ticket'
@@ -75,7 +77,7 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
     const failure = parsedXML.serviceresponse.authenticationfailure
     if (failure) {
       console.error('CAS authentication failed (' + failure.$.code + ').')
-      res.sendStatus(401)
+      internalError(req, res, 'cas')
       return
     }
 
@@ -107,7 +109,7 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
 
         if (inserted.length === 0) {
           console.error('Failed to find or insert new record')
-          res.render('database-error')
+          internalError(req, res, 'internal-error')
           return
         } else {
           user = inserted[0]
@@ -119,17 +121,17 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
           return
         } else {
           console.error('Failed to find or insert new record')
-          res.render('database-error')
+          internalError(req, res, 'internal-error')
           return
         }
       }
     }
 
     console.error('CAS authentication failed.')
-    res.sendStatus(401)
+    internalError(req, res, 'cas')
   } catch (err) {
     console.error(err)
-    res.sendStatus(500)
+    internalError(req, res, 'internal-error')
   }
 
   return
@@ -150,7 +152,7 @@ if (process.env.CAS_ENABLED !== 'true') {
 
       res.redirect('/')
     } else {
-      res.send('User not found')
+      notFound(req, res)
     }
   })
 
@@ -167,7 +169,8 @@ if (process.env.CAS_ENABLED !== 'true') {
       setLoggedInAs(req, user)
       res.redirect('/')
     } catch (err) {
-      res.render('database-error')
+      console.error(err)
+      internalError(req, res, 'internal-error')
     }
   })
 }

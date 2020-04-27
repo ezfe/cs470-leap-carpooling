@@ -10,7 +10,11 @@ import { Request, Response } from 'express'
  * @param req The request object
  * @param res The response object
  */
-export function internalError(req: Request, res: Response, error: 'internal-error' | 'google-maps-key') {
-  res.status(500)
+export function internalError(req: Request, res: Response, error: 'internal-error' | 'google-maps-key' | 'cas') {
+  if (error == 'cas') {
+    res.status(401)
+  } else {
+    res.status(500)
+  }
   res.render('errors/internal-error', { error })
 }
