@@ -10,7 +10,7 @@ import {
   formatLocation
 } from '../../utils/location_formatter'
 import { lafayettePlaceID } from '../../utils/places'
-//import { geocode } from '@googlemaps/google-maps-services-js/dist/geocode/geocode'
+import { notFound } from '../errors/not-found'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -35,7 +35,7 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
 
     const tripMatch = await db('trip_matches').where({ id }).first<TripMatch>()
     if (!tripMatch) {
-      res.send(404)
+      notFound(req, res)
       return
     }
     req.tripMatch = tripMatch

@@ -2,6 +2,7 @@ import { Response, Router } from 'express'
 import db from '../../db'
 import { TripRequest } from '../../models/trip_requests'
 import { ReqAuthedReq } from '../../utils/authed_req'
+import { notFound } from '../errors/not-found'
 
 const routes = Router({ mergeParams: true })
 
@@ -11,7 +12,7 @@ routes.post('/cancel', async (req: ReqAuthedReq, res: Response) => {
     const tripRequest = await db('trip_requests').where({ id }).first<TripRequest>()
 
     if (!tripRequest) {
-      res.sendStatus(404)
+      notFound(req, res)
       return
     }
 
