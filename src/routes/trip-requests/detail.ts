@@ -3,6 +3,7 @@ import db from '../../db'
 import { TripRequest } from '../../models/trip_requests'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import { notFound } from '../errors/not-found'
+import { internalError } from '../errors/internal-error'
 
 const routes = Router({ mergeParams: true })
 
@@ -21,7 +22,7 @@ routes.post('/cancel', async (req: ReqAuthedReq, res: Response) => {
     res.redirect('/trips?delete=success')
   } catch (err) {
     console.error(err)
-    res.render('database-error')
+    internalError(req, res, 'internal-error')
   }
 })
 

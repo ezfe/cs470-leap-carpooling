@@ -84,7 +84,7 @@ block content
   hr.my-3
 
   .row
-    .col-12.col-lg-6.mb-4
+    div.col-12.col-lg-6.mb-4(class=googleMapsAPIKey ? '' : 'offset-3')
       .row
         .col.text-center
           h4 Your Trip
@@ -105,13 +105,14 @@ block content
     //-   fa.fas.fa-location-arrow
     //-   = ' Google Maps'
 
-    .col-12.col-lg-6.mb-4
-      #mapLoading
-        .d-flex.flex-column.justify-content-center.align-items-center(style="height: 100px;")
-          .spinner-border(role="status")
-          span.mt-2 Loading Map...
-      #mapWrapper.invisible
-        #googleMap(style="height: 300px;")
+    if googleMapsAPIKey
+      .col-12.col-lg-6.mb-4
+        #mapLoading
+          .d-flex.flex-column.justify-content-center.align-items-center(style="height: 100px;")
+            .spinner-border(role="status")
+            span.mt-2 Loading Map...
+        #mapWrapper.invisible
+          #googleMap(style="height: 300px;")
 
   include prettyDate
 
@@ -173,10 +174,11 @@ block content
               = getPreferredFirstName(otherUser)
 
 append scripts
-  script(
-    type="text/javascript",
-    src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`
-  )
+  if googleMapsAPIKey
+    script(
+      type="text/javascript",
+      src=`https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&libraries=places`
+    )
   script(
     type="module"
     src="/static/js/trip_detail.js"

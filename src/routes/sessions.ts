@@ -33,7 +33,8 @@ routes.get('/login', async (req: AuthedReq, res: Response) => {
       const currentUser = req.user
       res.render('sessions/choose_user', { users, currentUser })
     } catch (err) {
-      res.render('database-error')
+      console.error(err)
+      internalError(req, res, 'internal-error')
     }
   }
 })

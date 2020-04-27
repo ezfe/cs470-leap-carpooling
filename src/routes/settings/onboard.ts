@@ -7,6 +7,7 @@ import { ReqAuthedReq } from '../../utils/authed_req'
 import { sendWelcomeEmail } from '../../utils/emails'
 import { phoneNumber, preferredEmail, preferredName } from '../../validation'
 import { onboardSchema } from '../../validation/onboard'
+import { internalError } from '../errors/internal-error'
 
 const routes = Router()
 
@@ -50,7 +51,7 @@ routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
     if (err.name === 'validation-error') {
       res.render('settings/onboard')
     } else {
-      res.render('database-error')
+      internalError(req, res, 'internal-error')
     }
   }
 })
@@ -65,7 +66,8 @@ routes.post(
       })
       res.redirect('/settings/onboard')
     } catch (err) {
-      res.render('database-error')
+      console.error(err)
+      internalError(req, res, 'internal-error')
     }
   }
 )
@@ -90,7 +92,7 @@ routes.get(
       res.redirect('/settings/onboard')
     } catch (err) {
       console.error(err)
-      res.render('database-error')
+      internalError(req, res, 'internal-error')
     }
   }
 )

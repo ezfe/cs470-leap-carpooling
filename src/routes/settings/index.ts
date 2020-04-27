@@ -11,6 +11,7 @@ import { formatLocation } from '../../utils/location_formatter'
 import { phoneNumber, preferredEmail, preferredName } from '../../validation'
 import { settingsSchema } from '../../validation/settings'
 import onboard from './onboard'
+import { internalError } from '../errors/internal-error'
 
 const routes = Router()
 
@@ -33,7 +34,8 @@ routes.use('/onboard', onboard)
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
   if (!googleMapsAPIKey) {
-    res.send('GOOGLE_MAPS_PLACES_KEY is unset')
+    console.error('GOOGLE_MAPS_PLACES_KEY must be set to load the settings page')
+    internalError(req, res, 'google-maps-key')
     return
   }
 
@@ -89,7 +91,7 @@ routes.get(
       res.redirect('/settings')
     } catch (err) {
       console.error(err)
-      res.render('database-error')
+      internalError(req, res, 'internal-error')
     }
   }
 )
@@ -114,7 +116,7 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
     res.redirect('/settings')
   } catch (err) {
     console.error(err)
-    res.render('database-error')
+    internalError(req, res, 'internal-error')
   }
 })
 
@@ -129,7 +131,8 @@ routes.post(
       })
       res.redirect('/settings')
     } catch (err) {
-      res.render('database-error')
+      console.error(err)
+      internalError(req, res, 'internal-error')
     }
   }
 )

@@ -6,6 +6,7 @@ import { ReqAuthedReq } from '../../utils/authed_req'
 import tripDetail from './detail'
 import tripCreation from './new'
 import { formatLocation } from '../../utils/location_formatter'
+import { internalError } from '../errors/internal-error'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -50,7 +51,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     res.render('trips/index', { trips, alerts,  })
   } catch (err) {
     console.error(err)
-    res.render('database-error')
+    internalError(req, res, 'internal-error')
   }
 })
 

@@ -7,6 +7,7 @@ import { sendTripProcessingEmail } from '../../utils/emails'
 import { geocode } from '../../utils/geocoding'
 import { formatLocation } from '../../utils/location_formatter'
 import { newTripSchema } from '../../validation/new_trip'
+import { internalError } from '../errors/internal-error'
 
 const routes = Router()
 
@@ -62,7 +63,7 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
     res.redirect('/trips')
   } catch (err) {
     console.error(err)
-    res.render('database-error')
+    internalError(req, res, 'internal-error')
   }
 })
 

@@ -50,7 +50,7 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
     if (!driverRequest || !riderRequest) {
       console.error('Failed to retrieve requests from a match')
       console.error('This might indicate database issues')
-      res.sendStatus(500)
+      internalError(req, res, 'internal-error')
       return
     }
     req.driverRequest = driverRequest
@@ -77,7 +77,7 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
           riderRequest
         )} requests has invalid members?`
       )
-      res.sendStatus(500)
+      internalError(req, res, 'internal-error')
       return
     }
     req.driver = driver
@@ -99,10 +99,6 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
 routes.get('/', async (req: MatchRequest, res: Response) => {
   try {
     const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
-    if (!googleMapsAPIKey) {
-      internalError(req, res, "google-maps-key")
-      return
-    }
 
     const driverProfileImageURL =
       req.driver.profile_image_name || 'static/blank-profile.png'
@@ -135,7 +131,7 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
 
     if (!firstPlaceID || !midPlaceID || !lastPlaceID) {
       console.error('Unable to find all place IDs!')
-      res.sendStatus(500)
+      internalError(req, res, 'internal-error')
       return
     }
 
@@ -241,7 +237,7 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
     })
   } catch (err) {
     console.error(err)
-    res.render('database-error')
+    internalError(req, res, 'internal-error')
   }
 })
 
@@ -320,7 +316,7 @@ routes.post('/confirm', async (req: MatchRequest, res: Response) => {
     return
   } catch (err) {
     console.error(err)
-    res.render('database-error')
+    internalError(req, res, 'internal-error')
   }
 })
 
