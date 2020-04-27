@@ -37,7 +37,9 @@ block content
               table.table.table-sm.table-bordered
                 tr
                   th(scope="row") Location
-                  td= otherLoc
+                  td
+                    a(href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(otherLoc)}&query_place_id=${otherUserRequest.location}`)
+                      = otherLoc
                 tr
                   th(scope="row") Phone
                   td
@@ -97,12 +99,6 @@ block content
             div.mt-3.mb-1
               i.fas.fa-arrow-down
           .location-box.box-shadow-hover= lastPlaceDescription
-
-    //- a.btn.btn-outline-info(
-    //-   href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(riderRequest.location_description)}&query_place_id=${riderRequest.location}`
-    //- )
-    //-   fa.fas.fa-location-arrow
-    //-   = ' Google Maps'
 
     if googleMapsAPIKey
       .col-12.col-lg-6.mb-4
