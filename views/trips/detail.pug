@@ -40,7 +40,8 @@ block content
                   td= otherLoc
                 tr
                   th(scope="row") Phone
-                  td= otherUser.phone_number
+                  td
+                    a(href=`sms:${otherUser.phone_number}`)= otherUser.phone_number
                 tr
                   th(scope="row") Email
                   - const email = getEmail(otherUser)
