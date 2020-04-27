@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 
 /**
- * Process a request as not found and
+ * Process a request as an internal error and
  * fill out a template to make it look nice.
  *
  * This route will always send a response, so
@@ -10,7 +10,7 @@ import { Request, Response } from 'express'
  * @param req The request object
  * @param res The response object
  */
-export function notFound(req: Request, res: Response) {
-  res.status(404)
-  res.render('error/not-found')
+export function internalError(req: Request, res: Response, error: 'internal-error' | 'google-maps-key') {
+  res.status(500)
+  res.render('errors/internal-error', { error })
 }

@@ -1,0 +1,19 @@
+extends ../base.pug
+
+block navbar_settings
+  - var current_page = "internal-error"
+
+block content
+  .row
+    .col
+      .alert.alert-danger(role="alert")
+        h4
+          i.fas.fa-exclamation-triangle.mr-2
+          | Internal Server Error
+        hr
+        p.mb-0
+          if !error || error == 'internal-error'
+            | Your request could not be completed at this time
+          else if error == 'google-maps-key'
+            | The Google Maps API keys are incorrectly configured
+    

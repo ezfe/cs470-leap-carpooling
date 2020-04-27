@@ -1,6 +1,7 @@
 import { Response, Router } from 'express'
 import db from '../../db'
 import { ReqAuthedReq } from '../../utils/authed_req'
+import { internalError } from '../errors/internal-error'
 
 const routes = Router({ mergeParams: true })
 
@@ -16,7 +17,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     res.redirect('/settings')
   } catch (err) {
     console.error(err)
-    res.render('database-error')
+    internalError(req, res, 'internal-error')
   }
 })
 

@@ -1,0 +1,15 @@
+extends ../base.pug
+
+block navbar_settings
+  - var current_page = "database-error"
+
+block content
+  .row
+    .col
+      .alert.alert-danger(role="alert")
+        h4
+          i.fas.fa-exclamation-triangle.mr-2
+          | 404 - Page Not Found
+        hr
+        p.mb-0 The resource you were looking for doesn't exist at this location
+    

@@ -11,6 +11,7 @@ import {
 } from '../../utils/location_formatter'
 import { lafayettePlaceID } from '../../utils/places'
 import { notFound } from '../errors/not-found'
+import { internalError } from '../errors/internal-error'
 
 /* This whole file has a `requireAuthenticated` on it in routes/index.ts */
 
@@ -91,8 +92,7 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
     next()
   } catch (err) {
     console.error(err)
-    res.sendStatus(500)
-    return
+    internalError(req, res, "internal-error")
   }
 })
 
@@ -100,7 +100,7 @@ routes.get('/', async (req: MatchRequest, res: Response) => {
   try {
     const googleMapsAPIKey = process.env.GOOGLE_MAPS_PLACES_KEY
     if (!googleMapsAPIKey) {
-      res.send('GOOGLE_MAPS_PLACES_KEY is unset')
+      internalError(req, res, "google-maps-key")
       return
     }
 
