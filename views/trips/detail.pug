@@ -38,7 +38,7 @@ block content
                 tr
                   th(scope="row") Location
                   td
-                    a(href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(otherLoc)}&query_place_id=${otherUserRequest.location}`)
+                    a(href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(otherLoc)}&query_place_id=${otherUserRequest.location}` target="_blank")
                       = otherLoc
                 tr
                   th(scope="row") Phone
