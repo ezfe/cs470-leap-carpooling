@@ -1,6 +1,6 @@
 import { Response, Router } from 'express'
 import db from '../../db'
-import sampleJob from '../../jobs/pairing-job'
+import pairingJob from '../../jobs/pairing-job'
 import { TripRequest } from '../../models/trip_requests'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripProcessingEmail } from '../../utils/emails'
@@ -59,7 +59,7 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
       sendTripProcessingEmail(req.user, tripRequest)
     }
 
-    await sampleJob()
+    await pairingJob()
 
     res.redirect('/trips')
   } catch (err) {

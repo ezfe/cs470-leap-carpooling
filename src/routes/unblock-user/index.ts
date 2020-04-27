@@ -1,5 +1,6 @@
 import { Response, Router } from 'express'
 import db from '../../db'
+import pairingJob from '../../jobs/pairing-job'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import { internalError } from '../errors/internal-error'
 
@@ -13,6 +14,8 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
       .where('blockee_id', unblockID)
       .where('blocker_id', currentUserID)
       .del()
+
+    await pairingJob()
 
     res.redirect('/settings')
   } catch (err) {
