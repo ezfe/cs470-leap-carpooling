@@ -5,7 +5,7 @@ import { internalError } from '../errors/internal-error'
 
 const routes = Router({ mergeParams: true })
 
-routes.get('/', async (req: ReqAuthedReq, res: Response) => {
+routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const unblockID = req.params.userId
     const currentUserID = req.user.id
