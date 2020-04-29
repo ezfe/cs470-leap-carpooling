@@ -358,11 +358,21 @@ routes.post('/reject', async (req: MatchRequest, res: Response) => {
     res.sendStatus(403)
     return
   }
+  
+  if (requestedReason !== 'block_person' && req.currentUserRequest.last_date instanceof Date) {
+    console.log(`Recording: ${req.currentUserRequest.last_date}`)
+    await db<PairRejection>('pair_rejections').insert({
+      blocker_id: req.user.id,
+      blockee_id: req.otherUser.id,
+      expire_after: req.currentUserRequest.last_date
+    })
+  } else {
+    await db<PairRejection>('pair_rejections').insert({
+      blocker_id: req.user.id,
+      blockee_id: req.otherUser.id
+    })
+  }
 
-  await db<PairRejection>('pair_rejections').insert({
-    blocker_id: req.user.id,
-    blockee_id: req.otherUser.id,
-  })
   await db<TripMatch>('trip_matches').where({ id: req.tripMatch.id }).del()
 
   await pairingJob()

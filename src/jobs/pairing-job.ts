@@ -44,6 +44,7 @@ async function generatePotentialPairs(direction: TripDirection): Promise<Potenti
             .orOn('trip_requests.id', '=', 'trip_matches.rider_request_id')
           })
           .whereNull('trip_matches.id')
+          .andWhere('trip_requests.last_date', '>=', db.raw('CURRENT_DATE'))
           .andWhere('trip_requests.direction', '=', direction)
           .andWhere('role', '=', role)
           .as(`${role}_t`)
