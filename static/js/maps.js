@@ -1,6 +1,6 @@
 import getMeta from './getMeta.js'
 
-function myMap() {
+function initMap() {
   var directionsService = new google.maps.DirectionsService;
   var directionsDisplay = new google.maps.DirectionsRenderer;
   var mapProp= {center:new google.maps.LatLng(51.508742,-0.120850),zoom:5,};
@@ -32,4 +32,4 @@ function calculateAndDisplayRoute(directionsService, directionsDisplay){
   });
 }
 
-myMap()
+initMap()
