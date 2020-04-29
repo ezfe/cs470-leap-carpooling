@@ -3,6 +3,9 @@ extends ../base.pug
 block navbar_settings
   - var current_page = "session_choose_user"
 
+append title
+  = ' - Choose User'
+
 block content
   if currentUser
     .row
