@@ -8,5 +8,5 @@ export const settingsSchema = Joi.object({
 
   place_id: Joi.string(),
 
-  deviation_limit: Joi.number().integer().positive().empty('').default(null),
+  deviation_limit: joiConstraints.deviation_limit,
 })
