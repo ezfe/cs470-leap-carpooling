@@ -8,6 +8,7 @@ import { geocode } from '../../utils/geocoding'
 import { formatLocation } from '../../utils/location_formatter'
 import { newTripSchema } from '../../validation/new_trip'
 import { internalError } from '../errors/internal-error'
+import { deviationLimit } from '../../validation'
 
 const routes = Router()
 
@@ -29,6 +30,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   res.render('trips/new', {
     googleMapsAPIKey,
     formattedLocation,
+    constraints: { deviationLimit }
   })
 })
 

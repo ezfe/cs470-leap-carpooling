@@ -8,7 +8,7 @@ import { User } from '../../models/users'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import { geocode } from '../../utils/geocoding'
 import { formatLocation } from '../../utils/location_formatter'
-import { phoneNumber, preferredEmail, preferredName } from '../../validation'
+import { phoneNumber, preferredEmail, preferredName, deviationLimit } from '../../validation'
 import { settingsSchema } from '../../validation/settings'
 import onboard from './onboard'
 import { internalError } from '../errors/internal-error'
@@ -43,6 +43,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     preferredName,
     preferredEmail,
     phoneNumber,
+    deviationLimit
   }
 
   const profileImageURL =

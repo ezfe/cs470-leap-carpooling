@@ -122,7 +122,8 @@ block content
                     value=currentUser.deviation_limit
                     required
                     type="number"
-                    min=0
+                    min=constraints.deviationLimit.min
+                    max=constraints.deviationLimit.max
                   )
                   .input-group-append
                     span.input-group-text(style="border-radius: 0 0.25rem 0.25rem 0;") Minutes

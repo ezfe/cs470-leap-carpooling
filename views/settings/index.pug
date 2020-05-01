@@ -105,7 +105,8 @@ block content
                   id ="deviation_limit"
                   value=currentUser.deviation_limit
                   type="number"
-                  min=0
+                  min=constraints.deviationLimit.min
+                  max=constraints.deviationLimit.max
                 )
             .row.mb-4
               .col

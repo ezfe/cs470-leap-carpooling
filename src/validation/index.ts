@@ -17,6 +17,11 @@ export const phoneNumber = {
   max: 30,
 }
 
+export const deviationLimit = {
+  min: 0,
+  max: 10_000_0000
+}
+
 export const joiConstraints = {
   preferred_name: Joi.string()
     .pattern(preferredName.pattern)
@@ -38,5 +43,5 @@ export const joiConstraints = {
 
   allow_notifications: Joi.boolean().truthy('on').default(false),
 
-  deviation_limit: Joi.number().integer().positive().allow(0).empty('').default(null)
+  deviation_limit: Joi.number().integer().min(deviationLimit.min).max(deviationLimit.max).empty('').default(null)
 }
