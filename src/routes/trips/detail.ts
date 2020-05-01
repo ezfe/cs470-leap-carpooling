@@ -360,7 +360,6 @@ routes.post('/reject', async (req: MatchRequest, res: Response) => {
   }
   
   if (requestedReason !== 'block_person' && req.currentUserRequest.last_date instanceof Date) {
-    console.log(`Recording: ${req.currentUserRequest.last_date}`)
     await db<PairRejection>('pair_rejections').insert({
       blocker_id: req.user.id,
       blockee_id: req.otherUser.id,
