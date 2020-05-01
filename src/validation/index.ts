@@ -38,5 +38,5 @@ export const joiConstraints = {
 
   allow_notifications: Joi.boolean().truthy('on').default(false),
 
-  deviation_limit: Joi.number().integer().positive().empty('').default(null)
+  deviation_limit: Joi.number().integer().positive().allow(0).empty('').default(null)
 }
