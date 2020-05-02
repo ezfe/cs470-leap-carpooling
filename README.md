@@ -176,6 +176,43 @@ If you don't have an Ubuntu/Linux based system, then install the same software b
 
    By setting CAS_DISABLED, you won't have to configure CAS to test the site. If this is left out, then the two CAS configuration lines must be set up in the `.env` file.
 
+12. Configuring NGINX
+
+   This step is best done from an administrator account. If you switched away to test the project, switch back to an admin account now.
+
+   ```bash
+   sudo apt install -y nginx
+   ```
+
+   You can verify that NGINX is running by loading your website at the default port _http://[your:ip:here]_.
+
+13. Configure HTTPs
+
+   If you are using a different operating system or server other than NGINX, follow the instrucitons at [certbot.eff.org](https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx).
+
+   ```bash
+   sudo apt install -y software-properties-common
+   sudo add-apt-repository universe
+   sudo add-apt-repository ppa:certbot/certbot
+   sudo apt update
+
+   sudo apt install -y certbot python3-certbot-nginx
+
+   sudo certbot certonly --nginx
+
+   # You'll be prompted for information about the website. Fill this information out accurately.
+   ```
+
+14. Finish NGINX Configuration
+
+   Replace the default NGINX configuration (located at `/etc/nginx/sites-enabled/default`) with the contents of the template provided in the project, in the `nginx` directory.
+
+   Replace all four instances of `carpool.cs.lafayette.edu` with the correct domain name for the website.
+
+   ```bash
+   sudo systemctl restart nginx
+   ```
+
 # Google Maps
 
 A project must be created at [console.cloud.google.com](https://console.cloud.google.com). Generate 1 key capable of using the Javascript Autocomplete APIs, and 1 key for the server side requests to the distance matrix.
