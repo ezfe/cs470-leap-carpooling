@@ -11,7 +11,7 @@ import { internalError } from './errors/internal-error'
 import { notFound } from './errors/not-found'
 
 const routes = Router()
-const service = 'https://carpool.cs.lafayette.edu/sessions/handle-ticket'
+const service = process.env.CAS_SERVICE_URL
 
 routes.get('/login', async (req: AuthedReq, res: Response) => {
   if (req.session?.loginRedirect && !req.query.forwarding) {
@@ -29,7 +29,7 @@ routes.get('/login', async (req: AuthedReq, res: Response) => {
     }
   } else {
     const casURL = format({
-      pathname: 'https://cas.lafayette.edu/cas/login',
+      pathname: `https://${process.env.CAS_ENDPOINT}/login`,
       query: {
         service,
       },
@@ -42,100 +42,18 @@ routes.get('/login', async (req: AuthedReq, res: Response) => {
 routes.get('/logout', (req, res) => {
   setLoggedOut(req)
 
-  const casURL = format({
-    pathname: 'https://cas.lafayette.edu/cas/logout',
-    query: {
-      service,
-    },
-  })
-
   if (process.env.CAS_DISABLED === 'true') {
     res.redirect('/')
   } else {
+    const casURL = format({
+      pathname: `https://${process.env.CAS_ENDPOINT}/logout`,
+      query: {
+        service,
+      },
+    })
+  
     res.redirect(casURL)
   }
-})
-
-routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
-  const requestURL = format({
-    pathname: 'https://cas.lafayette.edu/cas/p3/serviceValidate',
-    query: {
-      service,
-      ticket: req.query.ticket as string,
-    },
-  })
-
-  try {
-    const axiosResponse = await axios.get(requestURL)
-
-    const parsedXML = await xml.parseStringPromise(axiosResponse.data, {
-      trim: true,
-      normalize: true,
-      explicitArray: false,
-      tagNameProcessors: [normalize, stripPrefix],
-    })
-
-    const failure = parsedXML.serviceresponse.authenticationfailure
-    if (failure) {
-      console.error('CAS authentication failed (' + failure.$.code + ').')
-      internalError(req, res, 'cas')
-      return
-    }
-
-    const success = parsedXML.serviceresponse.authenticationsuccess
-    if (success) {
-      const netid = success.user
-      const firstName = success.attributes.givenname
-      const lastName = success.attributes.surname
-
-      let user = await getUserByNetID(netid)
-      if (user) {
-        setLoggedInAs(req, user)
-
-        if (req.session?.loginRedirect) {
-          delete req.session.loginRedirect
-          res.redirect(req.session.loginRedirect)
-          return
-        }
-
-        res.redirect('/')
-        return
-      } else {
-        const inserted = await db<User>('users').insert({
-          netid,
-          first_name: firstName,
-          last_name: lastName,
-          created_at: db.fn.now()
-        }).returning<User[]>('*')
-
-        if (inserted.length === 0) {
-          console.error('Failed to find or insert new record')
-          internalError(req, res, 'internal-error')
-          return
-        } else {
-          user = inserted[0]
-        }
-
-        if (user) {
-          setLoggedInAs(req, user)
-          res.redirect('/settings/onboard')
-          return
-        } else {
-          console.error('Failed to find or insert new record')
-          internalError(req, res, 'internal-error')
-          return
-        }
-      }
-    }
-
-    console.error('CAS authentication failed.')
-    internalError(req, res, 'cas')
-  } catch (err) {
-    console.error(err)
-    internalError(req, res, 'internal-error')
-  }
-
-  return
 })
 
 if (process.env.CAS_DISABLED === 'true') {
@@ -173,6 +91,88 @@ if (process.env.CAS_DISABLED === 'true') {
       console.error(err)
       internalError(req, res, 'internal-error')
     }
+  })
+} else {
+  routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
+    const requestURL = format({
+      pathname: `https://${process.env.CAS_ENDPOINT}/p3/serviceValidate`,
+      query: {
+        service,
+        ticket: req.query.ticket as string,
+      },
+    })
+
+    try {
+      const axiosResponse = await axios.get(requestURL)
+
+      const parsedXML = await xml.parseStringPromise(axiosResponse.data, {
+        trim: true,
+        normalize: true,
+        explicitArray: false,
+        tagNameProcessors: [normalize, stripPrefix],
+      })
+
+      const failure = parsedXML.serviceresponse.authenticationfailure
+      if (failure) {
+        console.error('CAS authentication failed (' + failure.$.code + ').')
+        internalError(req, res, 'cas')
+        return
+      }
+
+      const success = parsedXML.serviceresponse.authenticationsuccess
+      if (success) {
+        const netid = success.user
+        const firstName = success.attributes.givenname
+        const lastName = success.attributes.surname
+
+        let user = await getUserByNetID(netid)
+        if (user) {
+          setLoggedInAs(req, user)
+
+          if (req.session?.loginRedirect) {
+            delete req.session.loginRedirect
+            res.redirect(req.session.loginRedirect)
+            return
+          }
+
+          res.redirect('/')
+          return
+        } else {
+          const inserted = await db<User>('users').insert({
+            netid,
+            first_name: firstName,
+            last_name: lastName,
+            created_at: db.fn.now()
+          }).returning<User[]>('*')
+
+          if (inserted.length === 0) {
+            console.error('Failed to find or insert new record')
+            internalError(req, res, 'internal-error')
+            return
+          } else {
+            user = inserted[0]
+          }
+
+          if (user) {
+            setLoggedInAs(req, user)
+            res.redirect('/settings/onboard')
+            return
+          } else {
+            console.error('Failed to find or insert new record')
+            internalError(req, res, 'internal-error')
+            return
+          }
+        }
+      }
+
+      console.error('CAS authentication failed.')
+      internalError(req, res, 'cas')
+    } catch (err) {
+      console.error(err)
+      internalError(req, res, 'internal-error')
+    }
+
+    return
   })
 }
 
