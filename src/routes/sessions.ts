@@ -18,7 +18,7 @@ routes.get('/login', async (req: AuthedReq, res: Response) => {
     delete req.session.loginRedirect
   }
 
-  if (process.env.CAS_ENABLED === 'true') {
+  if (process.env.CAS_DISABLED === 'true') {
     const casURL = format({
       pathname: 'https://cas.lafayette.edu/cas/login',
       query: {
@@ -49,7 +49,7 @@ routes.get('/logout', (req, res) => {
     },
   })
 
-  if (process.env.CAS_ENABLED === 'true') {
+  if (process.env.CAS_DISABLED === 'true') {
     res.redirect(casURL)
   } else {
     res.redirect('/')
@@ -138,7 +138,7 @@ routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
   return
 })
 
-if (process.env.CAS_ENABLED !== 'true') {
+if (process.env.CAS_DISABLED !== 'true') {
   // POST /sessions/login
   routes.post('/login', async (req: AuthedReq, res: Response) => {
     const user = await getUserByID(req.body.chosen_user)
