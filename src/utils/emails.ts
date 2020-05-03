@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer'
 import { User, getPreferredFirstName, getEmail } from '../models/users';
 import { TripRequest } from '../models/trip_requests';
 import { TripMatch } from '../models/trip_matches';
+import { formatLocation } from './location_formatter';
 
 const transporter = nodemailer.createTransport({
   service: 'SendInBlue',
@@ -69,9 +70,9 @@ export async function sendTripProcessingEmail(user: User, tripRequest: TripReque
       message += '<br><br>'
       message += 'Thanks for submitting a trip request! We have you travelling'
       if (tripRequest.direction == 'towards_lafayette') {
-        message += ` to Lafayette College from ${tripRequest.location_description}`
+        message += ` to Lafayette College from ${formatLocation(tripRequest.location_description, 'full')}`
       } else {
-        message += ` from Lafayette College to ${tripRequest.location_description}`
+        message += ` from Lafayette College to ${formatLocation(tripRequest.location_description, 'full')}`
       }
       if (firstDateString == lastDateString) {
         message += ` on ${firstDateString}. `
@@ -104,40 +105,12 @@ export async function sendTripMatchEmail(
   otherUser: User) {
   if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
 
-  // To assure the database actually gave us a date!
-  if (!(tripMatch.first_date instanceof Date && tripMatch.last_date instanceof Date)) {
-    console.error("Trip request dates weren't the right type")
-    console.error(typeof tripMatch.first_date, typeof tripMatch.last_date)
-    return
-  }
-  const firstDateString = prettyDate(tripMatch.first_date)
-  const lastDateString = prettyDate(tripMatch.last_date)
-
   const isDriver = driverRequest.member_id == user.id
-  const tripDirection = driverRequest.direction
 
   let message = `Hello ${getPreferredFirstName(user)},`
-      message += '<br><br>'
-      message += 'We found you a '
-      if (isDriver) {
-        message += `rider! You will be driving ${getPreferredFirstName(otherUser)} ${otherUser.last_name}`
-      } else {
-        message += `driver! ${getPreferredFirstName(otherUser)} ${otherUser.last_name} will be driving you`
-      }
-      if (tripDirection == 'towards_lafayette') {
-        if (riderRequest.location_description == driverRequest.location_description) {
-          message += ` to Lafayette College from ${riderRequest.location_description}`
-        } else {
-          message += ` to Lafayette College from ${riderRequest.location_description} on the way from ${driverRequest.location_description}`
-        }
-      } else {
-        if (riderRequest.location_description == driverRequest.location_description) {
-          message += ` from Lafayette College to ${riderRequest.location_description}`
-        } else {
-          message += ` from Lafayette College to ${riderRequest.location_description} on the way to ${driverRequest.location_description}`
-        }
-      }
-      message += (firstDateString == lastDateString) ? ` on ${firstDateString}. ` : ` sometime between ${firstDateString} and ${lastDateString}. `
+      message += '<br><br>We found you a '
+      message += (isDriver) ? `rider!` : `driver!`
+      message += formatTripDetails(user, otherUser, tripMatch, riderRequest, driverRequest)
       message += `Please login to ${process.env.SITE_NAME} to confirm or reject your trip. <br><br> The ${process.env.SITE_NAME} Team`
 
   await transporter.sendMail({
@@ -153,32 +126,20 @@ export async function sendTripMatchEmail(
  * @param user The user to email
  * @param otherUser The other user in the match
  * @param tripMatch The match
- * @param userRequest The user's request
- * @param otherUserRequest The other user's request
+ * @param riderRequest The rider's request
+ * @param driverRequest The driver's request
  */
 export async function sendTripConfirmationEmail(
   user: User,
   otherUser: User,
   tripMatch: TripMatch,
-  userRequest: TripRequest,
-  otherUserRequest: TripRequest) { 
+  riderRequest: TripRequest,
+  driverRequest: TripRequest) { 
   if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
 
-  // To assure the database actually gave us a date!
-  if (!(tripMatch.first_date instanceof Date && tripMatch.last_date instanceof Date)) {
-    console.error("Trip request dates weren't the right type")
-    console.error(typeof tripMatch.first_date, typeof tripMatch.last_date)
-    return
-  }
-  const firstDateString = prettyDate(tripMatch.first_date)
-  const lastDateString = prettyDate(tripMatch.last_date)
-
   let message = `Hello ${getPreferredFirstName(user)},
-                <br><br> Both you and ${getPreferredFirstName(otherUser)} have confirmed your trip.
-                Here are your trip details: <br>
-                Your location: ${userRequest.location_description} <br>
-                ${getPreferredFirstName(otherUser)}'s location: ${otherUserRequest.location_description} <br>`
-      message += (firstDateString == lastDateString) ? `Date: ${firstDateString}` : `Date Range: ${firstDateString} to ${lastDateString}`
+                <br><br> Both you and ${getPreferredFirstName(otherUser)} have confirmed your trip.`
+      message += formatTripDetails(user, otherUser, tripMatch, riderRequest, driverRequest)
       message += `<br><br> The ${process.env.SITE_NAME} Team`
   
   await transporter.sendMail({
@@ -191,38 +152,96 @@ export async function sendTripConfirmationEmail(
 
 /**
  * Send a given user an email reminding them of an upcoming trip.
+ * @param user The user to email
+ * @param otherUser The other user in the match
+ * @param tripMatch The match
+ * @param riderRequest The rider's request
+ * @param driverRequest The driver's request
  */
 export async function sendTripReminderEmail(
-  name: string, email: string, firstDate, lastDate, driver: boolean, passengerName: string, trip_direction: string, 
-  driverLocation: string, riderLocation: string) {
+  user: User,
+  otherUser: User,
+  tripMatch: TripMatch,
+  riderRequest: TripRequest,
+  driverRequest: TripRequest) {
   if (!process.env.SENDINBLUE_EMAIL || !process.env.SENDINBLUE_PASSWORD) return;
   
-  firstDate = prettyDate(new Date(firstDate))
-  lastDate = prettyDate(new Date(lastDate))
-  let message = `Hello ${name}, <br><br> Your trip with ${passengerName} is coming up `
-      message += (firstDate == lastDate) ? `on ${firstDate}! ` : `between ${firstDate} and ${lastDate}! `
-      message += (driver) ? `You will be driving ${passengerName} ` : `${passengerName} will be driving you `
-      if (trip_direction == 'to_lafayette') {
-        if (riderLocation == driverLocation) {
-          message += ` to Lafayette College from ${riderLocation}.`  
-        } else {
-          message += ` to Lafayette College from ${riderLocation} on the way from ${driverLocation}.`  
-        }
-      } else { 
-        if (riderLocation == driverLocation) {
-          message += ` from Lafayette College to ${riderLocation}.`
-        } else {
-          message += ` from Lafayette College to ${riderLocation} on the way to ${driverLocation}.`
-        }
-      }
-      message += `<br><br>Thanks for using ${process.env.SITE_NAME}! <br><br> The ${process.env.SITE_NAME} Team`
+  let message = `Hello ${getPreferredFirstName(user)}, <br><br> Your trip with ${getPreferredFirstName(otherUser)} is coming up soon! `
+      message += formatTripDetails(user, otherUser, tripMatch, riderRequest, driverRequest)
+      message += `<br><br>Thanks for using ${process.env.SITE_NAME}! <br><br>The ${process.env.SITE_NAME} Team`
 
   await transporter.sendMail({
     from: `"${process.env.SITE_NAME}" <${process.env.CONTACT_EMAIL}>`,
-    to: email,
+    to: getEmail(user),
     subject: "Trip Reminder",
     html: message
   });
+}
+
+/**
+ * Send a given user an email if they no longer have a match.
+ * @param user The user to email
+ * @param otherUser The other user in the match
+ */
+export async function sendTripReprocessingEmail(
+  user: User,
+  otherUser : User
+) {
+  let message = `Hello ${getPreferredFirstName(user)}, <br><br>`
+      message += `We're emailing to let you know that your trip match, ${getPreferredFirstName(otherUser)}, `
+              + `has cancelled or otherwise changed their trip, so we're going to have to reprocess your trip request. `
+              + `Don't worry, we'll let you know when we find you a new match! `
+              + `<br><br>The ${process.env.SITE_NAME} Team`
+
+  await transporter.sendMail({
+    from: `"${process.env.SITE_NAME}" <${process.env.CONTACT_EMAIL}>`,
+    to: getEmail(user),
+    subject: "Reprocessing Trip Request",
+    html: message
+  })
+}
+
+/**
+ * Take trip details and format for use in emails to matched users.
+ * @param user The user to email
+ * @param otherUser The other user in the match
+ * @param tripMatch The match
+ * @param riderRequest The rider's request
+ * @param driverRequest The driver's request
+ */
+function formatTripDetails(
+  user: User,
+  otherUser: User,
+  tripMatch: TripMatch,
+  riderRequest: TripRequest,
+  driverRequest: TripRequest) {
+
+  // To assure the database actually gave us a date!
+  if (!(tripMatch.first_date instanceof Date && tripMatch.last_date instanceof Date)) {
+    console.error("Trip request dates weren't the right type")
+    console.error(typeof tripMatch.first_date, typeof tripMatch.last_date)
+    return
+  }
+
+  const firstDateString = prettyDate(tripMatch.first_date)
+  const lastDateString = prettyDate(tripMatch.last_date)
+
+  const riderLocation = formatLocation(riderRequest.location_description, 'full')
+  const driverLocation = formatLocation(driverRequest.location_description, 'full')
+  const isDriver = driverRequest.member_id == user.id
+  const tripDirection = driverRequest.direction
+
+  let message = (isDriver) ? ` You will be driving ${getPreferredFirstName(otherUser)}` : ` ${getPreferredFirstName(otherUser)} will be driving you`
+  if (tripDirection == 'towards_lafayette') {
+    message += ` to Lafayette College from ${riderLocation}`
+    message += (isDriver && riderLocation != driverLocation) ? ` on the way from ${driverLocation}` : ``
+  } else {
+    message += ` from Lafayette College to ${riderLocation}`
+    message += (isDriver && riderLocation != driverLocation) ? ` on the way to ${driverLocation}` : ``
+  }
+  message += (firstDateString == lastDateString) ? ` on ${firstDateString}.` : ` sometime between ${firstDateString} and ${lastDateString}.`
+
+  return message
 }
 
 function prettyDate(date: Date){

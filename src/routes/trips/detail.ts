@@ -5,7 +5,7 @@ import { TripMatch } from '../../models/trip_matches'
 import { TripRequest } from '../../models/trip_requests'
 import { getPreferredFirstName, User } from '../../models/users'
 import { ReqAuthedReq } from '../../utils/authed_req'
-import { sendTripConfirmationEmail } from '../../utils/emails'
+import { sendTripConfirmationEmail, sendTripReprocessingEmail } from '../../utils/emails'
 import { formatLocation } from '../../utils/location_formatter'
 import { lafayettePlaceID } from '../../utils/places'
 import { notFound } from '../errors/not-found'
@@ -375,6 +375,8 @@ routes.post('/reject', async (req: MatchRequest, res: Response) => {
   await db<TripMatch>('trip_matches').where({ id: req.tripMatch.id }).del()
 
   await pairingJob()
+
+  sendTripReprocessingEmail(req.user, req.otherUser)
 
   res.redirect('/trips?reject=success')
   return

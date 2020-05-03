@@ -19,41 +19,28 @@ export default async function job(): Promise<void> {
 async function notifyMatch(match: TripMatch): Promise<void> {
   const driverRequest = await db('trip_requests').where({ id: match.driver_request_id }).first<TripRequest>()
   const driver = await db('users').where({ id: driverRequest.member_id }).first<User>()
-  const driverName = getPreferredFirstName(driver)
-  const driverEmail = getEmail(driver)
-
   const riderRequest = await db('trip_requests').where({ id: match.rider_request_id }).first<TripRequest>()
   const rider = await db('users').where({ id: riderRequest.member_id }).first<User>()
-  const riderName = getPreferredFirstName(rider)
-  const riderEmail = getEmail(rider)
 
   // Send Driver Notification
   if (driver.allow_notifications) {
     sendTripReminderEmail(
-      driverName,
-      driverEmail,
-      match.first_date,
-      match.last_date,
-      true,
-      riderName,
-      driverRequest.direction,
-      driverRequest.location_description,
-      riderRequest.location_description
+      driver,
+      rider,
+      match,
+      riderRequest,
+      driverRequest
     )
   }
 
   // Send Rider Notification
   if (rider.allow_notifications) {
     sendTripReminderEmail(
-      riderName,
-      riderEmail,
-      match.first_date,
-      match.last_date,
-      true,
-      driverName,
-      driverRequest.direction,
-      driverRequest.location_description,
-      riderRequest.location_description
+      rider,
+      driver,
+      match,
+      riderRequest,
+      driverRequest
     )
   }
   await db<TripMatch>('trip_matches').where({ id: match.id })
