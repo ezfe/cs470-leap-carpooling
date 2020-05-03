@@ -67,8 +67,7 @@ export async function sendTripProcessingEmail(user: User, tripRequest: TripReque
   const lastDateString = prettyDate(tripRequest.last_date)
 
   let message = `Hello ${getPreferredFirstName(user)},`
-      message += '<br><br>'
-      message += 'Thanks for submitting a trip request! We have you travelling'
+      message += '<br><br>Thanks for submitting a trip request! We have you travelling'
       if (tripRequest.direction == 'towards_lafayette') {
         message += ` to Lafayette College from ${formatLocation(tripRequest.location_description, 'full')}`
       } else {
@@ -90,7 +89,7 @@ export async function sendTripProcessingEmail(user: User, tripRequest: TripReque
 }
 
 /**
- * Send a email confirming a trip match
+ * Send an email confirming a trip match
  * @param user The user to email
  * @param tripMatch The match that was found
  * @param driverRequest The driver's request
@@ -188,10 +187,10 @@ export async function sendTripReprocessingEmail(
   otherUser : User
 ) {
   let message = `Hello ${getPreferredFirstName(user)}, <br><br>`
-      message += `We're emailing to let you know that your trip match, ${getPreferredFirstName(otherUser)}, `
-              + `has cancelled or otherwise changed their trip, so we're going to have to reprocess your trip request. `
-              + `Don't worry, we'll let you know when we find you a new match! `
-              + `<br><br>The ${process.env.SITE_NAME} Team`
+      message += `We're emailing to let you know that your trip match, ${getPreferredFirstName(otherUser)}, 
+                  has cancelled or otherwise changed their trip, so we're going to have to reprocess your trip request.  
+                  Don't worry, we'll let you know when we find you a new match! 
+                  <br><br>The ${process.env.SITE_NAME} Team`
 
   await transporter.sendMail({
     from: `"${process.env.SITE_NAME}" <${process.env.CONTACT_EMAIL}>`,
@@ -231,7 +230,8 @@ function formatTripDetails(
   const isDriver = driverRequest.member_id == user.id
   const tripDirection = driverRequest.direction
 
-  let message = (isDriver) ? ` You will be driving ${getPreferredFirstName(otherUser)}` : ` ${getPreferredFirstName(otherUser)} will be driving you`
+  let message = (isDriver) ? ` You will be driving ${getPreferredFirstName(otherUser)}` : 
+    ` ${getPreferredFirstName(otherUser)} will be driving you`
   if (tripDirection == 'towards_lafayette') {
     message += ` to Lafayette College from ${riderLocation}`
     message += (isDriver && riderLocation != driverLocation) ? ` on the way from ${driverLocation}` : ``

@@ -22,7 +22,7 @@ routes.post('/cancel', async (req: ReqAuthedReq, res: Response) => {
       const userToNotify = await db('users').where(
         { id: (await db('trip_requests').select('member_id').join('trip_matches', 'trip_requests.id', userRole).first<TripRequest>()).member_id }
       ).first<User>()
-      sendTripReprocessingEmail(req.user, userToNotify)
+      sendTripReprocessingEmail(userToNotify, req.user)
     } 
 
     if (!tripRequest) {

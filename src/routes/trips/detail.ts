@@ -376,7 +376,7 @@ routes.post('/reject', async (req: MatchRequest, res: Response) => {
 
   await pairingJob()
 
-  sendTripReprocessingEmail(req.user, req.otherUser)
+  sendTripReprocessingEmail(req.otherUser, req.user)
 
   res.redirect('/trips?reject=success')
   return
