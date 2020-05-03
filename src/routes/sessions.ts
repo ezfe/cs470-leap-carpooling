@@ -130,8 +130,8 @@ if (process.env.CAS_DISABLED === 'true') {
           setLoggedInAs(req, user)
 
           if (req.session?.loginRedirect) {
-            delete req.session.loginRedirect
             res.redirect(req.session.loginRedirect)
+            delete req.session.loginRedirect
             return
           }
 
