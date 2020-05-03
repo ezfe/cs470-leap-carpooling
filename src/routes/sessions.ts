@@ -11,23 +11,14 @@ import { internalError } from './errors/internal-error'
 import { notFound } from './errors/not-found'
 
 const routes = Router()
-const service = 'https://carpool.cs.lafayette.edu/sessions/handle-ticket'
+const service = process.env.CAS_SERVICE_URL
 
 routes.get('/login', async (req: AuthedReq, res: Response) => {
   if (req.session?.loginRedirect && !req.query.forwarding) {
     delete req.session.loginRedirect
   }
 
-  if (process.env.CAS_ENABLED === 'true') {
-    const casURL = format({
-      pathname: 'https://cas.lafayette.edu/cas/login',
-      query: {
-        service,
-      },
-    })
-
-    res.redirect(casURL)
-  } else {
+  if (process.env.CAS_DISABLED === 'true') {
     try {
       const users = await db<User>('users')
       const currentUser = req.user
@@ -36,109 +27,36 @@ routes.get('/login', async (req: AuthedReq, res: Response) => {
       console.error(err)
       internalError(req, res, 'internal-error')
     }
+  } else {
+    const casURL = format({
+      pathname: `https://${process.env.CAS_ENDPOINT}/login`,
+      query: {
+        service,
+      },
+    })
+
+    res.redirect(casURL)
   }
 })
 
 routes.get('/logout', (req, res) => {
   setLoggedOut(req)
 
-  const casURL = format({
-    pathname: 'https://cas.lafayette.edu/cas/logout',
-    query: {
-      service,
-    },
-  })
-
-  if (process.env.CAS_ENABLED === 'true') {
-    res.redirect(casURL)
-  } else {
+  if (process.env.CAS_DISABLED === 'true') {
     res.redirect('/')
-  }
-})
-
-routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
-  const requestURL = format({
-    pathname: 'https://cas.lafayette.edu/cas/p3/serviceValidate',
-    query: {
-      service,
-      ticket: req.query.ticket as string,
-    },
-  })
-
-  try {
-    const axiosResponse = await axios.get(requestURL)
-
-    const parsedXML = await xml.parseStringPromise(axiosResponse.data, {
-      trim: true,
-      normalize: true,
-      explicitArray: false,
-      tagNameProcessors: [normalize, stripPrefix],
+  } else {
+    const casURL = format({
+      pathname: `https://${process.env.CAS_ENDPOINT}/logout`,
+      query: {
+        service,
+      },
     })
-
-    const failure = parsedXML.serviceresponse.authenticationfailure
-    if (failure) {
-      console.error('CAS authentication failed (' + failure.$.code + ').')
-      internalError(req, res, 'cas')
-      return
-    }
-
-    const success = parsedXML.serviceresponse.authenticationsuccess
-    if (success) {
-      const netid = success.user
-      const firstName = success.attributes.givenname
-      const lastName = success.attributes.surname
-
-      let user = await getUserByNetID(netid)
-      if (user) {
-        setLoggedInAs(req, user)
-
-        if (req.session?.loginRedirect) {
-          delete req.session.loginRedirect
-          res.redirect(req.session.loginRedirect)
-          return
-        }
-
-        res.redirect('/')
-        return
-      } else {
-        const inserted = await db<User>('users').insert({
-          netid,
-          first_name: firstName,
-          last_name: lastName,
-          created_at: db.fn.now()
-        }).returning<User[]>('*')
-
-        if (inserted.length === 0) {
-          console.error('Failed to find or insert new record')
-          internalError(req, res, 'internal-error')
-          return
-        } else {
-          user = inserted[0]
-        }
-
-        if (user) {
-          setLoggedInAs(req, user)
-          res.redirect('/settings/onboard')
-          return
-        } else {
-          console.error('Failed to find or insert new record')
-          internalError(req, res, 'internal-error')
-          return
-        }
-      }
-    }
-
-    console.error('CAS authentication failed.')
-    internalError(req, res, 'cas')
-  } catch (err) {
-    console.error(err)
-    internalError(req, res, 'internal-error')
+  
+    res.redirect(casURL)
   }
-
-  return
 })
 
-if (process.env.CAS_ENABLED !== 'true') {
+if (process.env.CAS_DISABLED === 'true') {
   // POST /sessions/login
   routes.post('/login', async (req: AuthedReq, res: Response) => {
     const user = await getUserByID(req.body.chosen_user)
@@ -173,6 +91,88 @@ if (process.env.CAS_ENABLED !== 'true') {
       console.error(err)
       internalError(req, res, 'internal-error')
     }
+  })
+} else {
+  routes.get('/handle-ticket', async (req: AuthedReq, res: Response) => {
+    const requestURL = format({
+      pathname: `https://${process.env.CAS_ENDPOINT}/p3/serviceValidate`,
+      query: {
+        service,
+        ticket: req.query.ticket as string,
+      },
+    })
+
+    try {
+      const axiosResponse = await axios.get(requestURL)
+
+      const parsedXML = await xml.parseStringPromise(axiosResponse.data, {
+        trim: true,
+        normalize: true,
+        explicitArray: false,
+        tagNameProcessors: [normalize, stripPrefix],
+      })
+
+      const failure = parsedXML.serviceresponse.authenticationfailure
+      if (failure) {
+        console.error('CAS authentication failed (' + failure.$.code + ').')
+        internalError(req, res, 'cas')
+        return
+      }
+
+      const success = parsedXML.serviceresponse.authenticationsuccess
+      if (success) {
+        const netid = success.user
+        const firstName = success.attributes.givenname
+        const lastName = success.attributes.surname
+
+        let user = await getUserByNetID(netid)
+        if (user) {
+          setLoggedInAs(req, user)
+
+          if (req.session?.loginRedirect) {
+            res.redirect(req.session.loginRedirect)
+            delete req.session.loginRedirect
+            return
+          }
+
+          res.redirect('/')
+          return
+        } else {
+          const inserted = await db<User>('users').insert({
+            netid,
+            first_name: firstName,
+            last_name: lastName,
+            created_at: db.fn.now()
+          }).returning<User[]>('*')
+
+          if (inserted.length === 0) {
+            console.error('Failed to find or insert new record')
+            internalError(req, res, 'internal-error')
+            return
+          } else {
+            user = inserted[0]
+          }
+
+          if (user) {
+            setLoggedInAs(req, user)
+            res.redirect('/settings/onboard')
+            return
+          } else {
+            console.error('Failed to find or insert new record')
+            internalError(req, res, 'internal-error')
+            return
+          }
+        }
+      }
+
+      console.error('CAS authentication failed.')
+      internalError(req, res, 'cas')
+    } catch (err) {
+      console.error(err)
+      internalError(req, res, 'internal-error')
+    }
+
+    return
   })
 }
 

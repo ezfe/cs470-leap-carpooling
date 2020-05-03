@@ -22,9 +22,17 @@ if (!process.env.SESSION_SECRET) {
 }
 
 if (!process.env.CONTACT_EMAIL || !process.env.SITE_NAME) {
-  console.log('CONTACT_EMAIL and SITE_NAME must be set')
+  console.error('CONTACT_EMAIL and SITE_NAME must be set')
   console.error('Use .env file to configure environment variables')
   process.exit(1)
+}
+
+if (process.env.CAS_DISABLED !== 'true') {
+  if (!process.env.CAS_ENDPOINT || !process.env.CAS_SERVICE_URL) {
+    console.error('CAS_ENDPOINT and CAS_SERVICE_URL must be set when CAS_DISABLED is not set to `true`')
+    console.error('Use .env file to configure environment variables')
+    process.exit(1)  
+  }
 }
 
 app.use(

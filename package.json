@@ -4,10 +4,10 @@
   "main": "build/index.js",
   "license": "UNLICENSED",
   "scripts": {
-    "clean": "rm -rf ./dist/*",
+    "clean": "rm -rf ./build",
     "tsc": "tsc",
     "node": "node .",
-    "start": "npm-run-all tsc node",
+    "start": "npm-run-all clean tsc node",
     "lint": "eslint . --ext .ts",
     "prettier": "prettier --write \"src/**/*.ts\"",
     "migrate:make": "knex migrate:make",
