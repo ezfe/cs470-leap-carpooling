@@ -16,19 +16,25 @@ function locationFormatter(locDesc: string): string {
   const json = JSON.parse(locDesc)
 
   let finalAddress = ''
-  if (json.street_number) {
-    finalAddress = `${finalAddress}${json.street_number} `
-  }
-
   if (json.street) {
-    finalAddress = `${finalAddress}${json.street} `
+    if (json.street_number) {
+      finalAddress = `${json.street_number} ${json.street}, `
+    } else {
+      finalAddress = `${json.street}, `
+    }
   }
 
-  if (json.locality) {
-    finalAddress = `${finalAddress}${json.locality}, `
+  if (json.state) {
+    if (json.locality) {
+      if (json.zip) {
+        finalAddress = `${finalAddress}${json.locality}, ${json.state} ${json.zip} USA`
+      } else {
+        finalAddress = `${finalAddress}${json.locality}, ${json.state}, USA`
+      }
+    } else {
+      finalAddress = `${finalAddress}${json.state}, USA`
+    }
   }
-
-  finalAddress = `${finalAddress}${json.state} ${json.zip} USA`
 
   return finalAddress
 }
