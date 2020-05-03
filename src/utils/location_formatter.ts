@@ -27,12 +27,12 @@ function locationFormatter(locDesc: string): string {
   if (json.state) {
     if (json.locality) {
       if (json.zip) {
-        finalAddress = `${finalAddress}${json.locality}, ${json.state} ${json.zip} USA`
+        finalAddress = `${finalAddress}${json.locality}, ${json.state} ${json.zip}`
       } else {
-        finalAddress = `${finalAddress}${json.locality}, ${json.state}, USA`
+        finalAddress = `${finalAddress}${json.locality}, ${json.state}`
       }
     } else {
-      finalAddress = `${finalAddress}${json.state}, USA`
+      finalAddress = `${finalAddress}${json.state}`
     }
   }
 
