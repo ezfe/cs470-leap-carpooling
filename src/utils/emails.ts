@@ -111,7 +111,7 @@ export async function sendTripMatchEmail(
       message += '<br><br>We found you a '
       message += (isDriver) ? `rider!` : `driver!`
       message += formatTripDetails(user, otherUser, tripMatch, riderRequest, driverRequest)
-      message += `Please login to ${process.env.SITE_NAME} to confirm or reject your trip. <br><br> The ${process.env.SITE_NAME} Team`
+      message += ` Please login to ${process.env.SITE_NAME} to confirm or reject your trip. <br><br> The ${process.env.SITE_NAME} Team`
 
   await transporter.sendMail({
     from: `"${process.env.SITE_NAME}" <${process.env.CONTACT_EMAIL}>`,
