@@ -1,0 +1,14 @@
+[Unit]
+Description=Carpool Service
+After=network.target
+
+[Service]
+Type=simple
+User=carpool
+Group=carpool
+WorkingDirectory=/home/carpool/cs470-leap-carpooling
+ExecStart=/bin/bash /home/carpool/cs470-leap-carpooling/start.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
