@@ -213,6 +213,32 @@ If you don't have an Ubuntu/Linux based system, then install the same software b
     sudo systemctl restart nginx
     ```
 
+15. Setup Service
+
+    To have the project start-up automatically on server boot, enable the service provided in the `service` directory.
+
+    Copy the `carpool.service` file to `/etc/systemd/system/carpool.service`
+
+    Register the service and start it up
+
+    ```bash
+    cd /etc/systemd/system
+    chmod +x carpool.service
+    systemctl daemon-reload
+    systemctl enable carpool.service
+    systemctl start carpool
+    ```
+
+    The website should now be running! There may be a delay while it compiles. Use the following commands to manage the service:
+
+    ```bash
+    # Check status and view output logs
+    systemctl status carpool
+
+    # Start, stop, restart service
+    systemctl [start|stop|restart] carpool
+    ```
+
 # Google Maps
 
 A project must be created at [console.cloud.google.com](https://console.cloud.google.com). Generate 1 key capable of using the Javascript Autocomplete APIs, and 1 key for the server side requests to the distance matrix.
