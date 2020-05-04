@@ -30,6 +30,8 @@ server {
     # HSTS (ngx_http_headers_module is required) (63072000 seconds)
     add_header Strict-Transport-Security "max-age=63072000" always;
 
+    client_max_body_size 10M;
+
     location / {
         root /var/www/html;
         try_files $uri @carpool;
