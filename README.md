@@ -10,8 +10,8 @@ If you don't have an Ubuntu/Linux based system, then install the same software b
 
 2. Update your package manager and any outdated packages:
    ```bash
-   $ sudo apt update
-   $ sudo apt upgrade -y
+   sudo apt update
+   sudo apt upgrade -y
    ```
 
 3. This manual assumes that `git` is installed. If you do not have `git`, install it now.
@@ -62,7 +62,7 @@ If you don't have an Ubuntu/Linux based system, then install the same software b
 
    # Create a new user
    # The user will be assumed to
-   # be called `carpool` for the remainer
+   # be called `carpool` for the remainder
    # of this document.
    createuser --interactive
 
@@ -89,7 +89,8 @@ If you don't have an Ubuntu/Linux based system, then install the same software b
    # Set a password while in the Postgres prompt
    \password
 
-   # Exit the Postgres prompt with `control+d`
+   # Exit the Postgres prompt
+   \q
 
    # Exit the `carpool` linux account
    logout
@@ -176,7 +177,7 @@ If you don't have an Ubuntu/Linux based system, then install the same software b
 
     By setting CAS_DISABLED, you won't have to configure CAS to test the site. If this is left out, then the two CAS configuration lines must be set up in the `.env` file.
 
-12. Configuring NGINX
+12. Install NGINX
 
     This step is best done from an administrator account. If you switched away to clone the project, switch back to an admin account now.
 
@@ -188,7 +189,7 @@ If you don't have an Ubuntu/Linux based system, then install the same software b
 
 13. Configure HTTPs
 
-    If you are using a different operating system or server other than NGINX, follow the instrucitons at [certbot.eff.org](https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx).
+    If you are using a different operating system, or a server other than NGINX, follow the instructions at [certbot.eff.org](https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx).
 
     ```bash
     sudo apt install -y software-properties-common
@@ -203,7 +204,7 @@ If you don't have an Ubuntu/Linux based system, then install the same software b
     # You'll be prompted for information about the website. Fill this information out accurately.
     ```
 
-14. Finish NGINX Configuration
+14. Configure NGINX
 
     Replace the default NGINX configuration (located at `/etc/nginx/sites-enabled/default`) with the contents of the template provided in the project, in the `nginx` directory.
 
@@ -213,7 +214,7 @@ If you don't have an Ubuntu/Linux based system, then install the same software b
     sudo systemctl restart nginx
     ```
 
-15. Setup Service
+15. Setup Carpool Service
 
     To have the project start-up automatically on server boot, enable the service provided in the `service` directory.
 
