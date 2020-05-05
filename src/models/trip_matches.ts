@@ -4,6 +4,9 @@ import db from '../db'
 import { User } from './users'
 import { UserRole, TripDirection } from './misc_types'
 
+/**
+ * The database record for a trip match
+ */
 export interface TripMatch {
   id: number
   driver_request_id: number
@@ -17,6 +20,10 @@ export interface TripMatch {
   notification_sent: boolean
 }
 
+/**
+ * An annotated version of a trip match,
+ * with more information to ease rendering
+ */
 export interface AnnotatedTripMatch {
   id: number
   first_date: Date | Raw<any>
@@ -39,12 +46,11 @@ export interface AnnotatedTripMatch {
  * @param actionNeeded Whether the user in question also needs to confirm the trip
  */
 export async function getTripMatches(
-                                      user: User,
-                                      filter: "past" | "future" | null,
-                                      actionNeeded: boolean | null
-                                    ): Promise<AnnotatedTripMatch[]> {
-
-  const orderByParam = (filter === 'past' ? 'desc' : 'asc')
+  user: User,
+  filter: 'past' | 'future' | null,
+  actionNeeded: boolean | null
+): Promise<AnnotatedTripMatch[]> {
+  const orderByParam = filter === 'past' ? 'desc' : 'asc'
 
   let query = db('trip_matches')
     .select(
@@ -88,23 +94,23 @@ export async function getTripMatches(
   // Since in JavaScript, null is falsy,
   // can't just if (actionNeeded) else if (!actionNeeded)
   if (actionNeeded === true) {
-    query = query.andWhere(function() {
+    query = query.andWhere(function () {
       this.where({
         'trip_matches.driver_confirmed': false,
-        'driver_t.member_id': user.id
+        'driver_t.member_id': user.id,
       }).orWhere({
         'trip_matches.rider_confirmed': false,
-        'rider_t.member_id': user.id
+        'rider_t.member_id': user.id,
       })
     })
   } else if (actionNeeded === false) {
-    query = query.andWhere(function() {
+    query = query.andWhere(function () {
       this.where({
         'trip_matches.driver_confirmed': true,
-        'driver_t.member_id': user.id
+        'driver_t.member_id': user.id,
       }).orWhere({
         'trip_matches.rider_confirmed': true,
-        'rider_t.member_id': user.id
+        'rider_t.member_id': user.id,
       })
     })
   }

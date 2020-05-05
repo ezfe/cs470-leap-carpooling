@@ -2,6 +2,9 @@
 import { Raw } from 'knex'
 import { TripDirection, UserRole } from './misc_types'
 
+/**
+ * A request for a trip
+ */
 export interface TripRequest {
   id: number
   member_id: number
