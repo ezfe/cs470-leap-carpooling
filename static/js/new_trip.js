@@ -111,7 +111,11 @@ $('#last_date').on('changeDate', function(e) {
   }
   $('#first_date').datepicker('setEndDate', $('#last_date').val())
   console.log(first_date_val)
-});
+})
+
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
 
 document.getElementById('request_form').addEventListener('submit', (event) => {
   let otherOverride = false
