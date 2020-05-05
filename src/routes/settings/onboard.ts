@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage })
 
-routes.get('/onboard', (req: ReqAuthedReq, res: Response) => {
+routes.get('/', (req: ReqAuthedReq, res: Response) => {
   const profileImageURL =
     req.user.profile_image_name || 'static/blank-profile.png'
 
@@ -40,7 +40,7 @@ routes.get('/onboard', (req: ReqAuthedReq, res: Response) => {
   res.render('settings/onboard', { profileImageURL, constraints })
 })
 
-routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
+routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const validated = await onboardSchema.validateAsync(req.body)
 
@@ -73,7 +73,7 @@ routes.post('/onboard', async (req: ReqAuthedReq, res: Response) => {
 })
 
 routes.post(
-  '/onboard/upload-onboard-image',
+  '/upload-onboard-image',
   upload.single('profile_photo'),
   async (req: ReqAuthedReq, res: Response) => {
     try {
@@ -89,7 +89,7 @@ routes.post(
 )
 
 routes.get(
-  '/onboard/remove-profile-image',
+  '/remove-profile-image',
   async (req: ReqAuthedReq, res: Response) => {
     try {
       await db<User>('users').where({ id: req.user.id }).update({
