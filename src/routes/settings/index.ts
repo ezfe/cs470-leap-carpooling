@@ -8,7 +8,12 @@ import { User } from '../../models/users'
 import { ReqAuthedReq } from '../../utils/authed_req'
 import { geocode } from '../../utils/geocoding'
 import { formatLocation } from '../../utils/location_formatter'
-import { phoneNumber, preferredEmail, preferredName, deviationLimit } from '../../validation'
+import {
+  phoneNumber,
+  preferredEmail,
+  preferredName,
+  deviationLimit,
+} from '../../validation'
 import { settingsSchema } from '../../validation/settings'
 import onboard from './onboard'
 import { internalError } from '../errors/internal-error'
@@ -34,7 +39,9 @@ routes.use('/onboard', onboard)
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_BROWSER_KEY
   if (!googleMapsAPIKey) {
-    console.error('GOOGLE_MAPS_BROWSER_KEY must be set to load the settings page')
+    console.error(
+      'GOOGLE_MAPS_BROWSER_KEY must be set to load the settings page'
+    )
     internalError(req, res, 'google-maps-key')
     return
   }
@@ -43,7 +50,7 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     preferredName,
     preferredEmail,
     phoneNumber,
-    deviationLimit
+    deviationLimit,
   }
 
   const profileImageURL =
