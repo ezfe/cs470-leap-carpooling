@@ -1,18 +1,29 @@
 import { NextFunction, Response, Router } from 'express'
 import db from '../../db'
+import pairingJob from '../../jobs/pairing-job'
 import { PairRejection } from '../../models/pair_rejections'
 import { TripMatch } from '../../models/trip_matches'
 import { TripRequest } from '../../models/trip_requests'
 import { getPreferredFirstName, User } from '../../models/users'
 import { ReqAuthedReq } from '../../utils/authed_req'
-import { sendTripConfirmationEmail, sendTripReprocessingEmail } from '../../utils/emails'
+import {
+  sendTripConfirmationEmail,
+  sendTripReprocessingEmail,
+} from '../../utils/emails'
 import { formatLocation } from '../../utils/location_formatter'
 import { lafayettePlaceID } from '../../utils/places'
-import { notFound } from '../errors/not-found'
 import { internalError } from '../errors/internal-error'
-import pairingJob from '../../jobs/pairing-job'
+import { notFound } from '../errors/not-found'
 
-/* This whole file has a `requireAuthenticated` on it in routes/index.ts */
+/**
+ * This file is pre-processed by middleware that requires
+ * authentication, so all requests may be ReqAuthRequest.
+ *
+ * Additionally, all requests are annotated with additional information
+ * to reduce repeated validation code. This occurs using the
+ * MatchRequest interface and the middleware that appears
+ * directly below it.
+ */
 
 const routes = Router({ mergeParams: true })
 
@@ -28,7 +39,6 @@ interface MatchRequest extends ReqAuthedReq {
   isDriver: boolean
 }
 
-// Middleware for just this file's routes
 routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
   try {
     const id = parseInt(req.params.tripId, 10)
@@ -95,6 +105,11 @@ routes.use(async (req: MatchRequest, res: Response, next: NextFunction) => {
   }
 })
 
+/**
+ * GET /trips/:tripId
+ * 
+ * View the details of a matched trip
+ */
 routes.get('/', async (req: MatchRequest, res: Response) => {
   try {
     const googleMapsAPIKey = process.env.GOOGLE_MAPS_BROWSER_KEY
@@ -296,6 +311,11 @@ function sendConfirmationEmails(
   }
 }
 
+/**
+ * POST /trips/:tripId/confirm
+ * 
+ * Confirm a trip
+ */
 routes.post('/confirm', async (req: MatchRequest, res: Response) => {
   try {
     if (req.isDriver) {
@@ -340,6 +360,12 @@ routes.post('/confirm', async (req: MatchRequest, res: Response) => {
   }
 })
 
+/**
+ * POST /trips/:tripId/reject
+ * 
+ * Reject a trip, specifying the reason and acting
+ * accordingly.
+ */
 routes.post('/reject', async (req: MatchRequest, res: Response) => {
   const reasons = [
     'incompatible-location',
@@ -358,17 +384,26 @@ routes.post('/reject', async (req: MatchRequest, res: Response) => {
     res.sendStatus(403)
     return
   }
-  
-  if (requestedReason !== 'block_person' && req.currentUserRequest.last_date instanceof Date) {
+
+  if (
+    requestedReason !== 'block_person' &&
+    req.currentUserRequest.last_date instanceof Date
+  ) {
+    // If the user didn't specify the option that they
+    // did not want to ride with that person, we assume
+    // it's another detail of the trip, and block for just
+    // the duration of travel.
     await db<PairRejection>('pair_rejections').insert({
       blocker_id: req.user.id,
       blockee_id: req.otherUser.id,
-      expire_after: req.currentUserRequest.last_date
+      expire_after: req.currentUserRequest.last_date,
     })
   } else {
+    // If the user specified they want to block that person,
+    // then we block indefinitly.
     await db<PairRejection>('pair_rejections').insert({
       blocker_id: req.user.id,
-      blockee_id: req.otherUser.id
+      blockee_id: req.otherUser.id,
     })
   }
 

@@ -3,12 +3,15 @@ import db from '../../db'
 import { getTripMatches } from '../../models/trip_matches'
 import { TripRequest } from '../../models/trip_requests'
 import { ReqAuthedReq } from '../../utils/authed_req'
-import tripDetail from './detail'
-import tripCreation from './new'
 import { formatLocation } from '../../utils/location_formatter'
 import { internalError } from '../errors/internal-error'
+import tripDetail from './detail'
+import tripCreation from './new'
 
-/* This whole file has a `requireAuthenticated` on it in routes/index.ts */
+/**
+ * This file is pre-processed by middleware that requires
+ * authentication, so all requests may be ReqAuthRequest.
+ */
 
 const routes = Router()
 
@@ -24,31 +27,38 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const alerts = {
       delete: req.query.delete === 'success',
-      reject: req.query.reject === 'success'
+      reject: req.query.reject === 'success',
     }
 
-    const pastMatchedRequests = await getTripMatches(req.user, "past", null)
-    const futureActionNotNeeded = await getTripMatches(req.user, "future", false)
-    const futureActionNeeded = await getTripMatches(req.user, "future", true)
+    const pastMatchedRequests = await getTripMatches(req.user, 'past', null)
+    const futureActionNotNeeded = await getTripMatches(
+      req.user,
+      'future',
+      false
+    )
+    const futureActionNeeded = await getTripMatches(req.user, 'future', true)
 
     const unmatchedRequests: TripRequest[] = await db('trip_requests')
-      .select(
-        'trip_requests.*'
-      ).leftJoin('trip_matches', function() {
-        this.on('trip_requests.id', '=', 'trip_matches.driver_request_id')
-          .orOn('trip_requests.id', '=', 'trip_matches.rider_request_id')
-      }).whereNull('trip_matches.id')
+      .select('trip_requests.*')
+      .leftJoin('trip_matches', function () {
+        this.on('trip_requests.id', '=', 'trip_matches.driver_request_id').orOn(
+          'trip_requests.id',
+          '=',
+          'trip_matches.rider_request_id'
+        )
+      })
+      .whereNull('trip_matches.id')
       .andWhere('trip_requests.member_id', req.user.id)
 
     const trips = [
       ...futureActionNeeded,
       ...futureActionNotNeeded,
       ...unmatchedRequests,
-      ...pastMatchedRequests
+      ...pastMatchedRequests,
     ]
 
     res.locals.formatLocation = formatLocation
-    res.render('trips/index', { trips, alerts,  })
+    res.render('trips/index', { trips, alerts })
   } catch (err) {
     console.error(err)
     internalError(req, res, 'internal-error')

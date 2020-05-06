@@ -6,17 +6,28 @@ import { ReqAuthedReq } from '../../utils/authed_req'
 import { sendTripProcessingEmail } from '../../utils/emails'
 import { geocode } from '../../utils/geocoding'
 import { formatLocation } from '../../utils/location_formatter'
+import { deviationLimit } from '../../validation'
 import { newTripSchema } from '../../validation/new_trip'
 import { internalError } from '../errors/internal-error'
-import { deviationLimit } from '../../validation'
+
+/**
+ * This file is pre-processed by middleware that requires
+ * authentication, so all requests may be ReqAuthRequest.
+ */
 
 const routes = Router()
 
-// GET /trips/new
+/**
+ * GET /trips/new
+ * 
+ * Request a new trip
+ */
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_BROWSER_KEY
   if (!googleMapsAPIKey) {
-    console.error('GOOGLE_MAPS_BROWSER_KEY must be set to load the new trips page')
+    console.error(
+      'GOOGLE_MAPS_BROWSER_KEY must be set to load the new trips page'
+    )
     internalError(req, res, 'google-maps-key')
     return
   }
@@ -30,11 +41,15 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   res.render('trips/new', {
     googleMapsAPIKey,
     formattedLocation,
-    constraints: { deviationLimit }
+    constraints: { deviationLimit },
   })
 })
 
-// POST /trips/new
+/**
+ * POST /trips/new
+ * 
+ * Record a request for a new trip, posted by the browser.
+ */
 routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const validated = await newTripSchema.validateAsync(req.body)
