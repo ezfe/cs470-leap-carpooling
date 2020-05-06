@@ -1,7 +1,8 @@
-import path from 'path'
 import crypto from 'crypto'
 import { Response, Router } from 'express'
 import fs from 'fs'
+import multer from 'multer'
+import path from 'path'
 import db from '../../db'
 import { User } from '../../models/users'
 import { ReqAuthedReq } from '../../utils/authed_req'
@@ -9,7 +10,11 @@ import { sendWelcomeEmail } from '../../utils/emails'
 import { phoneNumber, preferredEmail, preferredName } from '../../validation'
 import { onboardSchema } from '../../validation/onboard'
 import { internalError } from '../errors/internal-error'
-import multer from 'multer'
+
+/**
+ * This file is pre-processed by middleware that requires
+ * authentication, so all requests may be ReqAuthRequest.
+ */
 
 const routes = Router()
 
@@ -27,6 +32,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage })
 
+/**
+ * GET /settings/onboard
+ *
+ * Onboard the user, collecting basic information
+ * required for proper site operation.
+ */
 routes.get('/', (req: ReqAuthedReq, res: Response) => {
   const profileImageURL =
     req.user.profile_image_name || 'static/blank-profile.png'
@@ -40,6 +51,11 @@ routes.get('/', (req: ReqAuthedReq, res: Response) => {
   res.render('settings/onboard', { profileImageURL, constraints })
 })
 
+/**
+ * POST /settings/onboard
+ *
+ * Record the onboarding data posted by the user's browser.
+ */
 routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const validated = await onboardSchema.validateAsync(req.body)
@@ -72,6 +88,11 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   }
 })
 
+/**
+ * POST /settings/onboard/upload-onboard-image
+ *
+ * Save new profile image posted by the browser
+ */
 routes.post(
   '/upload-onboard-image',
   upload.single('profile_photo'),
@@ -88,6 +109,12 @@ routes.post(
   }
 )
 
+/**
+ * GET /settings/onboard/remove-profile-image
+ *
+ * Endpoint that deletes the current profile image and
+ * returns the user back to the onboard page
+ */
 routes.get(
   '/remove-profile-image',
   async (req: ReqAuthedReq, res: Response) => {

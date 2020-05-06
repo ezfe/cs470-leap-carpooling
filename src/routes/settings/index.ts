@@ -9,14 +9,19 @@ import { ReqAuthedReq } from '../../utils/authed_req'
 import { geocode } from '../../utils/geocoding'
 import { formatLocation } from '../../utils/location_formatter'
 import {
+  deviationLimit,
   phoneNumber,
   preferredEmail,
   preferredName,
-  deviationLimit,
 } from '../../validation'
 import { settingsSchema } from '../../validation/settings'
-import onboard from './onboard'
 import { internalError } from '../errors/internal-error'
+import onboard from './onboard'
+
+/**
+ * This file is pre-processed by middleware that requires
+ * authentication, so all requests may be ReqAuthRequest.
+ */
 
 const routes = Router()
 
@@ -36,6 +41,11 @@ const upload = multer({ storage })
 
 routes.use('/onboard', onboard)
 
+/**
+ * GET /settings
+ * 
+ * Main Settings Page
+ */
 routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   const googleMapsAPIKey = process.env.GOOGLE_MAPS_BROWSER_KEY
   if (!googleMapsAPIKey) {
@@ -79,6 +89,12 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
   })
 })
 
+/**
+ * GET /settings/remove-profile-image
+ * 
+ * Endpoint that deletes the current profile image and
+ * returns the user back to the settings page
+ */
 routes.get(
   '/remove-profile-image',
   async (req: ReqAuthedReq, res: Response) => {
@@ -104,6 +120,12 @@ routes.get(
   }
 )
 
+/**
+ * POST /settings
+ * 
+ * Record new settings posted by the browser to
+ * this endpoint.
+ */
 routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   try {
     const validated = await settingsSchema.validateAsync(req.body)
@@ -128,6 +150,11 @@ routes.post('/', async (req: ReqAuthedReq, res: Response) => {
   }
 })
 
+/**
+ * POST /settings/upload-image
+ * 
+ * Save new profile image posted by the browser
+ */
 routes.post(
   '/upload-image',
   upload.single('profile_photo'),
