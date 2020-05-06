@@ -1,7 +1,7 @@
 
 exports.up = function(knex) {
   return knex.schema.table('users', table => {
-    table.boolean('allow_notifications').notNullable().defaultTo(false)
+    table.boolean('allow_notifications').notNullable().defaultTo(true)
   })
 };
 
