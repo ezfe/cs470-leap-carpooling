@@ -77,9 +77,6 @@ routes.get('/', async (req: ReqAuthedReq, res: Response) => {
     formattedLocation = await formatLocation(defaultLocationInformation, 'full')
   }
 
-  //const temp =await(locationCity(validated.place_id))
-  // const locDict = JSON.stringify(temp)
-
   res.render('settings/index', {
     constraints,
     googleMapsAPIKey,
@@ -160,7 +157,6 @@ routes.post(
   upload.single('profile_photo'),
   async (req: ReqAuthedReq, res: Response) => {
     try {
-      // Prepend a / so that public/uploads/file.jpg becomes /public/uploads/file.jpg
       await db<User>('users').where({ id: req.user.id }).update({
         profile_image_name: req.file.path,
       })
