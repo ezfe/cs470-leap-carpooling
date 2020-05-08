@@ -11,7 +11,7 @@ import {
   setLoggedOut,
   User,
 } from '../models/users'
-import { AuthedReq } from '../utils/authed_req'
+import { AuthedReq, ReqAuthedReq } from '../utils/authed_req'
 import axios from 'axios'
 import { internalError } from './errors/internal-error'
 import { notFound } from './errors/not-found'
@@ -146,7 +146,7 @@ if (process.env.CAS_DISABLED === 'true') {
       if (success) {
         if (!isStudent(success.edupersonentitlement)) {
           // The person logging in is not a student
-          res.render('errors/non-authorized-role')
+          res.redirect('/sessions/students-only')
           return
         }
 
@@ -206,5 +206,9 @@ if (process.env.CAS_DISABLED === 'true') {
     return
   })
 }
+
+routes.get('students-only', (req: ReqAuthedReq, res: Response) => {
+  res.render('errors/non-authorized-role')
+})
 
 export default routes
