@@ -127,7 +127,7 @@ if (process.env.CAS_DISABLED === 'true') {
 
       // eslint-disable-next-line no-inner-declarations
       function isStudent(eduPersonEntitlement) {
-        const searchKey = 'faculty'
+        const searchKey = 'student'
         if (Array.isArray(eduPersonEntitlement)) {
           for (const entitlement of eduPersonEntitlement) {
             if (entitlement.indexOf(searchKey) >= 0) {
