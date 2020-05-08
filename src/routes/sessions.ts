@@ -112,6 +112,9 @@ if (process.env.CAS_DISABLED === 'true') {
         tagNameProcessors: [normalize, stripPrefix],
       })
 
+      console.log('CAS XML Payload (parsed):')
+      console.log(JSON.stringify(parsedXML))
+
       const failure = parsedXML.serviceresponse.authenticationfailure
       if (failure) {
         console.error('CAS authentication failed (' + failure.$.code + ').')
