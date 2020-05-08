@@ -7,7 +7,7 @@ exports.up = function(knex) {
       .inTable('users')
       .notNullable()
       .onDelete('cascade')
-    t.enu('role', null, { existingType: true, useNative: true, enumName: 'user_role' })
+    t.enu('role', ['rider', 'driver'], { useNative: true, enumName: 'user_role' })
       .notNullable()
     t.text('location').notNullable()
     t.text('location_description').notNullable()
@@ -25,7 +25,8 @@ exports.down = function(knex) {
   return Promise.all(
     [
       knex.schema.dropTable('trip_requests'),
-      knex.raw('DROP TYPE trip_direction')
+      knex.raw('DROP TYPE trip_direction'),
+      knex.raw('DROP TYPE user_role')
     ]
   )
 };

@@ -75,7 +75,6 @@ export interface User {
   id: number
   netid: string
   email?: string
-  default_role?: UserRole
   default_location?: string
   default_location_description?: string
   deviation_limit?: number
