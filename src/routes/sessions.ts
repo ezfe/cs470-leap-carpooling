@@ -112,9 +112,39 @@ if (process.env.CAS_DISABLED === 'true') {
         tagNameProcessors: [normalize, stripPrefix],
       })
 
+      const sampleParse = await xml.parseStringPromise(`<cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
+      <cas:authenticationSuccess>
+          <cas:user>eline</cas:user>
+          <cas:attributes>
+              <cas:eduPersonEntitlement>https://carpool.cs.lafayette.edu/student</cas:eduPersonEntitlement>
+              <cas:eduPersonEntitlement>https://carpool.cs.lafayette.edu/faculty</cas:eduPersonEntitlement>
+              <cas:isFromNewLogin>false</cas:isFromNewLogin>
+              <cas:bypassMultifactorAuthentication>false</cas:bypassMultifactorAuthentication>
+              <cas:authenticationDate>2020-05-08T23:27:50.743689Z</cas:authenticationDate>
+              <cas:authnContextClass>mfa-duo</cas:authnContextClass>
+              <cas:givenName>Ezekiel</cas:givenName>
+              <cas:successfulAuthenticationHandlers>LdapAuthenticationHandler</cas:successfulAuthenticationHandlers>
+              <cas:successfulAuthenticationHandlers>mfa-duo</cas:successfulAuthenticationHandlers>
+              <cas:credentialType>UsernamePasswordCredential</cas:credentialType>
+              <cas:credentialType>DuoSecurityCredential</cas:credentialType>
+              <cas:samlAuthenticationStatementAuthMethod>urn:oasis:names:tc:SAML:1.0:am:password</cas:samlAuthenticationStatementAuthMethod>
+              <cas:samlAuthenticationStatementAuthMethod>urn:oasis:names:tc:SAML:1.0:am:unspecified</cas:samlAuthenticationStatementAuthMethod>
+              <cas:authenticationMethod>LdapAuthenticationHandler</cas:authenticationMethod>
+              <cas:authenticationMethod>mfa-duo</cas:authenticationMethod>
+              <cas:surname>Elin</cas:surname>
+              <cas:longTermAuthenticationRequestTokenUsed>false</cas:longTermAuthenticationRequestTokenUsed>
+              </cas:attributes>
+      </cas:authenticationSuccess>
+  </cas:serviceResponse>
+  `, {
+    trim: true,
+    normalize: true,
+    explicitArray: false,
+    tagNameProcessors: [normalize, stripPrefix],
+  })
+
       console.log('CAS XML Payload (parsed):')
-      console.log(axiosResponse.data)
-      console.log(JSON.stringify(parsedXML))
+      console.log(JSON.stringify(sampleParse))
 
       const failure = parsedXML.serviceresponse.authenticationfailure
       if (failure) {
