@@ -144,7 +144,10 @@ if (process.env.CAS_DISABLED === 'true') {
 
       const success = parsedXML.serviceresponse.authenticationsuccess
       if (success) {
-        if (!isStudent(success.attributes.edupersonentitlement)) {
+        if (
+          process.env.CAS_ROLE_CHECK_DISABLED !== 'true' &&
+          !isStudent(success.attributes.edupersonentitlement)
+        ) {
           // The person logging in is not a student
           res.redirect('/sessions/students-only')
           return
