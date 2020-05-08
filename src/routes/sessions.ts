@@ -113,6 +113,7 @@ if (process.env.CAS_DISABLED === 'true') {
       })
 
       console.log('CAS XML Payload (parsed):')
+      console.log(axiosResponse.data)
       console.log(JSON.stringify(parsedXML))
 
       const failure = parsedXML.serviceresponse.authenticationfailure
