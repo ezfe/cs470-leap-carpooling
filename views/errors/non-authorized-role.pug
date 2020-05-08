@@ -1,0 +1,18 @@
+extends base.pug
+
+block navbar_settings
+  - var current_page = "non-authorized-role"
+
+append title
+  = ' - Unauthorized'
+
+block content
+  .row
+    .col
+      .alert.alert-danger(role="alert")
+        h4
+          i.fas.fa-exclamation-triangle.mr-2
+          | Non-Authorized Access
+        hr
+        p.mb-0
+          | This service is only accessible to Lafayette students. Faculty members and staff are currently not eligible to use the service.

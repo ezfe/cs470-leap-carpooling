@@ -4,7 +4,13 @@ import { format } from 'url'
 import xml from 'xml2js'
 import { normalize, stripPrefix } from 'xml2js/lib/processors'
 import db from '../db'
-import { getUserByID, getUserByNetID, setLoggedInAs, setLoggedOut, User } from '../models/users'
+import {
+  getUserByID,
+  getUserByNetID,
+  setLoggedInAs,
+  setLoggedOut,
+  User,
+} from '../models/users'
 import { AuthedReq } from '../utils/authed_req'
 import axios from 'axios'
 import { internalError } from './errors/internal-error'
@@ -51,7 +57,7 @@ routes.get('/logout', (req, res) => {
         service,
       },
     })
-  
+
     res.redirect(casURL)
   }
 })
@@ -79,11 +85,11 @@ if (process.env.CAS_DISABLED === 'true') {
   routes.post('/create-user', async (req: AuthedReq, res: Response) => {
     try {
       await db<User>('users').insert({
-          netid: req.body.netid,
-          first_name: req.body.first_name,
-          last_name: req.body.last_name,
-          created_at: db.fn.now()
-        })
+        netid: req.body.netid,
+        first_name: req.body.first_name,
+        last_name: req.body.last_name,
+        created_at: db.fn.now(),
+      })
       const user = await getUserByNetID(req.body.netid)
       setLoggedInAs(req, user)
       res.redirect('/')
@@ -112,40 +118,6 @@ if (process.env.CAS_DISABLED === 'true') {
         tagNameProcessors: [normalize, stripPrefix],
       })
 
-      const sampleParse = await xml.parseStringPromise(`<cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
-      <cas:authenticationSuccess>
-          <cas:user>eline</cas:user>
-          <cas:attributes>
-              <cas:eduPersonEntitlement>https://carpool.cs.lafayette.edu/student</cas:eduPersonEntitlement>
-              <cas:eduPersonEntitlement>https://carpool.cs.lafayette.edu/faculty</cas:eduPersonEntitlement>
-              <cas:isFromNewLogin>false</cas:isFromNewLogin>
-              <cas:bypassMultifactorAuthentication>false</cas:bypassMultifactorAuthentication>
-              <cas:authenticationDate>2020-05-08T23:27:50.743689Z</cas:authenticationDate>
-              <cas:authnContextClass>mfa-duo</cas:authnContextClass>
-              <cas:givenName>Ezekiel</cas:givenName>
-              <cas:successfulAuthenticationHandlers>LdapAuthenticationHandler</cas:successfulAuthenticationHandlers>
-              <cas:successfulAuthenticationHandlers>mfa-duo</cas:successfulAuthenticationHandlers>
-              <cas:credentialType>UsernamePasswordCredential</cas:credentialType>
-              <cas:credentialType>DuoSecurityCredential</cas:credentialType>
-              <cas:samlAuthenticationStatementAuthMethod>urn:oasis:names:tc:SAML:1.0:am:password</cas:samlAuthenticationStatementAuthMethod>
-              <cas:samlAuthenticationStatementAuthMethod>urn:oasis:names:tc:SAML:1.0:am:unspecified</cas:samlAuthenticationStatementAuthMethod>
-              <cas:authenticationMethod>LdapAuthenticationHandler</cas:authenticationMethod>
-              <cas:authenticationMethod>mfa-duo</cas:authenticationMethod>
-              <cas:surname>Elin</cas:surname>
-              <cas:longTermAuthenticationRequestTokenUsed>false</cas:longTermAuthenticationRequestTokenUsed>
-              </cas:attributes>
-      </cas:authenticationSuccess>
-  </cas:serviceResponse>
-  `, {
-    trim: true,
-    normalize: true,
-    explicitArray: false,
-    tagNameProcessors: [normalize, stripPrefix],
-  })
-
-      console.log('CAS XML Payload (parsed):')
-      console.log(JSON.stringify(sampleParse))
-
       const failure = parsedXML.serviceresponse.authenticationfailure
       if (failure) {
         console.error('CAS authentication failed (' + failure.$.code + ').')
@@ -153,8 +125,31 @@ if (process.env.CAS_DISABLED === 'true') {
         return
       }
 
+      // eslint-disable-next-line no-inner-declarations
+      function isStudent(eduPersonEntitlement) {
+        const searchKey = 'faculty'
+        if (Array.isArray(eduPersonEntitlement)) {
+          for (const entitlement of eduPersonEntitlement) {
+            if (entitlement.indexOf(searchKey) >= 0) {
+              return true
+            }
+          }
+          return false
+        } else if (typeof eduPersonEntitlement == 'string') {
+          return eduPersonEntitlement.indexOf(searchKey) >= 0
+        } else {
+          return false
+        }
+      }
+
       const success = parsedXML.serviceresponse.authenticationsuccess
       if (success) {
+        if (!isStudent(success.edupersonentitlement)) {
+          // The person logging in is not a student
+          res.render('errors/non-authorized-role')
+          return
+        }
+
         const netid = success.user
         const firstName = success.attributes.givenname
         const lastName = success.attributes.surname
@@ -172,12 +167,14 @@ if (process.env.CAS_DISABLED === 'true') {
           res.redirect('/')
           return
         } else {
-          const inserted = await db<User>('users').insert({
-            netid,
-            first_name: firstName,
-            last_name: lastName,
-            created_at: db.fn.now()
-          }).returning<User[]>('*')
+          const inserted = await db<User>('users')
+            .insert({
+              netid,
+              first_name: firstName,
+              last_name: lastName,
+              created_at: db.fn.now(),
+            })
+            .returning<User[]>('*')
 
           if (inserted.length === 0) {
             console.error('Failed to find or insert new record')
