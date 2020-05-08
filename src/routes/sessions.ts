@@ -207,7 +207,7 @@ if (process.env.CAS_DISABLED === 'true') {
   })
 }
 
-routes.get('students-only', (req: ReqAuthedReq, res: Response) => {
+routes.get('/students-only', (req: ReqAuthedReq, res: Response) => {
   res.render('errors/non-authorized-role')
 })
 
